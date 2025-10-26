@@ -64,9 +64,7 @@ const GymOwnerDashboard = () => {
             <Text style={styles.activityTime}>5 hours ago</Text>
           </View>
           <View style={styles.activityItem}>
-            <Text style={styles.activityText}>
-              Payment received: $150.00
-            </Text>
+            <Text style={styles.activityText}>Payment received: $150.00</Text>
             <Text style={styles.activityTime}>1 day ago</Text>
           </View>
         </View>

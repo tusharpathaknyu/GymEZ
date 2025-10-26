@@ -7,6 +7,12 @@ import {Text} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
+const iconStyle = {fontSize: 24};
+
+const DashboardIcon = () => <Text style={iconStyle}>🏠</Text>;
+const BrowseIcon = () => <Text style={iconStyle}>🔍</Text>;
+const MembershipsIcon = () => <Text style={iconStyle}>💳</Text>;
+
 const GymMemberNavigator = () => {
   return (
     <Tab.Navigator
@@ -25,7 +31,7 @@ const GymMemberNavigator = () => {
         component={DashboardScreen}
         options={{
           tabBarLabel: 'Dashboard',
-          tabBarIcon: ({color}) => <Text style={{fontSize: 24}}>🏠</Text>,
+          tabBarIcon: DashboardIcon,
         }}
       />
       <Tab.Screen
@@ -33,7 +39,7 @@ const GymMemberNavigator = () => {
         component={BrowseGymsScreen}
         options={{
           tabBarLabel: 'Browse',
-          tabBarIcon: ({color}) => <Text style={{fontSize: 24}}>🔍</Text>,
+          tabBarIcon: BrowseIcon,
         }}
       />
       <Tab.Screen
@@ -41,7 +47,7 @@ const GymMemberNavigator = () => {
         component={MyMembershipsScreen}
         options={{
           tabBarLabel: 'Memberships',
-          tabBarIcon: ({color}) => <Text style={{fontSize: 24}}>💳</Text>,
+          tabBarIcon: MembershipsIcon,
         }}
       />
     </Tab.Navigator>

@@ -3,8 +3,15 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import DashboardScreen from '../screens/GymOwner/DashboardScreen';
 import MembersScreen from '../screens/GymOwner/MembersScreen';
 import FacilitiesScreen from '../screens/GymOwner/FacilitiesScreen';
+import {Text} from 'react-native';
 
 const Tab = createBottomTabNavigator();
+
+const iconStyle = {fontSize: 24};
+
+const DashboardIcon = () => <Text style={iconStyle}>📊</Text>;
+const MembersIcon = () => <Text style={iconStyle}>👥</Text>;
+const FacilitiesIcon = () => <Text style={iconStyle}>🏋️</Text>;
 
 const GymOwnerNavigator = () => {
   return (
@@ -24,7 +31,7 @@ const GymOwnerNavigator = () => {
         component={DashboardScreen}
         options={{
           tabBarLabel: 'Dashboard',
-          tabBarIcon: ({color}) => <Text style={{fontSize: 24}}>📊</Text>,
+          tabBarIcon: DashboardIcon,
         }}
       />
       <Tab.Screen
@@ -32,7 +39,7 @@ const GymOwnerNavigator = () => {
         component={MembersScreen}
         options={{
           tabBarLabel: 'Members',
-          tabBarIcon: ({color}) => <Text style={{fontSize: 24}}>👥</Text>,
+          tabBarIcon: MembersIcon,
         }}
       />
       <Tab.Screen
@@ -40,14 +47,11 @@ const GymOwnerNavigator = () => {
         component={FacilitiesScreen}
         options={{
           tabBarLabel: 'Facilities',
-          tabBarIcon: ({color}) => <Text style={{fontSize: 24}}>🏋️</Text>,
+          tabBarIcon: FacilitiesIcon,
         }}
       />
     </Tab.Navigator>
   );
 };
-
-// Import Text component
-import {Text} from 'react-native';
 
 export default GymOwnerNavigator;
