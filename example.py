@@ -1,6 +1,10 @@
 """Example usage of the GymEZ user models.
 
 This script demonstrates how to create and use gym owners and gym members.
+
+NOTE: This is a demonstration script using fake data for educational purposes.
+In a production environment, sensitive data like emergency contacts should not
+be logged or printed in plain text.
 """
 
 from models.user import GymOwner, GymMember
