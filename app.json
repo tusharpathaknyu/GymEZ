@@ -1,0 +1,25 @@
+{
+  "name": "gymez",
+  "displayName": "GYMEZ",
+  "expo": {
+    "name": "GYMEZ",
+    "slug": "gymez",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.gymez.app"
+    },
+    "plugins": [
+      [
+        "@react-native-google-signin/google-signin"
+      ]
+    ]
+  }
+}

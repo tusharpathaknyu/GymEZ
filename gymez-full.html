@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏋️ GYMEZ - Complete Fitness App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .header {
+            background: linear-gradient(135deg, #4F46E5 0%, #10B981 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .stats-container {
+            display: flex;
+            padding: 20px;
+            justify-content: space-around;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4F46E5;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6B7280;
+            margin-top: 4px;
+        }
+        .features-container {
+            padding: 20px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+        .feature-card {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .feature-icon {
+            font-size: 32px;
+            margin-right: 16px;
+        }
+        .feature-text {
+            flex: 1;
+        }
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .feature-desc {
+            font-size: 14px;
+            color: #6B7280;
+            margin-top: 4px;
+        }
+        .action-button {
+            background: linear-gradient(135deg, #4F46E5 0%, #10B981 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        .action-button:hover {
+            opacity: 0.9;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 414px;
+            background: white;
+            display: flex;
+            border-top: 1px solid #e9ecef;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .nav-item {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-item:hover {
+            background: #f8f9fa;
+        }
+        .nav-icon {
+            font-size: 20px;
+            display: block;
+        }
+        .nav-label {
+            font-size: 10px;
+            margin-top: 4px;
+            color: #6B7280;
+        }
+        .timer-display {
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+        .timer-time {
+            font-size: 36px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        .hidden {
+            display: none;
+        }
+        .challenge-badge {
+            background: #fbbf24;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .social-post {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4F46E5 0%, #10B981 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        .post-content {
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .post-actions {
+            display: flex;
+            gap: 16px;
+            color: #6B7280;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="title">🏋️ GYMEZ</div>
+            <div class="subtitle">Your Complete Fitness Companion</div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard" class="view">
+            <!-- Stats Overview -->
+            <div class="stats-container">
+                <div class="stat">
+                    <div class="stat-number" id="workoutCount">3</div>
+                    <div class="stat-label">Workouts</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="minutesCount">45</div>
+                    <div class="stat-label">Minutes</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="caloriesCount">320</div>
+                    <div class="stat-label">Calories</div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="features-container">
+                <div class="section-title">🚀 Features</div>
+                
+                <div class="feature-card" onclick="showWorkoutBuilder()">
+                    <div class="feature-icon">🏃‍♀️</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Workout Builder</div>
+                        <div class="feature-desc">Create custom routines</div>
+                    </div>
+                </div>
+
+                <div class="feature-card" onclick="showWorkoutTimer()">
+                    <div class="feature-icon">⏱️</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Workout Timer</div>
+                        <div class="feature-desc">Track your sessions</div>
+                    </div>
+                </div>
+
+                <div class="feature-card" onclick="showChallenges()">
+                    <div class="feature-icon">🏆</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Challenges</div>
+                        <div class="feature-desc">Monthly fitness goals</div>
+                    </div>
+                </div>
+
+                <div class="feature-card" onclick="showSocialFeed()">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Social Feed</div>
+                        <div class="feature-desc">Connect with community</div>
+                    </div>
+                </div>
+
+                <div class="feature-card" onclick="showAnalytics()">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Analytics</div>
+                        <div class="feature-desc">Track your progress</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workout Builder -->
+        <div id="workoutBuilder" class="view hidden">
+            <div class="features-container">
+                <div class="section-title">🏃‍♀️ Workout Builder</div>
+                
+                <div class="feature-card">
+                    <div class="feature-text">
+                        <div class="feature-title">Push-ups</div>
+                        <div class="feature-desc">3 sets × 15 reps</div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-text">
+                        <div class="feature-title">Squats</div>
+                        <div class="feature-desc">3 sets × 20 reps</div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-text">
+                        <div class="feature-title">Planks</div>
+                        <div class="feature-desc">3 sets × 60 seconds</div>
+                    </div>
+                </div>
+                
+                <button class="action-button" onclick="alert('Adding new exercise!')">➕ Add Exercise</button>
+                <button class="action-button" onclick="alert('Workout saved!')">💾 Save Workout</button>
+            </div>
+        </div>
+
+        <!-- Workout Timer -->
+        <div id="workoutTimer" class="view hidden">
+            <div class="features-container">
+                <div class="section-title">⏱️ Workout Timer</div>
+                
+                <div class="timer-display">
+                    <div class="timer-time" id="timerDisplay">00:00</div>
+                    <div style="margin-top: 10px; font-size: 16px;">Current Exercise: Push-ups</div>
+                </div>
+                
+                <button class="action-button" onclick="startTimer()">▶️ Start Timer</button>
+                <button class="action-button" onclick="pauseTimer()">⏸️ Pause Timer</button>
+                <button class="action-button" onclick="resetTimer()">🔄 Reset Timer</button>
+            </div>
+        </div>
+
+        <!-- Challenges -->
+        <div id="challenges" class="view hidden">
+            <div class="features-container">
+                <div class="section-title">🏆 Challenges</div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔥</div>
+                    <div class="feature-text">
+                        <div class="feature-title">30-Day Push-up Challenge</div>
+                        <div class="feature-desc">Day 15/30 • <span class="challenge-badge">IN PROGRESS</span></div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🏃</div>
+                    <div class="feature-text">
+                        <div class="feature-title">10K Steps Daily</div>
+                        <div class="feature-desc">7,850/10,000 steps today</div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💪</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Strength Builder</div>
+                        <div class="feature-desc">Complete 20 strength workouts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Feed -->
+        <div id="socialFeed" class="view hidden">
+            <div class="features-container">
+                <div class="section-title">👥 Social Feed</div>
+                
+                <div class="social-post">
+                    <div class="post-header">
+                        <div class="avatar">JD</div>
+                        <div>
+                            <div style="font-weight: 600;">John Doe</div>
+                            <div style="font-size: 12px; color: #6B7280;">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="post-content">Just completed my morning workout! 💪 Feeling strong and ready for the day!</div>
+                    <div class="post-actions">
+                        <span onclick="alert('Liked!')">❤️ 12 likes</span>
+                        <span onclick="alert('Commenting!')">💬 3 comments</span>
+                    </div>
+                </div>
+                
+                <div class="social-post">
+                    <div class="post-header">
+                        <div class="avatar">SM</div>
+                        <div>
+                            <div style="font-weight: 600;">Sarah Miller</div>
+                            <div style="font-size: 12px; color: #6B7280;">4 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="post-content">New personal record! 🎉 Bench pressed 135 lbs today. The gym grind pays off!</div>
+                    <div class="post-actions">
+                        <span onclick="alert('Liked!')">❤️ 18 likes</span>
+                        <span onclick="alert('Commenting!')">💬 7 comments</span>
+                    </div>
+                </div>
+                
+                <button class="action-button" onclick="alert('Creating new post!')">📝 Create Post</button>
+            </div>
+        </div>
+
+        <!-- Analytics -->
+        <div id="analytics" class="view hidden">
+            <div class="features-container">
+                <div class="section-title">📊 Analytics</div>
+                
+                <div class="feature-card">
+                    <div class="feature-text">
+                        <div class="feature-title">Weekly Progress</div>
+                        <div class="feature-desc">5 workouts • +2 from last week</div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-text">
+                        <div class="feature-title">Strength Gains</div>
+                        <div class="feature-desc">+15% improvement this month</div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-text">
+                        <div class="feature-title">Consistency Score</div>
+                        <div class="feature-desc">87% • Excellent!</div>
+                    </div>
+                </div>
+                
+                <div class="timer-display">
+                    <div style="font-size: 18px; margin-bottom: 10px;">🎯 Monthly Goal</div>
+                    <div style="font-size: 24px; font-weight: bold;">16/20 Workouts</div>
+                    <div style="font-size: 14px; margin-top: 8px; opacity: 0.8;">4 more to reach your goal!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item" onclick="showDashboard()">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </div>
+            <div class="nav-item" onclick="showWorkoutBuilder()">
+                <div class="nav-icon">🏃‍♀️</div>
+                <div class="nav-label">Workout</div>
+            </div>
+            <div class="nav-item" onclick="showChallenges()">
+                <div class="nav-icon">🏆</div>
+                <div class="nav-label">Challenges</div>
+            </div>
+            <div class="nav-item" onclick="showSocialFeed()">
+                <div class="nav-icon">👥</div>
+                <div class="nav-label">Social</div>
+            </div>
+            <div class="nav-item" onclick="showAnalytics()">
+                <div class="nav-icon">📊</div>
+                <div class="nav-label">Analytics</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let isRunning = false;
+
+        function hideAllViews() {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.add('hidden');
+            });
+        }
+
+        function showDashboard() {
+            hideAllViews();
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        function showWorkoutBuilder() {
+            hideAllViews();
+            document.getElementById('workoutBuilder').classList.remove('hidden');
+        }
+
+        function showWorkoutTimer() {
+            hideAllViews();
+            document.getElementById('workoutTimer').classList.remove('hidden');
+        }
+
+        function showChallenges() {
+            hideAllViews();
+            document.getElementById('challenges').classList.remove('hidden');
+        }
+
+        function showSocialFeed() {
+            hideAllViews();
+            document.getElementById('socialFeed').classList.remove('hidden');
+        }
+
+        function showAnalytics() {
+            hideAllViews();
+            document.getElementById('analytics').classList.remove('hidden');
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimer() {
+            document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    updateTimer();
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(timerInterval);
+            }
+        }
+
+        function resetTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            updateTimer();
+        }
+
+        // Simulate live data updates
+        setInterval(() => {
+            const workoutCount = document.getElementById('workoutCount');
+            const minutesCount = document.getElementById('minutesCount');
+            const caloriesCount = document.getElementById('caloriesCount');
+            
+            if (Math.random() > 0.95) {
+                workoutCount.textContent = parseInt(workoutCount.textContent) + 1;
+                minutesCount.textContent = parseInt(minutesCount.textContent) + Math.floor(Math.random() * 30) + 15;
+                caloriesCount.textContent = parseInt(caloriesCount.textContent) + Math.floor(Math.random() * 100) + 50;
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
