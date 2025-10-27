@@ -13,6 +13,7 @@ import {
 import {GymService} from '../services/gymService';
 import {Gym} from '../types';
 import {useAuth} from '../services/auth';
+import nycGyms from '../data/nycGyms';
 
 interface GymSelectionProps {
   visible: boolean;
@@ -33,6 +34,15 @@ const GymSelection: React.FC<GymSelectionProps> = ({
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+  const [showNYCGyms, setShowNYCGyms] = useState(true);
+
+  useEffect(() => {
+    // Load NYC gyms by default
+    if (visible && showNYCGyms) {
+      setGyms(nycGyms as any[]);
+      setHasSearched(true);
+    }
+  }, [visible, showNYCGyms]);
 
   const searchGyms = async () => {
     if (!pincode.trim() && !searchQuery.trim()) {
@@ -60,6 +70,7 @@ const GymSelection: React.FC<GymSelectionProps> = ({
 
       setGyms(gymsWithCounts);
       setHasSearched(true);
+      setShowNYCGyms(false);
     } catch (error) {
       console.error('Error searching gyms:', error);
       Alert.alert('Error', 'Failed to search gyms. Please try again.');
@@ -92,7 +103,7 @@ const GymSelection: React.FC<GymSelectionProps> = ({
       </View>
       
       <Text style={styles.gymAddress}>{gym.address}</Text>
-      <Text style={styles.pincode}>Pincode: {gym.pincode}</Text>
+      <Text style={styles.pincode}>📍 NYC - {gym.pincode}</Text>
       
       {gym.description && (
         <Text style={styles.description} numberOfLines={2}>
@@ -106,7 +117,7 @@ const GymSelection: React.FC<GymSelectionProps> = ({
             <Text style={styles.memberCount}>👥 {gym.memberCount} members</Text>
           )}
           {gym.membership_cost && (
-            <Text style={styles.cost}>💰 ₹{gym.membership_cost}/month</Text>
+            <Text style={styles.cost}>💰 ${gym.membership_cost}/month</Text>
           )}
         </View>
         

@@ -77,7 +77,25 @@ export class SocialService {
       return this.formatPosts(data, userId);
     } catch (error) {
       console.error('Get feed posts error:', error);
-      throw error;
+      // Return empty array instead of throwing
+      return [];
+    }
+  }
+
+  /**
+   * Get following user IDs
+   */
+  static async getFollowingIds(userId: string): Promise<string> {
+    try {
+      const {data} = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', userId);
+      
+      const ids = data?.map(f => f.following_id) || [userId];
+      return ids.join(',');
+    } catch (error) {
+      return userId; // If error, just return self
     }
   }
 
@@ -146,7 +164,57 @@ export class SocialService {
   }
 
   /**
-   * Like/Unlike a post
+   * Add reaction to a post (supports 5 reaction types)
+   */
+  static async addReaction(postId: string, userId: string, reactionType: string = 'like'): Promise<boolean> {
+    try {
+      // Check if user already reacted
+      const {data: existingReaction} = await supabase
+        .from('post_likes')
+        .select('id, reaction_type')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .single();
+
+      if (existingReaction) {
+        // Update reaction type
+        if (existingReaction.reaction_type === reactionType) {
+          // Same reaction - remove it
+          await supabase
+            .from('post_likes')
+            .delete()
+            .eq('post_id', postId)
+            .eq('user_id', userId);
+          return false;
+        } else {
+          // Different reaction - update it
+          await supabase
+            .from('post_likes')
+            .update({reaction_type: reactionType})
+            .eq('post_id', postId)
+            .eq('user_id', userId);
+          return true;
+        }
+      }
+
+      // Add new reaction
+      await supabase
+        .from('post_likes')
+        .insert({
+          post_id: postId,
+          user_id: userId,
+          reaction_type: reactionType,
+        });
+
+      return true;
+    } catch (error) {
+      console.error('Add reaction error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Like/Unlike a post (backward compatibility)
    */
   static async toggleLike(postId: string, userId: string): Promise<boolean> {
     try {

@@ -10,10 +10,14 @@ import {
   RefreshControl,
   TextInput,
   Modal,
+  Animated,
 } from 'react-native';
 import {SocialService} from '../services/socialService';
 import {useAuth} from '../services/auth';
 import {Post, PostComment} from '../types';
+import ReactionButtons from './ReactionButtons';
+import StoryView from './StoryView';
+import EnhancedPost from './EnhancedPost';
 
 interface SocialFeedProps {
   gymId?: string;
@@ -159,13 +163,19 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
         <View style={styles.userInfo}>
-          {post.user?.profile_picture && (
+          {post.user?.profile_picture ? (
             <Image 
               source={{uri: post.user.profile_picture}} 
               style={styles.avatar}
             />
+          ) : (
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarText}>
+                {post.user?.full_name?.charAt(0) || 'U'}
+              </Text>
+            </View>
           )}
-          <View>
+          <View style={styles.userInfoText}>
             <Text style={styles.userName}>{post.user?.full_name || 'Unknown User'}</Text>
             {post.user?.username && (
               <Text style={styles.username}>@{post.user.username}</Text>
@@ -184,18 +194,20 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
       )}
 
       <View style={styles.postActions}>
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => handleLike(post.id)}>
-          <Text style={[styles.actionText, post.is_liked && styles.likedText]}>
-            {post.is_liked ? '❤️' : '🤍'} {post.likes_count || 0}
-          </Text>
-        </TouchableOpacity>
+        <ReactionButtons
+          postId={post.id}
+          initialLikes={post.likes_count || 0}
+          onLike={() => handleLike(post.id)}
+        />
 
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => handleComment(post)}>
           <Text style={styles.actionText}>💬 {post.comments_count || 0}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionText}>📤 Share</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -215,10 +227,18 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
     <View style={styles.container}>
       <FlatList
         data={posts}
-        renderItem={renderPost}
+        renderItem={({item}) => (
+          <EnhancedPost
+            post={item}
+            onLike={handleLike}
+            onComment={handleComment}
+            formatTime={formatTime}
+          />
+        )}
+        ListHeaderComponent={<StoryView />}
         keyExtractor={item => item.id}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#10b981" />
         }
         contentContainerStyle={styles.feedContainer}
         showsVerticalScrollIndicator={false}
@@ -298,11 +318,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     marginRight: 10,
-    backgroundColor: '#e5e7eb',
+  },
+  avatarPlaceholder: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#10b981',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  avatarText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  userInfoText: {
+    flex: 1,
   },
   userName: {
     fontSize: 16,
@@ -310,7 +346,7 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   username: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6b7280',
   },
   timeAgo: {
@@ -340,7 +376,7 @@ const styles = StyleSheet.create({
   },
   postActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     paddingTop: 15,
     borderTopWidth: 1,
     borderTopColor: '#f3f4f6',

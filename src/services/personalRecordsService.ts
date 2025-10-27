@@ -180,6 +180,29 @@ export class PersonalRecordsService {
   }
 
   /**
+   * Get recent PRs for a user
+   */
+  static async getRecentPRs(userId: string, limit: number = 10): Promise<PersonalRecord[]> {
+    try {
+      const {data, error} = await supabase
+        .from('personal_records')
+        .select('*')
+        .eq('user_id', userId)
+        .order('achieved_at', {ascending: false})
+        .limit(limit);
+
+      if (error) {
+        throw new Error(`Failed to fetch recent PRs: ${error.message}`);
+      }
+
+      return data as PersonalRecord[];
+    } catch (error) {
+      console.error('Get recent PRs error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get PR stats for a user
    */
   static async getUserPRStats(userId: string): Promise<{

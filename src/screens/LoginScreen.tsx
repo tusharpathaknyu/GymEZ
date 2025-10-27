@@ -384,11 +384,12 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 36,
+    fontSize: 42,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
     color: '#059669',
+    letterSpacing: -1,
   },
   subtitle: {
     fontSize: 18,
