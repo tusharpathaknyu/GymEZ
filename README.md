@@ -1,6 +1,25 @@
-# GYMEZ - Social Fitness Platform
+# 🏋️ GYMEZ - Complete Fitness App
 
-A comprehensive React Native mobile application that combines gym management with social fitness features. Users can track personal records, share achievements, and build fitness communities.
+A comprehensive React Native fitness application with real-time camera functionality, social features, and gym management capabilities. Built with modern TypeScript, React Native, and Supabase backend with full camera integration for PR video recording.
+
+## 🚀 Latest Updates (October 27, 2025)
+
+### ✨ Major New Features Added:
+- **🎥 Real Camera Integration** - Record PR videos with phone's camera (WebRTC + MediaRecorder)
+- **⚙️ Comprehensive Settings Menu** - Professional settings with account, preferences, privacy, and support
+- **🍔 Modern Navigation** - Hamburger menu with slide-out navigation replacing bottom tabs
+- **🌐 Browser Demo** - Full HTML/CSS/JS implementation for testing and demonstration
+- **📱 Enhanced Mobile UX** - Card-based layouts, animations, and responsive design
+- **🔄 Cross-Platform Deployment** - Browser testing via Python server + Android ADB deployment
+
+### 🎯 Enhanced User Experience:
+- Modern hamburger navigation with emoji icons and smooth animations
+- Professional camera interface with exercise selection and weight tracking
+- Real-time recording timer with front/back camera switching
+- Comprehensive settings with notifications, units, privacy controls
+- Social feed with interactive posts, likes, and community features
+- Challenge system with progress bars and achievement tracking
+- Leaderboard with rankings, points, and crown for top users
 
 ## 🎯 Core Features
 
