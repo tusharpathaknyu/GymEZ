@@ -1,7 +1,7 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import {supabase} from './supabase';
 import {User, UserType, AuthContextType} from '../types';
-import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
+// import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext<AuthContextType>({
@@ -28,34 +28,28 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Configure Google Sign-In
-    GoogleSignin.configure({
-      webClientId: 'YOUR_WEB_CLIENT_ID', // Replace with your Google Web Client ID
-      offlineAccess: true,
-    });
+    // Skip Google Sign-In configuration for now
+    // GoogleSignin.configure({
+    //   webClientId: 'YOUR_WEB_CLIENT_ID',
+    //   offlineAccess: true,
+    // });
 
-    // Check for existing session
-    supabase.auth.getSession().then(({data: {session}}) => {
-      if (session?.user) {
-        fetchUserProfile(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    });
+    // Skip Supabase session check for now - set loading to false
+    setLoading(false);
 
-    // Listen for auth changes
-    const {data: {subscription}} = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          await fetchUserProfile(session.user.id);
-        } else {
-          setUser(null);
-          setLoading(false);
-        }
-      }
-    );
+    // Skip auth state listener for now
+    // const {data: {subscription}} = supabase.auth.onAuthStateChange(
+    //   async (event, session) => {
+    //     if (session?.user) {
+    //       await fetchUserProfile(session.user.id);
+    //     } else {
+    //       setUser(null);
+    //       setLoading(false);
+    //     }
+    //   }
+    // );
 
-    return () => subscription.unsubscribe();
+    // return () => subscription.unsubscribe();
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
@@ -115,25 +109,8 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
   };
 
   const signInWithGoogle = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const result = await GoogleSignin.signIn();
-      
-      // For now, we'll use a simplified approach
-      // In production, you would configure proper Google OAuth with Supabase
-      throw new Error('Google Sign-In will be configured with your Google OAuth credentials');
-      
-    } catch (error: any) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        throw new Error('Sign-in was cancelled');
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        throw new Error('Sign-in is already in progress');
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        throw new Error('Google Play Services not available');
-      } else {
-        throw error;
-      }
-    }
+    // Google Sign-In temporarily disabled - requires proper OAuth setup
+    throw new Error('Google Sign-In will be configured with your Google OAuth credentials');
   };
 
   const resetPassword = async (email: string) => {

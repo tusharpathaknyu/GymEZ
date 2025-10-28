@@ -29,8 +29,8 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
   const [workoutStartTime, setWorkoutStartTime] = useState<Date | null>(null);
   const [restStartTime, setRestStartTime] = useState<Date | null>(null);
   
-  const workoutIntervalRef = useRef<NodeJS.Timeout>();
-  const restIntervalRef = useRef<NodeJS.Timeout>();
+  const workoutIntervalRef = useRef<ReturnType<typeof setInterval>>();
+  const restIntervalRef = useRef<ReturnType<typeof setInterval>>();
   const appStateRef = useRef(AppState.currentState);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;

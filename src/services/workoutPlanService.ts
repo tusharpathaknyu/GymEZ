@@ -369,8 +369,8 @@ export class WorkoutPlanService {
     });
     
     const favoriteExercises = Object.entries(exerciseCounts)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
+      .map(([name, count]: [string, number]) => ({ name, count }))
+      .sort((a: {name: string; count: number}, b: {name: string; count: number}) => b.count - a.count)
       .slice(0, 5);
     
     // Calculate weekly stats (last 8 weeks)

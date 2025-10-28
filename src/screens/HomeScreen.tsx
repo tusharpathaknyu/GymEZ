@@ -409,5 +409,13 @@ const styles = StyleSheet.create({
   },
 });
 
+HomeScreen.options = {
+  topBar: {
+    title: {
+      text: 'GymEZ'
+    }
+  }
+};
+
 export default HomeScreen;
 

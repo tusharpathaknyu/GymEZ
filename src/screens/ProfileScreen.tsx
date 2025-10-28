@@ -18,7 +18,7 @@ import FindFriends from '../components/FindFriends';
 import AchievementBadges from '../components/AchievementBadges';
 import GymComparison from '../components/GymComparison';
 
-const ProfileScreen = () => {
+const ProfileScreen = ({navigation}: any) => {
   const {user, signOut} = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [profilePic, setProfilePic] = useState<string | null>(user?.profile_picture || null);

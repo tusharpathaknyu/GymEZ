@@ -14,7 +14,7 @@ import {
 import {useAuth} from '../services/auth';
 import {UserType, Gym} from '../types';
 import OnboardingFlow from '../components/OnboardingFlow';
-import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
+// import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
 
 const LoginScreen = ({navigation}: any) => {
   const [email, setEmail] = useState('');
@@ -337,13 +337,13 @@ const LoginScreen = ({navigation}: any) => {
             <View style={styles.dividerLine} />
           </View>
 
-          <GoogleSigninButton
+          <TouchableOpacity
             style={styles.googleButton}
-            size={GoogleSigninButton.Size.Wide}
-            color={GoogleSigninButton.Color.Dark}
             onPress={handleGoogleSignIn}
             disabled={loading}
-          />
+          >
+            <Text style={styles.buttonText}>Continue with Google</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.switchButton}
