@@ -7,19 +7,36 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "backgroundColor": "#10b981",
+    "primaryColor": "#10b981",
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gymez.app"
     },
     "android": {
-      "package": "com.gymez.app"
+      "package": "com.gymez.app",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
     },
     "plugins": [
       [
         "@react-native-google-signin/google-signin"
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c5bc702b-da74-4e29-ab81-9fd6fbf815fc"
+      }
+    },
+    "owner": "tpathak1411"
   }
 }
