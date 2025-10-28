@@ -82,22 +82,7 @@ export class SocialService {
     }
   }
 
-  /**
-   * Get following user IDs
-   */
-  static async getFollowingIds(userId: string): Promise<string> {
-    try {
-      const {data} = await supabase
-        .from('follows')
-        .select('following_id')
-        .eq('follower_id', userId);
-      
-      const ids = data?.map(f => f.following_id) || [userId];
-      return ids.join(',');
-    } catch (error) {
-      return userId; // If error, just return self
-    }
-  }
+
 
   /**
    * Get gym-specific posts

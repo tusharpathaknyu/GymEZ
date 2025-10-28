@@ -77,12 +77,12 @@ const HomeScreen = ({navigation}: any) => {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#10b981" />
-      }
-    >
+    <View style={styles.container}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#10b981" />
+        }
+      >
       {/* Welcome Header */}
       <View style={styles.header}>
         <View>
@@ -203,15 +203,15 @@ const HomeScreen = ({navigation}: any) => {
       <PRAnalytics />
     </ScrollView>
 
-    {/* PR Log Form Modal */}
-    <PRLogForm
-      visible={showPRForm}
-      onClose={() => setShowPRForm(false)}
-      onSuccess={() => {
-        loadData();
-      }}
+      {/* PR Log Form Modal */}
+      <PRLogForm
+        visible={showPRForm}
+        onClose={() => setShowPRForm(false)}
+        onSuccess={() => {
+          loadData();
+        }}
       />
-    </ScrollView>
+    </View>
   );
 };
 

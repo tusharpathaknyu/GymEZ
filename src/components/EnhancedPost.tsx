@@ -92,16 +92,16 @@ const EnhancedPost: React.FC<EnhancedPostProps> = ({
       </View>
 
       {/* Quick Stats */}
-      {(post.likes_count || post.comments_count) && (
+      {((post.likes_count || 0) > 0 || (post.comments_count || 0) > 0) && (
         <View style={styles.quickStats}>
-          {post.likes_count > 0 && (
+          {(post.likes_count || 0) > 0 && (
             <Text style={styles.quickStatText}>
-              ❤️ {post.likes_count} {post.likes_count === 1 ? 'like' : 'likes'}
+              ❤️ {post.likes_count || 0} {(post.likes_count || 0) === 1 ? 'like' : 'likes'}
             </Text>
           )}
-          {post.comments_count > 0 && (
+          {(post.comments_count || 0) > 0 && (
             <Text style={styles.quickStatText}>
-              💬 {post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}
+              💬 {post.comments_count || 0} {(post.comments_count || 0) === 1 ? 'comment' : 'comments'}
             </Text>
           )}
         </View>
