@@ -1,0 +1,123 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.gymez.app"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+8-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="33" />
+9-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:3:5-67
+11-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:3:22-64
+12    <uses-permission android:name="android.permission.CAMERA" />
+12-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:4:5-65
+12-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:4:22-62
+13    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+13-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:5:5-80
+13-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:5:22-77
+14    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+14-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:6:5-81
+14-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:6:22-78
+15    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+15-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:7:5-79
+15-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:7:22-76
+16
+17    <uses-feature
+17-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:8:5-85
+18        android:name="android.hardware.camera"
+18-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:8:19-57
+19        android:required="false" />
+19-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:8:58-82
+20    <uses-feature
+20-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:9:5-95
+21        android:name="android.hardware.camera.autofocus"
+21-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:9:19-67
+22        android:required="false" />
+22-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:9:68-92
+23
+24    <permission
+24-->[androidx.core:core:1.9.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/31dd2fd25ee9a0eaa021c7cd8a443f22/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+25        android:name="com.gymez.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+25-->[androidx.core:core:1.9.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/31dd2fd25ee9a0eaa021c7cd8a443f22/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+26        android:protectionLevel="signature" />
+26-->[androidx.core:core:1.9.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/31dd2fd25ee9a0eaa021c7cd8a443f22/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+27
+28    <uses-permission android:name="com.gymez.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+28-->[androidx.core:core:1.9.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/31dd2fd25ee9a0eaa021c7cd8a443f22/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+28-->[androidx.core:core:1.9.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/31dd2fd25ee9a0eaa021c7cd8a443f22/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+29
+30    <application
+30-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:11:5-32:19
+31        android:name="com.gymez.app.MainApplication"
+31-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:12:7-38
+32        android:allowBackup="false"
+32-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:16:7-34
+33        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+33-->[androidx.core:core:1.9.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/31dd2fd25ee9a0eaa021c7cd8a443f22/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+34        android:debuggable="true"
+35        android:icon="@mipmap/ic_launcher"
+35-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:14:7-41
+36        android:label="@string/app_name"
+36-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:13:7-39
+37        android:roundIcon="@mipmap/ic_launcher_round"
+37-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:15:7-52
+38        android:supportsRtl="true"
+38-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:19:7-33
+39        android:theme="@style/AppTheme"
+39-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:17:7-38
+40        android:usesCleartextTraffic="true" >
+40-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:18:7-42
+41        <activity
+41-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:20:7-31:18
+42            android:name="com.gymez.app.MainActivity"
+42-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:21:9-37
+43            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+43-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:23:9-118
+44            android:exported="true"
+44-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:26:9-32
+45            android:label="@string/app_name"
+45-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:22:9-41
+46            android:launchMode="singleTask"
+46-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:24:9-40
+47            android:windowSoftInputMode="adjustResize" >
+47-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:25:9-51
+48            <intent-filter>
+48-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:27:9-30:25
+49                <action android:name="android.intent.action.MAIN" />
+49-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:28:13-65
+49-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:28:21-62
+50
+51                <category android:name="android.intent.category.LAUNCHER" />
+51-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:29:13-73
+51-->/Users/tushardhananjaypathak/Desktop/GYMEZ/android/app/src/main/AndroidManifest.xml:29:23-70
+52            </intent-filter>
+53        </activity>
+54
+55        <provider
+55-->[androidx.emoji2:emoji2:1.2.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/4fba12ef4182f687d009f13c4de2cd9c/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+56            android:name="androidx.startup.InitializationProvider"
+56-->[androidx.emoji2:emoji2:1.2.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/4fba12ef4182f687d009f13c4de2cd9c/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+57            android:authorities="com.gymez.app.androidx-startup"
+57-->[androidx.emoji2:emoji2:1.2.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/4fba12ef4182f687d009f13c4de2cd9c/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+58            android:exported="false" >
+58-->[androidx.emoji2:emoji2:1.2.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/4fba12ef4182f687d009f13c4de2cd9c/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+59            <meta-data
+59-->[androidx.emoji2:emoji2:1.2.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/4fba12ef4182f687d009f13c4de2cd9c/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+60                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+60-->[androidx.emoji2:emoji2:1.2.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/4fba12ef4182f687d009f13c4de2cd9c/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+61                android:value="androidx.startup" />
+61-->[androidx.emoji2:emoji2:1.2.0] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/4fba12ef4182f687d009f13c4de2cd9c/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+62            <meta-data
+62-->[androidx.lifecycle:lifecycle-process:2.4.1] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/182c6acf2d047ec1c362279ce2c7618c/transformed/lifecycle-process-2.4.1/AndroidManifest.xml:31:13-33:52
+63                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+63-->[androidx.lifecycle:lifecycle-process:2.4.1] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/182c6acf2d047ec1c362279ce2c7618c/transformed/lifecycle-process-2.4.1/AndroidManifest.xml:32:17-78
+64                android:value="androidx.startup" />
+64-->[androidx.lifecycle:lifecycle-process:2.4.1] /Users/tushardhananjaypathak/.gradle/caches/transforms-3/182c6acf2d047ec1c362279ce2c7618c/transformed/lifecycle-process-2.4.1/AndroidManifest.xml:33:17-49
+65        </provider>
+66    </application>
+67
+68</manifest>
