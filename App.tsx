@@ -14,44 +14,53 @@ import {
 import { WorkoutService } from './src/services/WorkoutService';
 import { ProgressService } from './src/services/ProgressService';
 import { GymService } from './src/services/gymService';
-import { AuthProvider, useAuth } from './src/context/AuthContext';
-import { AuthScreen } from './src/screens/AuthScreen';
+import { AuthProvider, useAuth } from './src/services/auth';
+import LoginScreen from './src/screens/LoginScreen';
+import GoogleAuthService from './src/services/GoogleAuthService';
+import PRScreen from './src/screens/PRScreen';
 
 type ScreenType = 'auth' | 'home' | 'workout' | 'progress' | 'gyms';
 
 // Main app component that handles authentication flow
 function MainApp(): React.JSX.Element {
-  const { state } = useAuth();
+  const { user } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
 
+  // Initialize Google Sign-In when app starts
+  React.useEffect(() => {
+    const initializeGoogleSignIn = async () => {
+      try {
+        const googleAuth = GoogleAuthService.getInstance();
+        await googleAuth.configure();
+        console.log('Google Sign-In initialized successfully');
+      } catch (error) {
+        console.log('Google Sign-In initialization failed, using mock mode:', error);
+      }
+    };
+
+    initializeGoogleSignIn();
+  }, []);
+
   // Show auth screen if not authenticated
-  if (!state.isAuthenticated) {
+  if (!user) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#10b981" />
-        <AuthScreen 
-          onLoginSuccess={() => {
-            // Auth context will handle the state update
-            setCurrentScreen('home');
-          }}
-          onNavigateToApp={() => {
-            // Allow users to skip authentication for demo
-            setCurrentScreen('home');
-          }}
-        />
+        <LoginScreen navigation={{ navigate: () => setCurrentScreen('home') }} />
       </SafeAreaView>
     );
   }
 
-  return <AuthenticatedApp currentScreen={currentScreen} setCurrentScreen={setCurrentScreen} />;
+  return <AuthenticatedApp currentScreen={currentScreen} setCurrentScreen={setCurrentScreen} user={user} />;
 }
 
 // Authenticated app component
-function AuthenticatedApp({ currentScreen, setCurrentScreen }: {
+function AuthenticatedApp({ currentScreen, setCurrentScreen, user }: {
   currentScreen: ScreenType;
   setCurrentScreen: (screen: ScreenType) => void;
+  user: any;
 }): React.JSX.Element {
-  const { state, logout } = useAuth();
+  const { signOut } = useAuth();
 
   const handleLogout = async () => {
     Alert.alert(
@@ -60,7 +69,7 @@ function AuthenticatedApp({ currentScreen, setCurrentScreen }: {
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Logout', onPress: async () => {
-          await logout();
+          await signOut();
           setCurrentScreen('home');
         }}
       ]
@@ -124,70 +133,8 @@ function AuthenticatedApp({ currentScreen, setCurrentScreen }: {
   };
 
   const renderProgressScreen = () => {
-    const mockStats = {
-      totalWorkouts: 47,
-      currentStreak: 5,
-      caloriesBurned: 8540,
-      avgDuration: 30
-    };
-
-    const mockGoals = [
-      { id: '1', title: 'Lose 10 kg', current: 75, target: 70, unit: 'kg' },
-      { id: '2', title: 'Bench Press 100kg', current: 85, target: 100, unit: 'kg' },
-      { id: '3', title: 'Run 5K under 25min', current: 28, target: 25, unit: 'min' }
-    ];
-
-    return (
-      <ScrollView style={styles.screenContainer}>
-        <Text style={styles.screenTitle}>Your Progress</Text>
-        
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{mockStats.totalWorkouts}</Text>
-            <Text style={styles.statLabel}>Total Workouts</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{mockStats.currentStreak}</Text>
-            <Text style={styles.statLabel}>Day Streak</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{mockStats.caloriesBurned}</Text>
-            <Text style={styles.statLabel}>Calories Burned</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{mockStats.avgDuration}m</Text>
-            <Text style={styles.statLabel}>Avg Duration</Text>
-          </View>
-        </View>
-
-        <Text style={styles.sectionTitle}>Fitness Goals</Text>
-        {mockGoals.map(goal => {
-          const progress = Math.min((goal.current / goal.target) * 100, 100);
-          return (
-            <View key={goal.id} style={styles.goalCard}>
-              <Text style={styles.goalTitle}>{goal.title}</Text>
-              <Text style={styles.goalProgress}>
-                {goal.current} / {goal.target} {goal.unit} ({Math.round(progress)}%)
-              </Text>
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${progress}%` }]} />
-              </View>
-            </View>
-          );
-        })}
-        
-        <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Add Goal', 'Create a new fitness goal to track your progress!')}>
-          <Text style={styles.buttonText}>Add New Goal</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.button, styles.backButton]} onPress={handleBackToHome}>
-          <Text style={[styles.buttonText, styles.backButtonText]}>← Back to Home</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    );
-  };
-
-  const renderGymsScreen = () => {
+    return <PRScreen onBackToHome={handleBackToHome} />;
+  };  const renderGymsScreen = () => {
     const gyms = GymService.getMockNearbyGyms();
     
     return (
@@ -234,11 +181,11 @@ function AuthenticatedApp({ currentScreen, setCurrentScreen }: {
               <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
           </View>
-          {state.user && (
+          {user && (
             <View style={styles.userWelcome}>
-              <Text style={styles.welcomeText}>Welcome back, {state.user.full_name}!</Text>
+              <Text style={styles.welcomeText}>Welcome back, {user.full_name}!</Text>
               <Text style={styles.userTypeText}>
-                {state.user.user_type === 'gym_owner' ? '🏋️ Gym Owner' : '💪 Gym Member'}
+                {user.user_type === 'gym_owner' ? '🏋️ Gym Owner' : '💪 Gym Member'}
               </Text>
             </View>
           )}
@@ -529,6 +476,49 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 12,
     opacity: 0.9,
+  },
+  authContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#10b981',
+  },
+  authSubtitle: {
+    color: '#ffffff',
+    fontSize: 16,
+    marginBottom: 40,
+    textAlign: 'center',
+    opacity: 0.9,
+  },
+  skipButton: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    width: '100%',
+    alignItems: 'center',
+  },
+  skipButtonText: {
+    color: '#10b981',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  authButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    width: '100%',
+    alignItems: 'center',
+  },
+  authButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

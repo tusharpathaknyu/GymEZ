@@ -10,16 +10,18 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useAuth } from '../context/AuthContext';
+import GoogleAuthService from '../services/GoogleAuthService';
+import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
 interface AuthScreenProps {
-  onLoginSuccess: (user: any) => void;
   onNavigateToApp: () => void;
 }
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ 
-  onLoginSuccess, 
-  onNavigateToApp 
+  onNavigateToApp,
 }) => {
+  const { login, signup, state } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -72,48 +74,39 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
       if (isLogin) {
-        // Mock login success
-        const mockUser = {
-          id: 'user_123',
-          email: formData.email,
-          full_name: 'Demo User',
-          user_type: 'gym_member',
-          is_private: false,
-        };
-        
-        Alert.alert(
-          'Success!', 
-          'Login successful! Welcome back to GYMEZ.',
-          [{ text: 'Continue', onPress: () => onLoginSuccess(mockUser) }]
-        );
+        await login(formData.email, formData.password);
+        if (!state.error) {
+          Alert.alert(
+            'Success!', 
+            'Login successful! Welcome back to GYMEZ.',
+            [{ text: 'OK', onPress: onNavigateToApp }]
+          );
+        }
       } else {
-        // Mock signup success
-        Alert.alert(
-          'Success!', 
-          'Account created successfully! Welcome to GYMEZ.',
-          [{ text: 'Continue', onPress: () => {
-            const mockUser = {
-              id: 'user_' + Date.now(),
-              email: formData.email,
-              full_name: formData.fullName,
-              user_type: formData.userType,
-              is_private: false,
-            };
-            onLoginSuccess(mockUser);
-          }}]
+        await signup(
+          formData.email, 
+          formData.password, 
+          formData.fullName, 
+          formData.userType
         );
+        if (!state.error) {
+          Alert.alert(
+            'Success!', 
+            'Account created successfully! Welcome to GYMEZ.',
+            [{ text: 'OK', onPress: onNavigateToApp }]
+          );
+        }
       }
     } catch (error) {
-      Alert.alert('Error', 'Authentication failed. Please try again.');
+      Alert.alert('Error', state.error || 'Authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -132,6 +125,34 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const switchMode = () => {
     setIsLogin(!isLogin);
     resetForm();
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const googleAuth = GoogleAuthService.getInstance();
+      await googleAuth.configure();
+      const { user, error } = await googleAuth.signIn();
+      
+      if (error) {
+        Alert.alert('Google Sign-In Error', error);
+        return;
+      }
+      
+      if (user) {
+        // Create a local user from Google user data
+        await signup(user.email, 'google_password_' + user.id, user.name, 'gym_member');
+        Alert.alert(
+          'Success!',
+          'Signed in with Google successfully!',
+          [{ text: 'OK', onPress: onNavigateToApp }]
+        );
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Google Sign-In failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -249,6 +270,17 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
               {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
             </Text>
           </TouchableOpacity>
+
+          {/* Google Sign-In Button */}
+          <View style={styles.googleButtonContainer}>
+            <GoogleSigninButton
+              style={styles.googleSigninButton}
+              size={GoogleSigninButton.Size.Wide}
+              color={GoogleSigninButton.Color.Light}
+              onPress={handleGoogleSignIn}
+              disabled={loading}
+            />
+          </View>
 
           <View style={styles.switchContainer}>
             <Text style={styles.switchText}>
@@ -373,6 +405,28 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: '#ffffff',
     fontSize: 18,
+    fontWeight: '600',
+  },
+  googleButtonContainer: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  googleSigninButton: {
+    width: '100%',
+    height: 48,
+  },
+  googleButton: {
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#e5e7eb',
+    borderRadius: 12,
+    paddingVertical: 16,
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  googleButtonText: {
+    color: '#1f2937',
+    fontSize: 16,
     fontWeight: '600',
   },
   switchContainer: {

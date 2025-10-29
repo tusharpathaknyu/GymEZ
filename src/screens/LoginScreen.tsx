@@ -14,7 +14,8 @@ import {
 import {useAuth} from '../services/auth';
 import {UserType, Gym} from '../types';
 import OnboardingFlow from '../components/OnboardingFlow';
-// import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
+import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
+import CustomGoogleSignInButton from '../components/CustomGoogleSignInButton';
 
 const LoginScreen = ({navigation}: any) => {
   const [email, setEmail] = useState('');
@@ -130,12 +131,15 @@ const LoginScreen = ({navigation}: any) => {
   };
 
   const handleGoogleSignIn = async () => {
+    console.log('Google Sign-In button pressed!');
     setLoading(true);
     try {
       await signInWithGoogle();
       Alert.alert('Success', 'Signed in with Google successfully!');
+      console.log('Google Sign-In completed successfully');
     } catch (error: any) {
-      Alert.alert('Google Sign-In Error', error.message);
+      console.log('Google Sign-In error:', error.message);
+      Alert.alert('Google Sign-In Error', error.message || 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }
@@ -338,11 +342,15 @@ const LoginScreen = ({navigation}: any) => {
           </View>
 
           <TouchableOpacity
-            style={styles.googleButton}
+            style={[styles.googleButton, loading && styles.buttonDisabled]}
             onPress={handleGoogleSignIn}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>Continue with Google</Text>
+            disabled={loading}>
+            <View style={styles.googleButtonContent}>
+              <View style={styles.googleIconContainer}>
+                <Text style={styles.googleIcon}>G</Text>
+              </View>
+              <Text style={styles.googleButtonText}>Continue with Google</Text>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -519,9 +527,49 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   googleButton: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#dadce0',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     width: '100%',
     height: 48,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  googleButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  googleIconContainer: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#4285f4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  googleIcon: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  googleButtonText: {
+    color: '#3c4043',
+    fontSize: 16,
+    fontWeight: '500',
   },
   switchButton: {
     alignItems: 'center',

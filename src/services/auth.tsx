@@ -3,6 +3,9 @@ import {supabase} from './supabase';
 import {User, UserType, AuthContextType} from '../types';
 // import {GoogleSignin, GoogleSigninButton, statusCodes} from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LocalAuthService} from './LocalAuthService';
+import {AuthService} from './AuthService';
+import GoogleAuthService from './GoogleAuthService';
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -28,28 +31,46 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Skip Google Sign-In configuration for now
-    // GoogleSignin.configure({
-    //   webClientId: 'YOUR_WEB_CLIENT_ID',
-    //   offlineAccess: true,
-    // });
+    const initializeAuth = async () => {
+      setLoading(true);
+      try {
+        // Try to get current user from local storage
+        const {user: localUser} = await LocalAuthService.getCurrentUser();
+        if (localUser) {
+          setUser(localUser as User);
+        }
+      } catch (error) {
+        console.warn('Failed to load user session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Skip Supabase session check for now - set loading to false
-    setLoading(false);
+    initializeAuth();
 
-    // Skip auth state listener for now
-    // const {data: {subscription}} = supabase.auth.onAuthStateChange(
-    //   async (event, session) => {
-    //     if (session?.user) {
-    //       await fetchUserProfile(session.user.id);
-    //     } else {
-    //       setUser(null);
-    //       setLoading(false);
-    //     }
-    //   }
-    // );
+    // Try to set up Supabase auth listener
+    try {
+      const {data: {subscription}} = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          if (session?.user) {
+            await fetchUserProfile(session.user.id);
+          } else {
+            // Check local auth when Supabase session is null
+            const {user: localUser} = await LocalAuthService.getCurrentUser();
+            if (localUser) {
+              setUser(localUser as User);
+            } else {
+              setUser(null);
+            }
+          }
+          setLoading(false);
+        }
+      );
 
-    // return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    } catch (error) {
+      console.warn('Supabase auth listener not available, using local auth only');
+    }
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
@@ -71,46 +92,135 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
   };
 
   const signIn = async (email: string, password: string) => {
-    const {error} = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      // Try Supabase first, fall back to local auth
+      const {error} = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) throw error;
+      if (error) {
+        // Fall back to local auth
+        const {user, error: localError} = await LocalAuthService.signIn({email, password});
+        if (localError) throw new Error(localError);
+        if (user) {
+          setUser(user as User);
+        }
+        return;
+      }
+    } catch (error) {
+      // Use local auth as primary method
+      const {user, error: localError} = await LocalAuthService.signIn({email, password});
+      if (localError) throw new Error(localError);
+      if (user) {
+        setUser(user as User);
+      }
+    }
   };
 
   const signUp = async (email: string, password: string, fullName: string, userType: UserType, gymId?: string) => {
-    const {data: authData, error: authError} = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    try {
+      // Try Supabase first, fall back to local auth
+      const {data: authData, error: authError} = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    if (authError) throw authError;
-
-    if (authData.user) {
-      // Create user profile
-      const {error: profileError} = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
+      if (authError) {
+        // Fall back to local auth
+        const {user: localUser, error: localError} = await LocalAuthService.signUp({
           email,
-          full_name: fullName,
-          user_type: userType,
-          gym_id: gymId,
+          password,
+          fullName,
+          userType,
         });
+        if (localError) throw new Error(localError);
+        if (localUser) {
+          setUser(localUser as User);
+        }
+        return;
+      }
 
-      if (profileError) throw profileError;
+      if (authData.user) {
+        // Create user profile in Supabase
+        const {error: profileError} = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email,
+            full_name: fullName,
+            user_type: userType,
+            gym_id: gymId,
+          });
+
+        if (profileError) throw profileError;
+      }
+    } catch (error) {
+      // Use local auth as primary method
+      const {user: localUser, error: localError} = await LocalAuthService.signUp({
+        email,
+        password,
+        fullName,
+        userType,
+      });
+      if (localError) throw new Error(localError);
+      if (localUser) {
+        setUser(localUser as User);
+      }
     }
   };
 
   const signOut = async () => {
-    const {error} = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      // Try Supabase logout
+      const {error} = await supabase.auth.signOut();
+      if (error) {
+        console.warn('Supabase logout failed, using local logout');
+      }
+    } catch (error) {
+      console.warn('Supabase not available, using local logout');
+    }
+    
+    // Always do local logout
+    await LocalAuthService.signOut();
+    setUser(null);
   };
 
   const signInWithGoogle = async () => {
-    // Google Sign-In temporarily disabled - requires proper OAuth setup
-    throw new Error('Google Sign-In will be configured with your Google OAuth credentials');
+    try {
+      // Use the GoogleAuthService to handle Google Sign-In
+      const googleAuth = GoogleAuthService.getInstance();
+      const result = await googleAuth.signIn();
+      
+      if (result.user) {
+        // Create a local user record for Google sign-in
+        const googleUser = {
+          id: 'google_' + result.user.id,
+          email: result.user.email,
+          full_name: result.user.name,
+          user_type: 'gym_member' as UserType,
+          profile_picture: result.user.photo,
+          is_private: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        
+        // Save to local storage
+        await LocalAuthService.signUp({
+          email: googleUser.email,
+          password: 'google_oauth', // Placeholder password for Google users
+          fullName: googleUser.full_name,
+          userType: googleUser.user_type,
+        });
+        
+        setUser(googleUser as User);
+      } else if (result.error) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Google Sign-In failed:', error);
+      throw error;
+    }
   };
 
   const resetPassword = async (email: string) => {
