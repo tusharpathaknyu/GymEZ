@@ -31,6 +31,7 @@ android/build/
 android/.gradle/
 android/app/.cxx/
 android/local.properties
+android/app/google-services.json
 *.apk
 *.aab
 
