@@ -1,13 +1,91 @@
 import {supabase} from './supabase';
 import {Gym} from '../types';
 
+// Enhanced Gym Service with mock data and real functionality
 export class GymService {
+  // Mock gym data for NYC area
+  static getMockNearbyGyms(): Gym[] {
+    return [
+      {
+        id: 'gym_1',
+        name: 'Equinox Tribeca',
+        address: '101 Avenue of the Americas',
+        city: 'New York',
+        state: 'NY',
+        zip_code: '10013',
+        phone: '(212) 334-4900',
+        latitude: 40.7238,
+        longitude: -74.0054,
+        rating: 4.5,
+        price_range: 5,
+        amenities: [
+          'Swimming Pool', 'Sauna', 'Steam Room', 'Personal Training',
+          'Group Classes', 'Locker Rooms', 'Towel Service', 'Parking'
+        ],
+        hours: {
+          'Monday': { open: '05:00', close: '23:00' },
+          'Tuesday': { open: '05:00', close: '23:00' },
+          'Wednesday': { open: '05:00', close: '23:00' },
+          'Thursday': { open: '05:00', close: '23:00' },
+          'Friday': { open: '05:00', close: '22:00' },
+          'Saturday': { open: '07:00', close: '21:00' },
+          'Sunday': { open: '07:00', close: '21:00' }
+        },
+        photos: ['gym1_1.jpg'],
+        description: 'Premium fitness club with state-of-the-art equipment',
+        membership_types: [
+          {
+            name: 'All Access',
+            price_monthly: 185,
+            benefits: ['Access to all locations', 'Group classes', 'Pool access']
+          }
+        ]
+      },
+      {
+        id: 'gym_2', 
+        name: 'Planet Fitness - Manhattan',
+        address: '538 9th Avenue',
+        city: 'New York',
+        state: 'NY', 
+        zip_code: '10018',
+        phone: '(212) 564-4653',
+        latitude: 40.7569,
+        longitude: -73.9873,
+        rating: 3.8,
+        price_range: 1,
+        amenities: [
+          'Cardio Equipment', 'Weight Training', 'Locker Rooms',
+          'HydroMassage', 'Massage Chairs', 'Free Fitness Training'
+        ],
+        hours: {
+          'Monday': { open: '04:00', close: '00:00' },
+          'Tuesday': { open: '04:00', close: '00:00' },
+          'Wednesday': { open: '04:00', close: '00:00' },
+          'Thursday': { open: '04:00', close: '00:00' },
+          'Friday': { open: '04:00', close: '22:00' },
+          'Saturday': { open: '06:00', close: '22:00' },
+          'Sunday': { open: '06:00', close: '22:00' }
+        },
+        photos: ['gym2_1.jpg'],
+        description: 'Affordable gym with judgment-free environment',
+        membership_types: [
+          {
+            name: 'Classic',
+            price_monthly: 10,
+            benefits: ['Access to home club', 'Free fitness training']
+          }
+        ]
+      }
+    ];
+  }
+
   /**
    * Get gyms near a pincode (simplified - in production you'd use geocoding API)
    */
   static async getNearbyGyms(userPincode: string, limit: number = 10): Promise<Gym[]> {
     try {
-      // For now, we'll do a simple search by pincode
+      // Return mock data for now
+      return this.getMockNearbyGyms().slice(0, limit);
       // In production, you'd convert pincode to lat/lng and calculate distances
       const {data, error} = await supabase
         .from('gyms')
