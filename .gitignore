@@ -87,3 +87,6 @@ Thumbs.db
 
 # Environment
 .env
+# Build outputs
+android/app/build/
+*.apk
