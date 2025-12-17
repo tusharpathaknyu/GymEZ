@@ -18,7 +18,7 @@ import FindFriends from '../components/FindFriends';
 import AchievementBadges from '../components/AchievementBadges';
 import GymComparison from '../components/GymComparison';
 
-const ProfileScreen = ({ navigation: _navigation }: any) => {
+const ProfileScreen = ({ navigation }: any) => {
   const { user, signOut } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [profilePic, setProfilePic] = useState<string | null>(
@@ -182,7 +182,23 @@ const ProfileScreen = ({ navigation: _navigation }: any) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header Actions */}
+      <View style={styles.headerActions}>
+        <TouchableOpacity 
+          style={styles.headerButton}
+          onPress={() => navigation.navigate('Notifications')}
+        >
+          <Text style={styles.headerButtonIcon}>🔔</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.headerButton}
+          onPress={() => navigation.navigate('Settings')}
+        >
+          <Text style={styles.headerButtonIcon}>⚙️</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Profile Header */}
       <View style={styles.profileHeader}>
         <TouchableOpacity
@@ -452,6 +468,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9fafb',
+  },
+  headerActions: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    flexDirection: 'row',
+    gap: 12,
+    zIndex: 10,
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerButtonIcon: {
+    fontSize: 18,
   },
   profileHeader: {
     backgroundColor: '#fff',

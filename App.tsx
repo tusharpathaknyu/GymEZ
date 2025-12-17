@@ -15,6 +15,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import GoogleAuthService from './src/services/GoogleAuthService';
 import PRScreen from './src/screens/PRScreen';
 import { User } from './src/types';
+import { ToastProvider } from './src/components/Toast';
 
 type ScreenType = 'auth' | 'home' | 'workout' | 'progress' | 'gyms';
 
@@ -651,9 +652,11 @@ const styles = StyleSheet.create({
 // Root App component with AuthProvider
 function App(): React.JSX.Element {
   return (
-    <AuthProvider>
-      <MainApp />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <MainApp />
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

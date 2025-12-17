@@ -17,6 +17,9 @@ import ProgressPhotos from '../components/ProgressPhotos';
 import QuickActions from '../components/QuickActions';
 import PRLogForm from '../components/PRLogForm';
 import PRAnalytics from '../components/PRAnalytics';
+import SearchBar from '../components/SearchBar';
+import CheckInButton from '../components/CheckInButton';
+import { SlideInView, FadeInView } from '../components/AnimatedComponents';
 
 const HomeScreen = ({ navigation }: any) => {
   const { user } = useAuth();
@@ -90,39 +93,123 @@ const HomeScreen = ({ navigation }: any) => {
             tintColor="#10b981"
           />
         }
+        showsVerticalScrollIndicator={false}
       >
         {/* Welcome Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Welcome back,</Text>
-            <Text style={styles.userName}>
-              {user?.full_name?.split(' ')[0] || 'Member'}! 👋
-            </Text>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.greeting}>Welcome back,</Text>
+              <Text style={styles.userName}>
+                {user?.full_name?.split(' ')[0] || 'Member'}! 👋
+              </Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.notificationButton}
+              onPress={() => navigation.navigate('Notifications')}
+            >
+              <Text style={styles.notificationIcon}>🔔</Text>
+              <View style={styles.notificationBadge} />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+            <SearchBar 
+              placeholder="Search exercises, users, gyms..."
+              onResultSelect={(result) => {
+                console.log('Selected:', result);
+                // Navigate based on type
+              }}
+            />
           </View>
         </View>
+
+        {/* Quick Check-in Card */}
+        <FadeInView delay={100}>
+          <View style={styles.checkInCard}>
+            <CheckInButton onCheckInSuccess={loadData} onCheckOutSuccess={loadData} />
+          </View>
+        </FadeInView>
+
+        {/* Quick Actions Grid - Industry Features */}
+        <SlideInView direction="up" delay={150}>
+          <View style={styles.quickActionsGrid}>
+            <TouchableOpacity 
+              style={[styles.quickActionCard, styles.primaryActionCard]}
+              onPress={() => navigation.navigate('LiveWorkout')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.actionIconContainer}>
+                <Text style={styles.actionIcon}>🏋️</Text>
+              </View>
+              <Text style={[styles.actionTitle, { color: '#fff' }]}>Start Workout</Text>
+              <Text style={[styles.actionSubtitle, { color: 'rgba(255,255,255,0.8)' }]}>Track in real-time</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => navigation.navigate('ExerciseLibrary')}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.actionIconContainer, { backgroundColor: '#fef3c7' }]}>
+                <Text style={styles.actionIcon}>📚</Text>
+              </View>
+              <Text style={styles.actionTitle}>Exercises</Text>
+              <Text style={styles.actionSubtitle}>Library</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => navigation.navigate('Activity')}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.actionIconContainer, { backgroundColor: '#e0e7ff' }]}>
+                <Text style={styles.actionIcon}>📊</Text>
+              </View>
+              <Text style={styles.actionTitle}>Activity</Text>
+              <Text style={styles.actionSubtitle}>History</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => navigation.getParent()?.navigate('Leaderboard')}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.actionIconContainer, { backgroundColor: '#fce7f3' }]}>
+                <Text style={styles.actionIcon}>🏆</Text>
+              </View>
+              <Text style={styles.actionTitle}>Leaderboard</Text>
+              <Text style={styles.actionSubtitle}>Rankings</Text>
+            </TouchableOpacity>
+          </View>
+        </SlideInView>
 
         {/* Quick Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statIcon}>🏆</Text>
-            <Text style={styles.statNumber}>{stats?.totalPRs || 0}</Text>
-            <Text style={styles.statLabel}>Total PRs</Text>
+        <SlideInView direction="up" delay={200}>
+          <View style={styles.statsContainer}>
+            <TouchableOpacity style={styles.statCard} activeOpacity={0.7}>
+              <Text style={styles.statIcon}>🏆</Text>
+              <Text style={styles.statNumber}>{stats?.totalPRs || 0}</Text>
+              <Text style={styles.statLabel}>Total PRs</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statCard} activeOpacity={0.7}>
+              <Text style={styles.statIcon}>💪</Text>
+              <Text style={styles.statNumber}>
+                {stats?.exercisesWithPRs?.length || 0}
+              </Text>
+              <Text style={styles.statLabel}>Exercises</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statCard} activeOpacity={0.7}>
+              <Text style={styles.statIcon}>🔥</Text>
+              <Text style={styles.statNumber}>{recentPRs.length}</Text>
+              <Text style={styles.statLabel}>This Week</Text>
+            </TouchableOpacity>
           </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statIcon}>💪</Text>
-            <Text style={styles.statNumber}>
-              {stats?.exercisesWithPRs?.length || 0}
-            </Text>
-            <Text style={styles.statLabel}>Exercises</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statIcon}>🔥</Text>
-            <Text style={styles.statNumber}>{recentPRs.length}</Text>
-            <Text style={styles.statLabel}>This Week</Text>
-          </View>
-        </View>
+        </SlideInView>
 
         {/* Recent PRs Section */}
+        <SlideInView direction="up" delay={300}>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent PRs 🏅</Text>
@@ -166,8 +253,10 @@ const HomeScreen = ({ navigation }: any) => {
             </View>
           )}
         </View>
+        </SlideInView>
 
         {/* Recent Activity */}
+        <SlideInView direction="up" delay={400}>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Activity 📰</Text>
@@ -207,18 +296,30 @@ const HomeScreen = ({ navigation }: any) => {
             </View>
           )}
         </View>
+        </SlideInView>
 
         {/* Workout Streak */}
-        <WorkoutStreak />
+        <SlideInView direction="up" delay={500}>
+          <WorkoutStreak />
+        </SlideInView>
 
         {/* Progress Photos */}
-        <ProgressPhotos />
+        <SlideInView direction="up" delay={600}>
+          <ProgressPhotos />
+        </SlideInView>
 
         {/* Quick Actions */}
-        <QuickActions onPress={() => setShowPRForm(true)} />
+        <SlideInView direction="up" delay={700}>
+          <QuickActions onPress={() => setShowPRForm(true)} />
+        </SlideInView>
 
         {/* PR Analytics */}
-        <PRAnalytics />
+        <SlideInView direction="up" delay={800}>
+          <PRAnalytics />
+        </SlideInView>
+
+        {/* Bottom padding */}
+        <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* PR Log Form Modal */}
@@ -247,7 +348,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#fff',
     paddingTop: 60,
-    paddingBottom: 30,
+    paddingBottom: 20,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
@@ -256,6 +357,42 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 3,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  notificationButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#f3f4f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  notificationIcon: {
+    fontSize: 22,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#ef4444',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  searchContainer: {
+    marginTop: 4,
+  },
+  checkInCard: {
+    marginHorizontal: 20,
+    marginTop: 16,
   },
   greeting: {
     fontSize: 16,
@@ -424,6 +561,50 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    marginTop: 16,
+    gap: 12,
+  },
+  quickActionCard: {
+    width: '47%',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  primaryActionCard: {
+    backgroundColor: '#10b981',
+  },
+  actionIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  actionIcon: {
+    fontSize: 28,
+  },
+  actionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  actionSubtitle: {
+    fontSize: 12,
+    color: '#6b7280',
   },
 });
 
