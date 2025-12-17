@@ -5,7 +5,7 @@ export interface UserProfile {
   age?: number;
   height_cm?: number;
   weight_kg?: number;
-  fitness_level: "beginner" | "intermediate" | "advanced";
+  fitness_level: 'beginner' | 'intermediate' | 'advanced';
   goals: string[];
   preferred_workout_types: string[];
   created_at: string;
@@ -52,7 +52,7 @@ export interface FitnessGoal {
   current_value: number;
   unit: string;
   target_date: string;
-  category: "weight" | "strength" | "endurance" | "habits" | "body_composition";
+  category: 'weight' | 'strength' | 'endurance' | 'habits' | 'body_composition';
   completed: boolean;
   created_at: string;
 }

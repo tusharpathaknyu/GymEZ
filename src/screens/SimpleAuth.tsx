@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 interface SimpleAuthProps {
   onNavigateToApp: () => void;
@@ -17,14 +11,14 @@ export const SimpleAuth: React.FC<SimpleAuthProps> = ({ onNavigateToApp }) => {
   const handleTestLogin = () => {
     Alert.alert('Test', 'Login button works!', [
       { text: 'Go to App', onPress: onNavigateToApp },
-      { text: 'Cancel', style: 'cancel' }
+      { text: 'Cancel', style: 'cancel' },
     ]);
   };
 
   const handleTestSignup = () => {
     Alert.alert('Test', 'Signup button works!', [
       { text: 'Go to App', onPress: onNavigateToApp },
-      { text: 'Cancel', style: 'cancel' }
+      { text: 'Cancel', style: 'cancel' },
     ]);
   };
 
@@ -34,7 +28,7 @@ export const SimpleAuth: React.FC<SimpleAuthProps> = ({ onNavigateToApp }) => {
       setLoading(false);
       Alert.alert('Success', 'Google Sign-In works! (Mock)', [
         { text: 'Go to App', onPress: onNavigateToApp },
-        { text: 'Cancel', style: 'cancel' }
+        { text: 'Cancel', style: 'cancel' },
       ]);
     }, 1000);
   };
@@ -44,24 +38,24 @@ export const SimpleAuth: React.FC<SimpleAuthProps> = ({ onNavigateToApp }) => {
       <Text style={styles.title}>GYMEZ</Text>
       <Text style={styles.subtitle}>Test Authentication</Text>
 
-      <TouchableOpacity 
-        style={[styles.button, styles.loginButton]} 
+      <TouchableOpacity
+        style={[styles.button, styles.loginButton]}
         onPress={handleTestLogin}
         disabled={loading}
       >
         <Text style={styles.buttonText}>Test Login</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.button, styles.signupButton]} 
+      <TouchableOpacity
+        style={[styles.button, styles.signupButton]}
         onPress={handleTestSignup}
         disabled={loading}
       >
         <Text style={styles.buttonText}>Test Signup</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.button, styles.googleButton]} 
+      <TouchableOpacity
+        style={[styles.button, styles.googleButton]}
         onPress={handleTestGoogle}
         disabled={loading}
       >
@@ -70,8 +64,8 @@ export const SimpleAuth: React.FC<SimpleAuthProps> = ({ onNavigateToApp }) => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.button, styles.skipButton]} 
+      <TouchableOpacity
+        style={[styles.button, styles.skipButton]}
         onPress={onNavigateToApp}
       >
         <Text style={styles.skipButtonText}>Skip to App</Text>

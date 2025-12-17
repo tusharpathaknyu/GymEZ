@@ -1,5 +1,5 @@
 import React from 'react';
-import {TouchableOpacity, Text, StyleSheet, View, Image} from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 
 interface GoogleSignInButtonProps {
   onPress: () => void;
@@ -16,7 +16,8 @@ const CustomGoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
     <TouchableOpacity
       style={[styles.button, disabled && styles.disabled, style]}
       onPress={onPress}
-      disabled={disabled}>
+      disabled={disabled}
+    >
       <View style={styles.content}>
         <View style={styles.iconContainer}>
           <Text style={styles.googleIcon}>G</Text>

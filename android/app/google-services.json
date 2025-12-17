@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "895230403778",
+    "project_id": "gymez-fitness-app",
+    "storage_bucket": "gymez-fitness-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895230403778:android:a1b2c3d4e5f6g7h8i9j0k1",
+        "android_client_info": {
+          "package_name": "com.gymez.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "895230403778-androidclientidforandroidapp123456.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gymez.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "895230403778-7a4klalvtmjr7iokdqrj17e7pdirli5p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmockApiKeyForGymezDevelopmentTesting123456"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "895230403778-7a4klalvtmjr7iokdqrj17e7pdirli5p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

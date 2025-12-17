@@ -1,28 +1,24 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import {useAuth} from '../services/auth';
-import {PersonalRecordsService} from '../services/personalRecordsService';
-import {supabase} from '../services/supabase';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useAuth } from '../services/auth';
+import { PersonalRecordsService } from '../services/personalRecordsService';
 
 const AchievementBadges = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [badges, setBadges] = useState<any[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [_stats, setStats] = useState<any>(null);
 
   useEffect(() => {
     if (user?.id) {
       loadBadges();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadBadges = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     try {
       const statsData = await PersonalRecordsService.getUserPRStats(user.id);
@@ -131,12 +127,14 @@ const AchievementBadges = () => {
         {badges.map(badge => (
           <View
             key={badge.id}
-            style={[
-              styles.badgeCard,
-              !badge.unlocked && styles.badgeLocked,
-            ]}
+            style={[styles.badgeCard, !badge.unlocked && styles.badgeLocked]}
           >
-            <Text style={[styles.badgeIcon, !badge.unlocked && styles.badgeIconLocked]}>
+            <Text
+              style={[
+                styles.badgeIcon,
+                !badge.unlocked && styles.badgeIconLocked,
+              ]}
+            >
               {badge.icon}
             </Text>
             <Text style={styles.badgeName}>{badge.name}</Text>
@@ -207,7 +205,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
@@ -246,4 +244,3 @@ const styles = StyleSheet.create({
 });
 
 export default AchievementBadges;
-

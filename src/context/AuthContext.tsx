@@ -19,7 +19,12 @@ type AuthAction =
 interface AuthContextType {
   state: AuthState;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, fullName: string, userType: 'gym_member' | 'gym_owner') => Promise<void>;
+  signup: (
+    email: string,
+    password: string,
+    fullName: string,
+    userType: 'gym_member' | 'gym_owner',
+  ) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (updates: Partial<AuthUser>) => Promise<void>;
   clearError: () => void;
@@ -41,7 +46,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         isLoading: true,
         error: null,
       };
-    
+
     case 'AUTH_SUCCESS':
       return {
         ...state,
@@ -50,7 +55,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         user: action.payload,
         error: null,
       };
-    
+
     case 'AUTH_ERROR':
       return {
         ...state,
@@ -59,24 +64,24 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         user: null,
         error: action.payload,
       };
-    
+
     case 'AUTH_LOGOUT':
       return {
         ...initialState,
       };
-    
+
     case 'UPDATE_USER':
       return {
         ...state,
         user: action.payload,
       };
-    
+
     case 'CLEAR_ERROR':
       return {
         ...state,
         error: null,
       };
-    
+
     default:
       return state;
   }
@@ -102,9 +107,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check authentication status on app start
   useEffect(() => {
     checkAuthStatus();
-    
+
     // Listen for auth state changes
-    const { data: authListener } = AuthService.onAuthStateChange((user) => {
+    const { data: authListener } = AuthService.onAuthStateChange(user => {
       if (user) {
         dispatch({ type: 'AUTH_SUCCESS', payload: user });
       } else {
@@ -121,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       dispatch({ type: 'AUTH_START' });
       const { user, error } = await AuthService.getCurrentUser();
-      
+
       if (error) {
         dispatch({ type: 'AUTH_ERROR', payload: error });
         return;
@@ -133,17 +138,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch({ type: 'AUTH_LOGOUT' });
       }
     } catch (error) {
-      dispatch({ type: 'AUTH_ERROR', payload: 'Failed to check authentication status' });
+      dispatch({
+        type: 'AUTH_ERROR',
+        payload: 'Failed to check authentication status',
+      });
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, _password: string) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       // For demo purposes, use mock authentication
       const { user, error } = await AuthService.mockSignIn(email);
-      
+
       if (error) {
         dispatch({ type: 'AUTH_ERROR', payload: error });
         return;
@@ -151,19 +159,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       dispatch({ type: 'AUTH_SUCCESS', payload: user });
     } catch (error) {
-      dispatch({ type: 'AUTH_ERROR', payload: 'Login failed. Please try again.' });
+      dispatch({
+        type: 'AUTH_ERROR',
+        payload: 'Login failed. Please try again.',
+      });
     }
   };
 
   const signup = async (
-    email: string, 
-    password: string, 
-    fullName: string, 
-    userType: 'gym_member' | 'gym_owner'
+    email: string,
+    password: string,
+    fullName: string,
+    userType: 'gym_member' | 'gym_owner',
   ) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       // For demo purposes, use mock authentication
       const { user, error } = await AuthService.mockSignUp({
         email,
@@ -171,7 +182,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         fullName,
         userType,
       });
-      
+
       if (error) {
         dispatch({ type: 'AUTH_ERROR', payload: error });
         return;
@@ -179,7 +190,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       dispatch({ type: 'AUTH_SUCCESS', payload: user });
     } catch (error) {
-      dispatch({ type: 'AUTH_ERROR', payload: 'Signup failed. Please try again.' });
+      dispatch({
+        type: 'AUTH_ERROR',
+        payload: 'Signup failed. Please try again.',
+      });
     }
   };
 
@@ -195,11 +209,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateUser = async (updates: Partial<AuthUser>) => {
     try {
-      if (!state.user) return;
+      if (!state.user) {
+        return;
+      }
 
       const updatedUser = { ...state.user, ...updates };
       dispatch({ type: 'UPDATE_USER', payload: updatedUser });
-      
+
       // In a real app, you'd also update the backend
       // const { user, error } = await AuthService.updateProfile(updates);
     } catch (error) {

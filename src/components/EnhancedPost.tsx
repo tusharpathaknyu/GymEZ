@@ -1,17 +1,8 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from 'react-native';
-import {Post} from '../types';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Post } from '../types';
 import ReactionButtons from './ReactionButtons';
 import MentionSystem from './MentionSystem';
-
-const {width} = Dimensions.get('window');
 
 interface EnhancedPostProps {
   post: Post;
@@ -26,15 +17,16 @@ const EnhancedPost: React.FC<EnhancedPostProps> = ({
   onComment,
   formatTime,
 }) => {
-  const [showFullText, setShowFullText] = useState(false);
-
   return (
     <View style={styles.postCard}>
       {/* Header */}
       <View style={styles.postHeader}>
         <View style={styles.userInfo}>
           {post.user?.profile_picture ? (
-            <Image source={{uri: post.user.profile_picture}} style={styles.avatar} />
+            <Image
+              source={{ uri: post.user.profile_picture }}
+              style={styles.avatar}
+            />
           ) : (
             <View style={styles.avatarPlaceholder}>
               <Text style={styles.avatarText}>
@@ -43,7 +35,9 @@ const EnhancedPost: React.FC<EnhancedPostProps> = ({
             </View>
           )}
           <View style={styles.userInfoText}>
-            <Text style={styles.userName}>{post.user?.full_name || 'Unknown User'}</Text>
+            <Text style={styles.userName}>
+              {post.user?.full_name || 'Unknown User'}
+            </Text>
             {post.user?.username && (
               <Text style={styles.username}>@{post.user.username}</Text>
             )}
@@ -96,12 +90,14 @@ const EnhancedPost: React.FC<EnhancedPostProps> = ({
         <View style={styles.quickStats}>
           {(post.likes_count || 0) > 0 && (
             <Text style={styles.quickStatText}>
-              ❤️ {post.likes_count || 0} {(post.likes_count || 0) === 1 ? 'like' : 'likes'}
+              ❤️ {post.likes_count || 0}{' '}
+              {(post.likes_count || 0) === 1 ? 'like' : 'likes'}
             </Text>
           )}
           {(post.comments_count || 0) > 0 && (
             <Text style={styles.quickStatText}>
-              💬 {post.comments_count || 0} {(post.comments_count || 0) === 1 ? 'comment' : 'comments'}
+              💬 {post.comments_count || 0}{' '}
+              {(post.comments_count || 0) === 1 ? 'comment' : 'comments'}
             </Text>
           )}
         </View>
@@ -117,7 +113,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -231,4 +227,3 @@ const styles = StyleSheet.create({
 });
 
 export default EnhancedPost;
-

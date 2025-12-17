@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,10 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {PersonalRecordsService} from '../services/personalRecordsService';
-import {SocialService} from '../services/socialService';
-import {ExerciseType} from '../types';
+import { useAuth } from '../services/auth';
+import { PersonalRecordsService } from '../services/personalRecordsService';
+import { SocialService } from '../services/socialService';
+import { ExerciseType } from '../types';
 
 interface PRLogFormProps {
   visible: boolean;
@@ -20,9 +20,15 @@ interface PRLogFormProps {
   onSuccess: () => void;
 }
 
-const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
-  const {user} = useAuth();
-  const [selectedExercise, setSelectedExercise] = useState<ExerciseType | null>(null);
+const PRLogForm: React.FC<PRLogFormProps> = ({
+  visible,
+  onClose,
+  onSuccess,
+}) => {
+  const { user } = useAuth();
+  const [selectedExercise, setSelectedExercise] = useState<ExerciseType | null>(
+    null,
+  );
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -51,7 +57,7 @@ const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
         user.id,
         selectedExercise,
         weightNum,
-        repsNum
+        repsNum,
       );
 
       // Check if it's a new best
@@ -59,12 +65,14 @@ const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
         user.id,
         selectedExercise,
         weightNum,
-        repsNum
+        repsNum,
       );
 
       // Share to feed if enabled
       if (shareToFeed) {
-        const exerciseName = exercises.find(e => e.type === selectedExercise)?.name;
+        const exerciseName = exercises.find(
+          e => e.type === selectedExercise,
+        )?.name;
         const content = isNewBest
           ? `🔥 NEW PR! ${exerciseName}: ${weightNum}kg × ${repsNum} reps 💪`
           : `${exerciseName}: ${weightNum}kg × ${repsNum} reps 💪`;
@@ -74,18 +82,25 @@ const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
           content,
           'pr_achievement',
           undefined,
-          pr.id
+          pr.id,
         );
       }
 
       Alert.alert(
         isNewBest ? '🏆 NEW PERSONAL BEST!' : '✅ PR Logged',
-        isNewBest ? 'Congratulations on your new personal best!' : 'PR has been logged successfully.',
-        [{text: 'OK', onPress: () => {
-          onSuccess();
-          onClose();
-          resetForm();
-        }}]
+        isNewBest
+          ? 'Congratulations on your new personal best!'
+          : 'PR has been logged successfully.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              onSuccess();
+              onClose();
+              resetForm();
+            },
+          },
+        ],
       );
     } catch (error: any) {
       Alert.alert('Error', error.message);
@@ -114,7 +129,7 @@ const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
             <Text style={styles.cancelButton}>Cancel</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Log Personal Record</Text>
-          <View style={{width: 60}} />
+          <View style={{ width: 60 }} />
         </View>
 
         <ScrollView style={styles.content}>
@@ -127,15 +142,19 @@ const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
                   key={exercise.type}
                   style={[
                     styles.exerciseCard,
-                    selectedExercise === exercise.type && styles.exerciseCardSelected,
+                    selectedExercise === exercise.type &&
+                      styles.exerciseCardSelected,
                   ]}
                   onPress={() => setSelectedExercise(exercise.type)}
                 >
                   <Text style={styles.exerciseIcon}>{exercise.icon}</Text>
-                  <Text style={[
-                    styles.exerciseName,
-                    selectedExercise === exercise.type && styles.exerciseNameSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.exerciseName,
+                      selectedExercise === exercise.type &&
+                        styles.exerciseNameSelected,
+                    ]}
+                  >
                     {exercise.name}
                   </Text>
                 </TouchableOpacity>
@@ -144,24 +163,27 @@ const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
           </View>
 
           {/* Weight Input */}
-          {selectedExercise && ['benchpress', 'squat', 'deadlift'].includes(selectedExercise) && (
-            <View style={styles.section}>
-              <Text style={styles.label}>Weight (kg) 💪</Text>
-              <TextInput
-                style={styles.input}
-                value={weight}
-                onChangeText={setWeight}
-                placeholder="Enter weight"
-                keyboardType="numeric"
-                autoFocus
-              />
-            </View>
-          )}
+          {selectedExercise &&
+            ['benchpress', 'squat', 'deadlift'].includes(selectedExercise) && (
+              <View style={styles.section}>
+                <Text style={styles.label}>Weight (kg) 💪</Text>
+                <TextInput
+                  style={styles.input}
+                  value={weight}
+                  onChangeText={setWeight}
+                  placeholder="Enter weight"
+                  keyboardType="numeric"
+                  autoFocus
+                />
+              </View>
+            )}
 
           {/* Reps Input */}
           <View style={styles.section}>
             <Text style={styles.label}>
-              {['benchpress', 'squat', 'deadlift'].includes(selectedExercise || '')
+              {['benchpress', 'squat', 'deadlift'].includes(
+                selectedExercise || '',
+              )
                 ? 'Reps 📊'
                 : 'Reps Count 💪'}
             </Text>
@@ -175,7 +197,10 @@ const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
             {selectedExercise && (
               <Text style={styles.hint}>
                 {['benchpress', 'squat', 'deadlift'].includes(selectedExercise)
-                  ? `Your 1RM: ${(parseFloat(weight || '0') * (1 + parseInt(reps || '0') / 30)).toFixed(1)}kg`
+                  ? `Your 1RM: ${(
+                      parseFloat(weight || '0') *
+                      (1 + parseInt(reps || '0') / 30)
+                    ).toFixed(1)}kg`
                   : 'Bodyweight exercise'}
               </Text>
             )}
@@ -201,7 +226,10 @@ const PRLogForm: React.FC<PRLogFormProps> = ({visible, onClose, onSuccess}) => {
 
           {/* Submit Button */}
           <TouchableOpacity
-            style={[styles.submitButton, submitting && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton,
+              submitting && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit}
             disabled={submitting}
           >
@@ -269,7 +297,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#e5e7eb',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -360,4 +388,3 @@ const styles = StyleSheet.create({
 });
 
 export default PRLogForm;
-

@@ -1,12 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import {useAuth} from '../services/auth';
-import {supabase} from '../services/supabase';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { useAuth } from '../services/auth';
+import { supabase } from '../services/supabase';
 
 interface StreakData {
   currentStreak: number;
@@ -14,25 +9,26 @@ interface StreakData {
   weeklyProgress: number[];
 }
 
-const {width} = Dimensions.get('window');
-
 const WorkoutStreak = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [streak, setStreak] = useState<StreakData>({
     currentStreak: 0,
     longestStreak: 0,
     weeklyProgress: [0, 0, 0, 0, 0, 0, 0],
   });
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user?.id) {
       loadStreak();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadStreak = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     try {
       // Calculate current streak (consecutive days with PRs)
@@ -44,20 +40,23 @@ const WorkoutStreak = () => {
         days.push(date.toISOString().split('T')[0]);
       }
 
-      const {data: prs} = await supabase
+      const { data: prs } = await supabase
         .from('personal_records')
         .select('achieved_at')
         .eq('user_id', user.id)
-        .in('achieved_at', days.map(d => d.split('T')[0]));
+        .in(
+          'achieved_at',
+          days.map(d => d.split('T')[0]),
+        );
 
       // Calculate current streak
       let currentStreak = 0;
       let checkDate = new Date(today);
-      
+
       while (true) {
         const dateStr = checkDate.toISOString().split('T')[0];
         const hasPR = prs?.some(pr => pr.achieved_at.startsWith(dateStr));
-        
+
         if (hasPR) {
           currentStreak++;
           checkDate.setDate(checkDate.getDate() - 1);
@@ -79,7 +78,7 @@ const WorkoutStreak = () => {
         weeklyProgress.push(hasPR ? 1 : 0);
       }
 
-      setStreak({currentStreak, longestStreak, weeklyProgress});
+      setStreak({ currentStreak, longestStreak, weeklyProgress });
     } catch (error) {
       console.error('Error loading streak:', error);
     } finally {
@@ -88,9 +87,15 @@ const WorkoutStreak = () => {
   };
 
   const getStreakMessage = () => {
-    if (streak.currentStreak === 0) return 'Start your streak!';
-    if (streak.currentStreak < 7) return `Keep it going! 🔥`;
-    if (streak.currentStreak < 30) return 'You\'re on fire! 🔥🔥';
+    if (streak.currentStreak === 0) {
+      return 'Start your streak!';
+    }
+    if (streak.currentStreak < 7) {
+      return 'Keep it going! 🔥';
+    }
+    if (streak.currentStreak < 30) {
+      return "You're on fire! 🔥🔥";
+    }
     return 'Incredible! Keep burning! 🔥🔥🔥';
   };
 
@@ -126,10 +131,12 @@ const WorkoutStreak = () => {
                 style={[
                   styles.dayBar,
                   day === 1 && styles.dayBarActive,
-                  {height: day === 1 ? 40 : 20},
+                  { height: day === 1 ? 40 : 20 },
                 ]}
               />
-              <Text style={styles.dayLabel}>{['S', 'M', 'T', 'W', 'T', 'F', 'S'][index]}</Text>
+              <Text style={styles.dayLabel}>
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'][index]}
+              </Text>
             </View>
           ))}
         </View>
@@ -145,7 +152,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     margin: 16,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
@@ -239,4 +246,3 @@ const styles = StyleSheet.create({
 });
 
 export default WorkoutStreak;
-

@@ -1,21 +1,16 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface QuickActionProps {
   onPress: () => void;
 }
 
-const QuickActions = ({onPress}: QuickActionProps) => {
+const QuickActions = ({ onPress }: QuickActionProps) => {
   const actions = [
-    {icon: '📹', label: 'Record PR', color: '#10b981'},
-    {icon: '🎯', label: 'Start Workout', color: '#3b82f6'},
-    {icon: '📊', label: 'View Stats', color: '#8b5cf6'},
-    {icon: '👥', label: 'Find Friends', color: '#f59e0b'},
+    { icon: '📹', label: 'Record PR', color: '#10b981' },
+    { icon: '🎯', label: 'Start Workout', color: '#3b82f6' },
+    { icon: '📊', label: 'View Stats', color: '#8b5cf6' },
+    { icon: '👥', label: 'Find Friends', color: '#f59e0b' },
   ];
 
   return (
@@ -25,7 +20,7 @@ const QuickActions = ({onPress}: QuickActionProps) => {
         {actions.map((action, index) => (
           <TouchableOpacity
             key={index}
-            style={[styles.actionCard, {borderLeftColor: action.color}]}
+            style={[styles.actionCard, { borderLeftColor: action.color }]}
             onPress={onPress}
           >
             <Text style={styles.actionIcon}>{action.icon}</Text>
@@ -60,7 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderLeftWidth: 4,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -77,4 +72,3 @@ const styles = StyleSheet.create({
 });
 
 export default QuickActions;
-

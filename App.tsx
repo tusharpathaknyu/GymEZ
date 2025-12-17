@@ -8,22 +8,33 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  FlatList,
 } from 'react-native';
-
-import { WorkoutService } from './src/services/WorkoutService';
-import { ProgressService } from './src/services/ProgressService';
 import { GymService } from './src/services/gymService';
 import { AuthProvider, useAuth } from './src/services/auth';
 import LoginScreen from './src/screens/LoginScreen';
 import GoogleAuthService from './src/services/GoogleAuthService';
 import PRScreen from './src/screens/PRScreen';
+import { User } from './src/types';
 
 type ScreenType = 'auth' | 'home' | 'workout' | 'progress' | 'gyms';
 
+// Helper function to validate user object
+const isValidUser = (
+  user: any,
+): user is { full_name: string; email: string; user_type: string } => {
+  return (
+    user !== null &&
+    typeof user === 'object' &&
+    typeof user.full_name === 'string' &&
+    user.full_name.trim().length > 0 &&
+    typeof user.email === 'string' &&
+    typeof user.user_type === 'string'
+  );
+};
+
 // Main app component that handles authentication flow
 function MainApp(): React.JSX.Element {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
 
   // Initialize Google Sign-In when app starts
@@ -34,7 +45,8 @@ function MainApp(): React.JSX.Element {
         await googleAuth.configure();
         console.log('Google Sign-In initialized successfully');
       } catch (error) {
-        console.log('Google Sign-In initialization failed, using mock mode:', error);
+        console.error('Google Sign-In initialization failed:', error);
+        // Don't fail silently - log the error for debugging
       }
     };
 
@@ -42,38 +54,76 @@ function MainApp(): React.JSX.Element {
   }, []);
 
   // Show auth screen if not authenticated
-  if (!user) {
+  if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#10b981" />
-        <LoginScreen navigation={{ navigate: () => setCurrentScreen('home') }} />
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text>Loading...</Text>
+        </View>
       </SafeAreaView>
     );
   }
 
-  return <AuthenticatedApp currentScreen={currentScreen} setCurrentScreen={setCurrentScreen} user={user} />;
+  if (!isValidUser(user)) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#10b981" />
+        <LoginScreen
+          navigation={{ navigate: () => setCurrentScreen('home') }}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <AuthenticatedApp
+      currentScreen={currentScreen}
+      setCurrentScreen={setCurrentScreen}
+      user={user}
+    />
+  );
 }
 
 // Authenticated app component
-function AuthenticatedApp({ currentScreen, setCurrentScreen, user }: {
+function AuthenticatedApp({
+  currentScreen,
+  setCurrentScreen,
+  user,
+}: {
   currentScreen: ScreenType;
   setCurrentScreen: (screen: ScreenType) => void;
-  user: any;
+  user: User | null;
 }): React.JSX.Element {
   const { signOut } = useAuth();
 
+  // Early return if user is not valid - prevent rendering with invalid data
+  if (!isValidUser(user)) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#10b981" />
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text>Loading user data...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const handleLogout = async () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', onPress: async () => {
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        onPress: async () => {
           await signOut();
           setCurrentScreen('home');
-        }}
-      ]
-    );
+        },
+      },
+    ]);
   };
 
   const handleStartWorkout = () => {
@@ -94,10 +144,30 @@ function AuthenticatedApp({ currentScreen, setCurrentScreen, user }: {
 
   const renderWorkoutScreen = () => {
     const workoutTemplates = [
-      { id: '1', name: 'Beginner Full Body', duration: '25 min', difficulty: 'Beginner' },
-      { id: '2', name: 'Upper Body Strength', duration: '45 min', difficulty: 'Intermediate' },
-      { id: '3', name: 'HIIT Cardio Blast', duration: '20 min', difficulty: 'Advanced' },
-      { id: '4', name: 'Lower Body Power', duration: '40 min', difficulty: 'Intermediate' }
+      {
+        id: '1',
+        name: 'Beginner Full Body',
+        duration: '25 min',
+        difficulty: 'Beginner',
+      },
+      {
+        id: '2',
+        name: 'Upper Body Strength',
+        duration: '45 min',
+        difficulty: 'Intermediate',
+      },
+      {
+        id: '3',
+        name: 'HIIT Cardio Blast',
+        duration: '20 min',
+        difficulty: 'Advanced',
+      },
+      {
+        id: '4',
+        name: 'Lower Body Power',
+        duration: '40 min',
+        difficulty: 'Intermediate',
+      },
     ];
 
     return (
@@ -106,27 +176,47 @@ function AuthenticatedApp({ currentScreen, setCurrentScreen, user }: {
         <Text style={styles.screenText}>
           Choose from our curated workout programs designed by fitness experts.
         </Text>
-        
+
         {workoutTemplates.map(template => (
-          <TouchableOpacity 
-            key={template.id} 
+          <TouchableOpacity
+            key={template.id}
             style={styles.workoutCard}
-            onPress={() => Alert.alert('Workout Selected', `Starting ${template.name}!\n\nDuration: ${template.duration}\nDifficulty: ${template.difficulty}`)}
+            onPress={() =>
+              Alert.alert(
+                'Workout Selected',
+                `Starting ${template.name}!\n\nDuration: ${template.duration}\nDifficulty: ${template.difficulty}`,
+              )
+            }
           >
             <View style={styles.workoutCardContent}>
               <Text style={styles.workoutName}>{template.name}</Text>
-              <Text style={styles.workoutDetails}>{template.duration} • {template.difficulty}</Text>
+              <Text style={styles.workoutDetails}>
+                {template.duration} • {template.difficulty}
+              </Text>
             </View>
             <Text style={styles.startButton}>START</Text>
           </TouchableOpacity>
         ))}
 
-        <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Custom Workout', 'Build your own workout from our exercise library!')}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            Alert.alert(
+              'Custom Workout',
+              'Build your own workout from our exercise library!',
+            )
+          }
+        >
           <Text style={styles.buttonText}>Create Custom Workout</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.button, styles.backButton]} onPress={handleBackToHome}>
-          <Text style={[styles.buttonText, styles.backButtonText]}>← Back to Home</Text>
+
+        <TouchableOpacity
+          style={[styles.button, styles.backButton]}
+          onPress={handleBackToHome}
+        >
+          <Text style={[styles.buttonText, styles.backButtonText]}>
+            ← Back to Home
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     );
@@ -134,9 +224,10 @@ function AuthenticatedApp({ currentScreen, setCurrentScreen, user }: {
 
   const renderProgressScreen = () => {
     return <PRScreen onBackToHome={handleBackToHome} />;
-  };  const renderGymsScreen = () => {
+  };
+  const renderGymsScreen = () => {
     const gyms = GymService.getMockNearbyGyms();
-    
+
     return (
       <ScrollView style={{ flex: 1 }}>
         <View style={styles.screenContainer}>
@@ -144,25 +235,48 @@ function AuthenticatedApp({ currentScreen, setCurrentScreen, user }: {
           <Text style={styles.screenText}>
             Discover top-rated gyms in NYC and find your perfect workout spot.
           </Text>
-          
+
           {gyms.map((gym: any) => (
             <View key={gym.id} style={styles.gymCard}>
               <Text style={styles.gymName}>{gym.name}</Text>
               <Text style={styles.gymAddress}>{gym.address}</Text>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: 8,
+                }}
+              >
                 <Text style={styles.gymRating}>⭐ {gym.rating || 4.0}/5.0</Text>
                 <Text style={{ fontSize: 12, color: '#6b7280' }}>
-                  {gym.amenities ? gym.amenities.slice(0, 2).join(' • ') : 'Full Service Gym'}
+                  {gym.amenities
+                    ? gym.amenities.slice(0, 2).join(' • ')
+                    : 'Full Service Gym'}
                 </Text>
               </View>
-              <Text style={{ fontSize: 12, color: '#10b981', marginTop: 4, fontWeight: '600' }}>
-                {gym.membership_types ? `From $${gym.membership_types[0]?.price_monthly}/month` : 'Contact for pricing'}
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#10b981',
+                  marginTop: 4,
+                  fontWeight: '600',
+                }}
+              >
+                {gym.membership_types
+                  ? `From $${gym.membership_types[0]?.price_monthly}/month`
+                  : 'Contact for pricing'}
               </Text>
             </View>
           ))}
-          
-          <TouchableOpacity style={[styles.button, styles.backButton]} onPress={handleBackToHome}>
-            <Text style={[styles.buttonText, styles.backButtonText]}>← Back to Home</Text>
+
+          <TouchableOpacity
+            style={[styles.button, styles.backButton]}
+            onPress={handleBackToHome}
+          >
+            <Text style={[styles.buttonText, styles.backButtonText]}>
+              ← Back to Home
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -171,42 +285,54 @@ function AuthenticatedApp({ currentScreen, setCurrentScreen, user }: {
 
   const renderHomeScreen = () => (
     <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <View>
-              <Text style={styles.logo}>GYMEZ</Text>
-              <Text style={styles.subtitle}>Your Fitness Journey Starts Here</Text>
-            </View>
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-              <Text style={styles.logoutText}>Logout</Text>
-            </TouchableOpacity>
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.logo}>GYMEZ</Text>
+            <Text style={styles.subtitle}>
+              Your Fitness Journey Starts Here
+            </Text>
           </View>
-          {user && (
-            <View style={styles.userWelcome}>
-              <Text style={styles.welcomeText}>Welcome back, {user.full_name}!</Text>
-              <Text style={styles.userTypeText}>
-                {user.user_type === 'gym_owner' ? '🏋️ Gym Owner' : '💪 Gym Member'}
-              </Text>
-            </View>
-          )}
-        </View>      <View style={styles.content}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+        {user && user.full_name ? (
+          <View style={styles.userWelcome}>
+            <Text style={styles.welcomeText}>
+              Welcome back, {String(user.full_name)}!
+            </Text>
+            <Text style={styles.userTypeText}>
+              {user.user_type === 'gym_owner'
+                ? '🏋️ Gym Owner'
+                : '💪 Gym Member'}
+            </Text>
+          </View>
+        ) : null}
+      </View>{' '}
+      <View style={styles.content}>
         <TouchableOpacity style={styles.button} onPress={handleStartWorkout}>
           <Text style={styles.buttonText}>Start Workout</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={handleViewProgress}>
+
+        <TouchableOpacity
+          style={[styles.button, styles.secondaryButton]}
+          onPress={handleViewProgress}
+        >
           <Text style={[styles.buttonText, styles.secondaryButtonText]}>
             View Progress
           </Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={handleFindGyms}>
+
+        <TouchableOpacity
+          style={[styles.button, styles.secondaryButton]}
+          onPress={handleFindGyms}
+        >
           <Text style={[styles.buttonText, styles.secondaryButtonText]}>
             Find Gyms
           </Text>
         </TouchableOpacity>
       </View>
-
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Ready to transform your fitness journey?

@@ -1,22 +1,20 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Modal,
   TextInput,
   Alert,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {supabase} from '../services/supabase';
-import {SocialService} from '../services/socialService';
+import { useAuth } from '../services/auth';
+import { supabase } from '../services/supabase';
+import { SocialService } from '../services/socialService';
 import SocialFeed from '../components/SocialFeed';
-import {Post} from '../types';
 
 const MyGymScreen = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [postContent, setPostContent] = useState('');
   const [postType, setPostType] = useState<'general' | 'workout'>('workout');
@@ -26,13 +24,16 @@ const MyGymScreen = () => {
     if (user?.gym_id) {
       loadGymMembers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadGymMembers = async () => {
-    if (!user?.gym_id) return;
+    if (!user?.gym_id) {
+      return;
+    }
 
     try {
-      const {data} = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('*')
         .eq('gym_id', user.gym_id)
@@ -45,10 +46,18 @@ const MyGymScreen = () => {
   };
 
   const handleCreatePost = async () => {
-    if (!postContent.trim() || !user?.id) return;
+    if (!postContent.trim() || !user?.id) {
+      return;
+    }
 
     try {
-      await SocialService.createPost(user.id, postContent, postType, undefined, user.gym_id);
+      await SocialService.createPost(
+        user.id,
+        postContent,
+        postType,
+        undefined,
+        user.gym_id,
+      );
       setShowCreatePost(false);
       setPostContent('');
       Alert.alert('Success', 'Workout posted to gym feed!');
@@ -123,10 +132,12 @@ const MyGymScreen = () => {
                 ]}
                 onPress={() => setPostType('workout')}
               >
-                <Text style={[
-                  styles.typeButtonText,
-                  postType === 'workout' && styles.typeButtonTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    postType === 'workout' && styles.typeButtonTextActive,
+                  ]}
+                >
                   💪 Workout
                 </Text>
               </TouchableOpacity>
@@ -137,10 +148,12 @@ const MyGymScreen = () => {
                 ]}
                 onPress={() => setPostType('general')}
               >
-                <Text style={[
-                  styles.typeButtonText,
-                  postType === 'general' && styles.typeButtonTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    postType === 'general' && styles.typeButtonTextActive,
+                  ]}
+                >
                   📝 General
                 </Text>
               </TouchableOpacity>
@@ -157,7 +170,10 @@ const MyGymScreen = () => {
             />
 
             <TouchableOpacity
-              style={[styles.submitButton, !postContent.trim() && styles.submitButtonDisabled]}
+              style={[
+                styles.submitButton,
+                !postContent.trim() && styles.submitButtonDisabled,
+              ]}
               onPress={handleCreatePost}
               disabled={!postContent.trim()}
             >
@@ -316,4 +332,3 @@ const styles = StyleSheet.create({
 });
 
 export default MyGymScreen;
-

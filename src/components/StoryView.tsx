@@ -1,14 +1,11 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
 } from 'react-native';
-
-const {width} = Dimensions.get('window');
 
 interface Story {
   id: string;
@@ -136,4 +133,3 @@ const styles = StyleSheet.create({
 });
 
 export default StoryView;
-

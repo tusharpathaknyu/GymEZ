@@ -1,16 +1,15 @@
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from '../screens/LoginScreen';
 import GymOwnerDashboard from '../screens/GymOwnerDashboard';
 import HomeScreen from '../screens/HomeScreen';
-import PRScreen from '../screens/PRScreen';
 import SocialScreen from '../screens/SocialScreen';
-import WorkoutsScreen from '../screens/WorkoutsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import MyGymScreen from '../screens/MyGymScreen';
-import {useAuth} from '../services/auth';
-import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import RewardsScreen from '../screens/RewardsScreen';
+import { useAuth } from '../services/auth';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,23 +23,23 @@ const LoadingScreen = () => (
 
 const MemberTabs = () => (
   <Tab.Navigator
-    screenOptions={({route}) => ({
-      tabBarIcon: ({focused, color, size}) => {
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused, color: _color, size: _size }) => {
         let iconName = '';
 
         if (route.name === 'Home') {
           iconName = focused ? '🏠' : '🏡';
+        } else if (route.name === 'Rewards') {
+          iconName = focused ? '🏆' : '🎖️';
         } else if (route.name === 'MyGym') {
           iconName = focused ? '🏋️' : '💪';
         } else if (route.name === 'Social') {
           iconName = focused ? '📱' : '📲';
-        } else if (route.name === 'Workouts') {
-          iconName = focused ? '🎯' : '🎯';
         } else if (route.name === 'Profile') {
           iconName = focused ? '👤' : '🙋';
         }
 
-        return <Text style={{fontSize: 22}}>{iconName}</Text>;
+        return <Text style={{ fontSize: 22 }}>{iconName}</Text>;
       },
       tabBarActiveTintColor: '#10b981',
       tabBarInactiveTintColor: '#9ca3af',
@@ -57,47 +56,51 @@ const MemberTabs = () => (
         fontWeight: '600',
       },
       headerShown: false,
-    })}>
-    <Tab.Screen 
-      name="Home" 
+    })}
+  >
+    <Tab.Screen
+      name="Home"
       component={HomeScreen}
-      options={{tabBarLabel: 'Home'}}
+      options={{ tabBarLabel: 'Home' }}
     />
-    <Tab.Screen 
-      name="MyGym" 
+    <Tab.Screen
+      name="Rewards"
+      component={RewardsScreen}
+      options={{ tabBarLabel: 'Rewards' }}
+    />
+    <Tab.Screen
+      name="MyGym"
       component={MyGymScreen}
-      options={{tabBarLabel: 'My Gym'}}
+      options={{ tabBarLabel: 'My Gym' }}
     />
-    <Tab.Screen 
-      name="Social" 
+    <Tab.Screen
+      name="Social"
       component={SocialScreen}
-      options={{tabBarLabel: 'Social'}}
+      options={{ tabBarLabel: 'Social' }}
     />
-    <Tab.Screen 
-      name="Workouts" 
-      component={WorkoutsScreen}
-      options={{tabBarLabel: 'Workouts'}}
-    />
-    <Tab.Screen 
-      name="Profile" 
+    <Tab.Screen
+      name="Profile"
       component={ProfileScreen}
-      options={{tabBarLabel: 'Profile'}}
+      options={{ tabBarLabel: 'Profile' }}
     />
   </Tab.Navigator>
 );
 
 const AppNavigator = () => {
-  const {user, loading} = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return <LoadingScreen />;
   }
 
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
         user.user_type === 'gym_owner' ? (
-          <Stack.Screen name="GymOwnerDashboard" component={GymOwnerDashboard} />
+          <Stack.Screen
+            name="GymOwnerDashboard"
+            component={GymOwnerDashboard}
+          />
         ) : (
           <Stack.Screen name="MemberTabs" component={MemberTabs} />
         )

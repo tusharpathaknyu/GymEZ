@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 interface ActivityStatsProps {
   workoutsThisWeek: number;
@@ -11,11 +7,20 @@ interface ActivityStatsProps {
   gymRank: number;
 }
 
-const ActivityStats = ({workoutsThisWeek, totalPrs, gymRank}: ActivityStatsProps) => {
+const ActivityStats = ({
+  workoutsThisWeek,
+  totalPrs,
+  gymRank,
+}: ActivityStatsProps) => {
   const stats = [
-    {label: 'Workouts', value: workoutsThisWeek, icon: '💪', color: '#10b981'},
-    {label: 'Total PRs', value: totalPrs, icon: '🏆', color: '#f59e0b'},
-    {label: 'Gym Rank', value: `#${gymRank}`, icon: '📊', color: '#3b82f6'},
+    {
+      label: 'Workouts',
+      value: workoutsThisWeek,
+      icon: '💪',
+      color: '#10b981',
+    },
+    { label: 'Total PRs', value: totalPrs, icon: '🏆', color: '#f59e0b' },
+    { label: 'Gym Rank', value: `#${gymRank}`, icon: '📊', color: '#3b82f6' },
   ];
 
   return (
@@ -25,7 +30,9 @@ const ActivityStats = ({workoutsThisWeek, totalPrs, gymRank}: ActivityStatsProps
         {stats.map((stat, index) => (
           <View key={index} style={styles.statCard}>
             <Text style={styles.statIcon}>{stat.icon}</Text>
-            <Text style={[styles.statValue, {color: stat.color}]}>{stat.value}</Text>
+            <Text style={[styles.statValue, { color: stat.color }]}>
+              {stat.value}
+            </Text>
             <Text style={styles.statLabel}>{stat.label}</Text>
           </View>
         ))}
@@ -41,7 +48,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     margin: 16,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
@@ -75,4 +82,3 @@ const styles = StyleSheet.create({
 });
 
 export default ActivityStats;
-

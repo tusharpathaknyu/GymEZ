@@ -1,5 +1,5 @@
-import {supabase} from './supabase';
-import {Gym} from '../types';
+import { supabase } from './supabase';
+import { Gym } from '../types';
 
 // Enhanced Gym Service with mock data and real functionality
 export class GymService {
@@ -19,17 +19,23 @@ export class GymService {
         rating: 4.5,
         price_range: 5,
         amenities: [
-          'Swimming Pool', 'Sauna', 'Steam Room', 'Personal Training',
-          'Group Classes', 'Locker Rooms', 'Towel Service', 'Parking'
+          'Swimming Pool',
+          'Sauna',
+          'Steam Room',
+          'Personal Training',
+          'Group Classes',
+          'Locker Rooms',
+          'Towel Service',
+          'Parking',
         ],
         hours: {
-          'Monday': { open: '05:00', close: '23:00' },
-          'Tuesday': { open: '05:00', close: '23:00' },
-          'Wednesday': { open: '05:00', close: '23:00' },
-          'Thursday': { open: '05:00', close: '23:00' },
-          'Friday': { open: '05:00', close: '22:00' },
-          'Saturday': { open: '07:00', close: '21:00' },
-          'Sunday': { open: '07:00', close: '21:00' }
+          Monday: { open: '05:00', close: '23:00' },
+          Tuesday: { open: '05:00', close: '23:00' },
+          Wednesday: { open: '05:00', close: '23:00' },
+          Thursday: { open: '05:00', close: '23:00' },
+          Friday: { open: '05:00', close: '22:00' },
+          Saturday: { open: '07:00', close: '21:00' },
+          Sunday: { open: '07:00', close: '21:00' },
         },
         photos: ['gym1_1.jpg'],
         description: 'Premium fitness club with state-of-the-art equipment',
@@ -37,16 +43,20 @@ export class GymService {
           {
             name: 'All Access',
             price_monthly: 185,
-            benefits: ['Access to all locations', 'Group classes', 'Pool access']
-          }
-        ]
+            benefits: [
+              'Access to all locations',
+              'Group classes',
+              'Pool access',
+            ],
+          },
+        ],
       },
       {
-        id: 'gym_2', 
+        id: 'gym_2',
         name: 'Planet Fitness - Manhattan',
         address: '538 9th Avenue',
         city: 'New York',
-        state: 'NY', 
+        state: 'NY',
         zip_code: '10018',
         phone: '(212) 564-4653',
         latitude: 40.7569,
@@ -54,17 +64,21 @@ export class GymService {
         rating: 3.8,
         price_range: 1,
         amenities: [
-          'Cardio Equipment', 'Weight Training', 'Locker Rooms',
-          'HydroMassage', 'Massage Chairs', 'Free Fitness Training'
+          'Cardio Equipment',
+          'Weight Training',
+          'Locker Rooms',
+          'HydroMassage',
+          'Massage Chairs',
+          'Free Fitness Training',
         ],
         hours: {
-          'Monday': { open: '04:00', close: '00:00' },
-          'Tuesday': { open: '04:00', close: '00:00' },
-          'Wednesday': { open: '04:00', close: '00:00' },
-          'Thursday': { open: '04:00', close: '00:00' },
-          'Friday': { open: '04:00', close: '22:00' },
-          'Saturday': { open: '06:00', close: '22:00' },
-          'Sunday': { open: '06:00', close: '22:00' }
+          Monday: { open: '04:00', close: '00:00' },
+          Tuesday: { open: '04:00', close: '00:00' },
+          Wednesday: { open: '04:00', close: '00:00' },
+          Thursday: { open: '04:00', close: '00:00' },
+          Friday: { open: '04:00', close: '22:00' },
+          Saturday: { open: '06:00', close: '22:00' },
+          Sunday: { open: '06:00', close: '22:00' },
         },
         photos: ['gym2_1.jpg'],
         description: 'Affordable gym with judgment-free environment',
@@ -72,39 +86,31 @@ export class GymService {
           {
             name: 'Classic',
             price_monthly: 10,
-            benefits: ['Access to home club', 'Free fitness training']
-          }
-        ]
-      }
+            benefits: ['Access to home club', 'Free fitness training'],
+          },
+        ],
+      },
     ];
   }
 
   /**
    * Get gyms near a pincode (simplified - in production you'd use geocoding API)
    */
-  static async getNearbyGyms(userPincode: string, limit: number = 10): Promise<Gym[]> {
+  static async getNearbyGyms(
+    userPincode: string,
+    limit: number = 10,
+  ): Promise<Gym[]> {
     try {
       // Return mock data for now
       return this.getMockNearbyGyms().slice(0, limit);
-      // In production, you'd convert pincode to lat/lng and calculate distances
-      const {data, error} = await supabase
-        .from('gyms')
-        .select('*')
-        .order('created_at', {ascending: false})
-        .limit(limit);
-
-      if (error) {
-        throw new Error(`Failed to fetch gyms: ${error.message}`);
-      }
-
-      // Simple distance calculation based on pincode similarity
-      const gymsWithDistance = data.map(gym => ({
-        ...gym,
-        distance: this.calculatePincodeDistance(userPincode, gym.pincode),
-      }));
-
-      // Sort by distance
-      return gymsWithDistance.sort((a, b) => a.distance - b.distance);
+      // TODO: In production, implement real gym search:
+      // const { data, error } = await supabase
+      //   .from('gyms')
+      //   .select('*')
+      //   .order('created_at', { ascending: false })
+      //   .limit(limit);
+      // if (error) throw new Error(`Failed to fetch gyms: ${error.message}`);
+      // return data;
     } catch (error) {
       console.error('Error fetching nearby gyms:', error);
       throw error;
@@ -116,10 +122,12 @@ export class GymService {
    */
   static async searchGyms(query: string, limit: number = 20): Promise<Gym[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('gyms')
         .select('*')
-        .or(`name.ilike.%${query}%,address.ilike.%${query}%,pincode.ilike.%${query}%`)
+        .or(
+          `name.ilike.%${query}%,address.ilike.%${query}%,pincode.ilike.%${query}%`,
+        )
         .limit(limit);
 
       if (error) {
@@ -138,10 +146,10 @@ export class GymService {
    */
   static async getAllGyms(): Promise<Gym[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('gyms')
         .select('*')
-        .order('name', {ascending: true});
+        .order('name', { ascending: true });
 
       if (error) {
         throw new Error(`Failed to fetch gyms: ${error.message}`);
@@ -159,7 +167,7 @@ export class GymService {
    */
   static async getGymById(gymId: string): Promise<Gym | null> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('gyms')
         .select('*')
         .eq('id', gymId)
@@ -184,7 +192,7 @@ export class GymService {
    */
   static async joinGym(userId: string, gymId: string): Promise<void> {
     try {
-      const {error} = await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({
           gym_id: gymId,
@@ -218,7 +226,7 @@ export class GymService {
     owner_id: string;
   }): Promise<Gym> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('gyms')
         .insert(gymData)
         .select()
@@ -240,9 +248,9 @@ export class GymService {
    */
   static async getGymMemberCount(gymId: string): Promise<number> {
     try {
-      const {count, error} = await supabase
+      const { count, error } = await supabase
         .from('profiles')
-        .select('id', {count: 'exact'})
+        .select('id', { count: 'exact' })
         .eq('gym_id', gymId)
         .eq('user_type', 'gym_member');
 
@@ -261,7 +269,10 @@ export class GymService {
    * Simple pincode distance calculation
    * In production, use proper geocoding and haversine formula
    */
-  private static calculatePincodeDistance(pincode1: string, pincode2: string): number {
+  private static calculatePincodeDistance(
+    pincode1: string,
+    pincode2: string,
+  ): number {
     // Simple numeric difference for demo purposes
     const num1 = parseInt(pincode1) || 0;
     const num2 = parseInt(pincode2) || 0;
@@ -275,7 +286,7 @@ export class GymService {
     lat1: number,
     lon1: number,
     lat2: number,
-    lon2: number
+    lon2: number,
   ): number {
     const R = 6371; // Earth's radius in kilometers
     const dLat = this.toRad(lat2 - lat1);

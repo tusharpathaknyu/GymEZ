@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,17 +11,19 @@ import {
   Platform,
   Modal,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {PersonalRecordsService} from '../services/personalRecordsService';
-import {supabase} from '../services/supabase';
+import { useAuth } from '../services/auth';
+import { PersonalRecordsService } from '../services/personalRecordsService';
+import { supabase } from '../services/supabase';
 import FindFriends from '../components/FindFriends';
 import AchievementBadges from '../components/AchievementBadges';
 import GymComparison from '../components/GymComparison';
 
-const ProfileScreen = ({navigation}: any) => {
-  const {user, signOut} = useAuth();
+const ProfileScreen = ({ navigation: _navigation }: any) => {
+  const { user, signOut } = useAuth();
   const [stats, setStats] = useState<any>(null);
-  const [profilePic, setProfilePic] = useState<string | null>(user?.profile_picture || null);
+  const [profilePic, setProfilePic] = useState<string | null>(
+    user?.profile_picture || null,
+  );
   const [followers, setFollowers] = useState(0);
   const [following, setFollowing] = useState(0);
   const [isLinkedToFacebook, setIsLinkedToFacebook] = useState(false);
@@ -34,10 +36,13 @@ const ProfileScreen = ({navigation}: any) => {
       loadStats();
       loadSocialStats();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadStats = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
     try {
       const statsData = await PersonalRecordsService.getUserPRStats(user.id);
       setStats(statsData);
@@ -47,17 +52,19 @@ const ProfileScreen = ({navigation}: any) => {
   };
 
   const loadSocialStats = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
     try {
       // Get followers and following counts
-      const {count: followersCount} = await supabase
+      const { count: followersCount } = await supabase
         .from('follows')
-        .select('*', {count: 'exact', head: true})
+        .select('*', { count: 'exact', head: true })
         .eq('following_id', user.id);
 
-      const {count: followingCount} = await supabase
+      const { count: followingCount } = await supabase
         .from('follows')
-        .select('*', {count: 'exact', head: true})
+        .select('*', { count: 'exact', head: true })
         .eq('follower_id', user.id);
 
       setFollowers(followersCount || 0);
@@ -68,27 +75,32 @@ const ProfileScreen = ({navigation}: any) => {
   };
 
   const showImagePicker = () => {
-    const options = ['Choose from Gallery', 'Take Photo', 'Remove Photo', 'Cancel'];
-    
+    const options = [
+      'Choose from Gallery',
+      'Take Photo',
+      'Remove Photo',
+      'Cancel',
+    ];
+
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
           options,
           cancelButtonIndex: 3,
         },
-        handleImageOption
+        handleImageOption,
       );
     } else {
-      Alert.alert(
-        'Change Profile Picture',
-        'Choose an option',
-        [
-          {text: 'Choose from Gallery', onPress: () => console.log('Gallery')},
-          {text: 'Take Photo', onPress: () => console.log('Camera')},
-          {text: 'Remove Photo', onPress: handleRemovePhoto, style: 'destructive'},
-          {text: 'Cancel', style: 'cancel'},
-        ]
-      );
+      Alert.alert('Change Profile Picture', 'Choose an option', [
+        { text: 'Choose from Gallery', onPress: () => console.log('Gallery') },
+        { text: 'Take Photo', onPress: () => console.log('Camera') },
+        {
+          text: 'Remove Photo',
+          onPress: handleRemovePhoto,
+          style: 'destructive',
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
     }
   };
 
@@ -103,16 +115,20 @@ const ProfileScreen = ({navigation}: any) => {
   };
 
   const handleRemovePhoto = async () => {
-    if (!user?.id) return;
-    
+    if (!user?.id) {
+      return;
+    }
+
     try {
-      const {error} = await supabase
+      const { error } = await supabase
         .from('profiles')
-        .update({profile_picture: null})
+        .update({ profile_picture: null })
         .eq('id', user.id);
 
-      if (error) throw error;
-      
+      if (error) {
+        throw error;
+      }
+
       setProfilePic(null);
       Alert.alert('Success', 'Profile picture removed');
     } catch (error) {
@@ -126,7 +142,7 @@ const ProfileScreen = ({navigation}: any) => {
       'Link Facebook',
       'Connect your Facebook account to share your achievements and find friends who use GYMEZ.',
       [
-        {text: 'Cancel', style: 'cancel'},
+        { text: 'Cancel', style: 'cancel' },
         {
           text: 'Connect',
           onPress: () => {
@@ -134,33 +150,31 @@ const ProfileScreen = ({navigation}: any) => {
             Alert.alert('Success', 'Facebook account linked successfully!');
           },
         },
-      ]
+      ],
     );
   };
 
   const handleSignOut = async () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        {text: 'Cancel', style: 'cancel'},
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await signOut();
-            } catch (error) {
-              console.error('Error signing out:', error);
-            }
-          },
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await signOut();
+          } catch (error) {
+            console.error('Error signing out:', error);
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const getDaysAtGym = () => {
-    if (!user?.gym_start_date) return 0;
+    if (!user?.gym_start_date) {
+      return 0;
+    }
     const startDate = new Date(user.gym_start_date);
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - startDate.getTime());
@@ -171,13 +185,13 @@ const ProfileScreen = ({navigation}: any) => {
     <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={styles.profileHeader}>
-        <TouchableOpacity 
-          style={styles.avatarContainer} 
+        <TouchableOpacity
+          style={styles.avatarContainer}
           onPress={showImagePicker}
           activeOpacity={0.8}
         >
           {profilePic ? (
-            <Image source={{uri: profilePic}} style={styles.avatar} />
+            <Image source={{ uri: profilePic }} style={styles.avatar} />
           ) : (
             <View style={styles.avatarPlaceholder}>
               <Text style={styles.avatarText}>
@@ -225,7 +239,9 @@ const ProfileScreen = ({navigation}: any) => {
           <Text style={styles.statLabel}>Total PRs</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={styles.statNumber}>{stats?.exercisesWithPRs?.length || 0}</Text>
+          <Text style={styles.statNumber}>
+            {stats?.exercisesWithPRs?.length || 0}
+          </Text>
           <Text style={styles.statLabel}>Exercises</Text>
         </View>
         <View style={styles.statBox}>
@@ -237,10 +253,7 @@ const ProfileScreen = ({navigation}: any) => {
       {/* Menu Items */}
       <View style={styles.menuSection}>
         <Text style={styles.sectionTitle}>Social Connections</Text>
-        <TouchableOpacity 
-          style={styles.menuItem}
-          onPress={handleLinkFacebook}
-        >
+        <TouchableOpacity style={styles.menuItem} onPress={handleLinkFacebook}>
           <Text style={styles.menuIcon}>📘</Text>
           <View style={styles.menuContent}>
             <View style={styles.menuHeader}>
@@ -253,40 +266,48 @@ const ProfileScreen = ({navigation}: any) => {
                 </View>
               )}
             </View>
-            <Text style={styles.menuDescription}>Connect with Facebook friends</Text>
+            <Text style={styles.menuDescription}>
+              Connect with Facebook friends
+            </Text>
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.menuItem}
           onPress={() => setShowFriendsModal(true)}
         >
           <Text style={styles.menuIcon}>👥</Text>
           <View style={styles.menuContent}>
             <Text style={styles.menuText}>Find Friends</Text>
-            <Text style={styles.menuDescription}>Discover people from your gym</Text>
+            <Text style={styles.menuDescription}>
+              Discover people from your gym
+            </Text>
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.menuItem}
           onPress={() => setShowAchievementsModal(true)}
         >
           <Text style={styles.menuIcon}>🏆</Text>
           <View style={styles.menuContent}>
             <Text style={styles.menuText}>Achievements</Text>
-            <Text style={styles.menuDescription}>View your badges and milestones</Text>
+            <Text style={styles.menuDescription}>
+              View your badges and milestones
+            </Text>
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.menuItem}
           onPress={() => setShowGymComparison(true)}
         >
           <Text style={styles.menuIcon}>📊</Text>
           <View style={styles.menuContent}>
             <Text style={styles.menuText}>Gym Leaderboard</Text>
-            <Text style={styles.menuDescription}>Compare your PRs with gym members</Text>
+            <Text style={styles.menuDescription}>
+              Compare your PRs with gym members
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -297,7 +318,9 @@ const ProfileScreen = ({navigation}: any) => {
           <Text style={styles.menuIcon}>👤</Text>
           <View style={styles.menuContent}>
             <Text style={styles.menuText}>Edit Profile</Text>
-            <Text style={styles.menuDescription}>Update your personal information</Text>
+            <Text style={styles.menuDescription}>
+              Update your personal information
+            </Text>
           </View>
         </TouchableOpacity>
 
@@ -305,7 +328,9 @@ const ProfileScreen = ({navigation}: any) => {
           <Text style={styles.menuIcon}>🔒</Text>
           <View style={styles.menuContent}>
             <Text style={styles.menuText}>Change Password</Text>
-            <Text style={styles.menuDescription}>Update your account password</Text>
+            <Text style={styles.menuDescription}>
+              Update your account password
+            </Text>
           </View>
         </TouchableOpacity>
 
@@ -313,7 +338,9 @@ const ProfileScreen = ({navigation}: any) => {
           <Text style={styles.menuIcon}>🎨</Text>
           <View style={styles.menuContent}>
             <Text style={styles.menuText}>Appearance</Text>
-            <Text style={styles.menuDescription}>Dark mode and preferences</Text>
+            <Text style={styles.menuDescription}>
+              Dark mode and preferences
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -324,7 +351,9 @@ const ProfileScreen = ({navigation}: any) => {
           <Text style={styles.menuIcon}>🔔</Text>
           <View style={styles.menuContent}>
             <Text style={styles.menuText}>Notifications</Text>
-            <Text style={styles.menuDescription}>Manage notification preferences</Text>
+            <Text style={styles.menuDescription}>
+              Manage notification preferences
+            </Text>
           </View>
         </TouchableOpacity>
 
@@ -433,7 +462,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 3,
@@ -508,7 +537,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
@@ -555,7 +584,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
@@ -589,7 +618,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -621,7 +650,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#fee2e2',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -668,4 +697,3 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileScreen;
-

@@ -17,21 +17,49 @@ export interface Gym {
   id: string;
   name: string;
   address: string;
-  pincode: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  pincode?: string;
   latitude?: number;
   longitude?: number;
   phone?: string;
   email?: string;
+  website?: string;
   description?: string;
   facilities?: string[];
+  amenities?: string[];
   membership_cost?: number;
-  owner_id: string;
-  distance?: number; // Added for search results
-  created_at: string;
-  updated_at: string;
+  owner_id?: string;
+  distance?: number;
+  rating?: number;
+  price_range?: 1 | 2 | 3 | 4 | 5;
+  hours?: {
+    [key: string]:
+      | {
+          open: string;
+          close: string;
+        }
+      | null
+      | undefined;
+  };
+  photos?: string[];
+  membership_types?: {
+    name: string;
+    price_monthly: number;
+    benefits: string[];
+  }[];
+  created_at?: string;
+  updated_at?: string;
 }
 
-export type ExerciseType = 'benchpress' | 'squat' | 'deadlift' | 'pullup' | 'pushup' | 'dip';
+export type ExerciseType =
+  | 'benchpress'
+  | 'squat'
+  | 'deadlift'
+  | 'pullup'
+  | 'pushup'
+  | 'dip';
 
 export interface Video {
   id: string;
@@ -116,7 +144,13 @@ export interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string, userType: UserType, gymId?: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+    userType: UserType,
+    gymId?: string,
+  ) => Promise<void>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -131,7 +165,15 @@ export interface AuthContextType {
 export interface Exercise {
   id: string;
   name: string;
-  category: 'chest' | 'back' | 'legs' | 'shoulders' | 'arms' | 'core' | 'cardio' | 'full_body';
+  category:
+    | 'chest'
+    | 'back'
+    | 'legs'
+    | 'shoulders'
+    | 'arms'
+    | 'core'
+    | 'cardio'
+    | 'full_body';
   equipment: string[];
   muscle_groups: string[];
   difficulty_level: 'beginner' | 'intermediate' | 'advanced';
@@ -147,7 +189,12 @@ export interface WorkoutPlan {
   creator_id: string;
   duration_weeks: number;
   difficulty_level: 'beginner' | 'intermediate' | 'advanced';
-  goal?: 'strength' | 'muscle_building' | 'weight_loss' | 'endurance' | 'general_fitness';
+  goal?:
+    | 'strength'
+    | 'muscle_building'
+    | 'weight_loss'
+    | 'endurance'
+    | 'general_fitness';
   is_public: boolean;
   price: number;
   tags: string[];
@@ -212,7 +259,12 @@ export interface Challenge {
   id: string;
   name: string;
   description: string;
-  challenge_type: 'pr_based' | 'consistency' | 'total_volume' | 'specific_exercise' | 'duration';
+  challenge_type:
+    | 'pr_based'
+    | 'consistency'
+    | 'total_volume'
+    | 'specific_exercise'
+    | 'duration';
   exercise_type?: string;
   target_value?: number;
   target_unit?: string;
@@ -244,7 +296,12 @@ export interface Badge {
   name: string;
   description: string;
   icon_url?: string;
-  badge_type: 'pr_milestone' | 'consistency' | 'challenge_winner' | 'social' | 'special';
+  badge_type:
+    | 'pr_milestone'
+    | 'consistency'
+    | 'challenge_winner'
+    | 'social'
+    | 'special';
   requirements: Record<string, any>;
   points_value: number;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
@@ -274,7 +331,12 @@ export interface UserPoints {
 export interface LeaderboardEntry {
   id: string;
   user_id: string;
-  leaderboard_type: 'global_points' | 'monthly_points' | 'challenge_specific' | 'gym_specific' | 'exercise_pr';
+  leaderboard_type:
+    | 'global_points'
+    | 'monthly_points'
+    | 'challenge_specific'
+    | 'gym_specific'
+    | 'exercise_pr';
   reference_id?: string;
   score: number;
   rank_position?: number;
@@ -429,7 +491,12 @@ export interface CreateWorkoutPlanData {
   description?: string;
   duration_weeks?: number;
   difficulty_level: 'beginner' | 'intermediate' | 'advanced';
-  goal?: 'strength' | 'muscle_building' | 'weight_loss' | 'endurance' | 'general_fitness';
+  goal?:
+    | 'strength'
+    | 'muscle_building'
+    | 'weight_loss'
+    | 'endurance'
+    | 'general_fitness';
   is_public?: boolean;
   price?: number;
   tags?: string[];
@@ -472,7 +539,12 @@ export interface LogExerciseData {
 export interface CreateChallengeData {
   name: string;
   description: string;
-  challenge_type: 'pr_based' | 'consistency' | 'total_volume' | 'specific_exercise' | 'duration';
+  challenge_type:
+    | 'pr_based'
+    | 'consistency'
+    | 'total_volume'
+    | 'specific_exercise'
+    | 'duration';
   exercise_type?: string;
   target_value?: number;
   target_unit?: string;

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,13 +11,12 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {UserType, Gym} from '../types';
+import { useAuth } from '../services/auth';
+import { UserType, Gym } from '../types';
 import OnboardingFlow from '../components/OnboardingFlow';
-import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
-import CustomGoogleSignInButton from '../components/CustomGoogleSignInButton';
+import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
-const LoginScreen = ({navigation}: any) => {
+const LoginScreen = ({ navigation: _navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,29 +32,34 @@ const LoginScreen = ({navigation}: any) => {
     fullName: string;
   } | null>(null);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [_resetEmailSent, setResetEmailSent] = useState(false);
 
-  const {signIn, signUp, signInWithGoogle, resetPassword} = useAuth();
+  const { signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
 
-  const handleOnboardingComplete = async (gym: Gym, userChoice: 'existing' | 'looking') => {
-    if (!pendingUserData) return;
+  const handleOnboardingComplete = async (
+    gym: Gym,
+    _userChoice: 'existing' | 'looking',
+  ) => {
+    if (!pendingUserData) {
+      return;
+    }
 
     setLoading(true);
     try {
       // Create account with selected gym
       await signUp(
-        pendingUserData.email, 
-        pendingUserData.password, 
-        pendingUserData.fullName, 
+        pendingUserData.email,
+        pendingUserData.password,
+        pendingUserData.fullName,
         'gym_member',
-        gym.id
+        gym.id,
       );
-      
+
       Alert.alert(
-        'Welcome to GYMEZ!', 
-        `Successfully joined ${gym.name}. Please check your email for verification.`
+        'Welcome to GYMEZ!',
+        `Successfully joined ${gym.name}. Please check your email for verification.`,
       );
-      
+
       // Reset states
       setShowOnboarding(false);
       setPendingUserData(null);
@@ -111,14 +115,17 @@ const LoginScreen = ({navigation}: any) => {
       if (isSignUp) {
         if (userType === 'gym_member') {
           // For gym members, show gym selection first
-          setPendingUserData({email, password, fullName});
+          setPendingUserData({ email, password, fullName });
           setShowOnboarding(true);
           setLoading(false);
           return;
         } else {
           // For gym owners, create account directly
           await signUp(email, password, fullName, userType);
-          Alert.alert('Success', 'Account created successfully! Please check your email for verification.');
+          Alert.alert(
+            'Success',
+            'Account created successfully! Please check your email for verification.',
+          );
         }
       } else {
         await signIn(email, password);
@@ -131,17 +138,25 @@ const LoginScreen = ({navigation}: any) => {
   };
 
   const handleGoogleSignIn = async () => {
-    console.log('Google Sign-In button pressed!');
     setLoading(true);
     try {
       await signInWithGoogle();
-      Alert.alert('Success', 'Signed in with Google successfully!');
-      console.log('Google Sign-In completed successfully');
+      // Don't show alert here - let the auth context handle navigation
+      console.log('Google Sign-In initiated successfully');
     } catch (error: any) {
-      console.log('Google Sign-In error:', error.message);
-      Alert.alert('Google Sign-In Error', error.message || 'Failed to sign in with Google');
+      console.error('Google Sign-In error:', error);
+      // Only show alert if sign-in actually failed (not cancelled)
+      if (error?.code !== 'SIGN_IN_CANCELLED') {
+        Alert.alert(
+          'Google Sign-In Failed',
+          'Please try again or use email/password login.',
+        );
+      }
     } finally {
-      setLoading(false);
+      // Use setTimeout - standard React Native pattern
+      setTimeout(() => {
+        setLoading(false);
+      }, 0);
     }
   };
 
@@ -162,7 +177,7 @@ const LoginScreen = ({navigation}: any) => {
       setResetEmailSent(true);
       Alert.alert(
         'Reset Email Sent',
-        'Please check your email for password reset instructions.'
+        'Please check your email for password reset instructions.',
       );
     } catch (error: any) {
       Alert.alert('Error', error.message);
@@ -173,8 +188,8 @@ const LoginScreen = ({navigation}: any) => {
 
   if (showForgotPassword) {
     return (
-      <KeyboardAvoidingView 
-        style={styles.container} 
+      <KeyboardAvoidingView
+        style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -199,7 +214,8 @@ const LoginScreen = ({navigation}: any) => {
             <TouchableOpacity
               style={[styles.button, loading && styles.buttonDisabled]}
               onPress={handleForgotPassword}
-              disabled={loading}>
+              disabled={loading}
+            >
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
@@ -209,7 +225,8 @@ const LoginScreen = ({navigation}: any) => {
 
             <TouchableOpacity
               style={styles.linkButton}
-              onPress={() => setShowForgotPassword(false)}>
+              onPress={() => setShowForgotPassword(false)}
+            >
               <Text style={styles.linkText}>← Back to Sign In</Text>
             </TouchableOpacity>
           </View>
@@ -219,8 +236,8 @@ const LoginScreen = ({navigation}: any) => {
   }
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -250,12 +267,15 @@ const LoginScreen = ({navigation}: any) => {
                       styles.userTypeButton,
                       userType === 'gym_member' && styles.selectedUserType,
                     ]}
-                    onPress={() => setUserType('gym_member')}>
+                    onPress={() => setUserType('gym_member')}
+                  >
                     <Text
                       style={[
                         styles.userTypeText,
-                        userType === 'gym_member' && styles.selectedUserTypeText,
-                      ]}>
+                        userType === 'gym_member' &&
+                          styles.selectedUserTypeText,
+                      ]}
+                    >
                       💪 Gym Member
                     </Text>
                   </TouchableOpacity>
@@ -264,12 +284,14 @@ const LoginScreen = ({navigation}: any) => {
                       styles.userTypeButton,
                       userType === 'gym_owner' && styles.selectedUserType,
                     ]}
-                    onPress={() => setUserType('gym_owner')}>
+                    onPress={() => setUserType('gym_owner')}
+                  >
                     <Text
                       style={[
                         styles.userTypeText,
                         userType === 'gym_owner' && styles.selectedUserTypeText,
-                      ]}>
+                      ]}
+                    >
                       🏢 Gym Owner
                     </Text>
                   </TouchableOpacity>
@@ -297,7 +319,8 @@ const LoginScreen = ({navigation}: any) => {
             />
             <TouchableOpacity
               style={styles.passwordToggle}
-              onPress={() => setPasswordVisible(!passwordVisible)}>
+              onPress={() => setPasswordVisible(!passwordVisible)}
+            >
               <Text style={styles.passwordToggleText}>
                 {passwordVisible ? '🙈' : '👁️'}
               </Text>
@@ -317,7 +340,8 @@ const LoginScreen = ({navigation}: any) => {
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleAuth}
-            disabled={loading}>
+            disabled={loading}
+          >
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
@@ -330,7 +354,8 @@ const LoginScreen = ({navigation}: any) => {
           {!isSignUp && (
             <TouchableOpacity
               style={styles.linkButton}
-              onPress={() => setShowForgotPassword(true)}>
+              onPress={() => setShowForgotPassword(true)}
+            >
               <Text style={styles.linkText}>Forgot Password?</Text>
             </TouchableOpacity>
           )}
@@ -341,17 +366,13 @@ const LoginScreen = ({navigation}: any) => {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity
-            style={[styles.googleButton, loading && styles.buttonDisabled]}
+          <GoogleSigninButton
+            size={GoogleSigninButton.Size.Standard}
+            color={GoogleSigninButton.Color.Light}
             onPress={handleGoogleSignIn}
-            disabled={loading}>
-            <View style={styles.googleButtonContent}>
-              <View style={styles.googleIconContainer}>
-                <Text style={styles.googleIcon}>G</Text>
-              </View>
-              <Text style={styles.googleButtonText}>Continue with Google</Text>
-            </View>
-          </TouchableOpacity>
+            disabled={loading}
+            style={styles.googleButton}
+          />
 
           <TouchableOpacity
             style={styles.switchButton}
@@ -359,7 +380,8 @@ const LoginScreen = ({navigation}: any) => {
               setIsSignUp(!isSignUp);
               setShowForgotPassword(false);
               setResetEmailSent(false);
-            }}>
+            }}
+          >
             <Text style={styles.switchText}>
               {isSignUp
                 ? 'Already have an account? Sign In'

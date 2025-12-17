@@ -1,5 +1,5 @@
-import {supabase} from './supabase';
-import {Post, PostLike, PostComment, Follow} from '../types';
+import { supabase } from './supabase';
+import { Post, PostComment } from '../types';
 
 export class SocialService {
   /**
@@ -11,10 +11,10 @@ export class SocialService {
     postType: 'general' | 'pr_achievement' | 'workout',
     videoId?: string,
     prId?: string,
-    gymId?: string
+    gymId?: string,
   ): Promise<Post> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('posts')
         .insert({
           user_id: userId,
@@ -24,10 +24,12 @@ export class SocialService {
           pr_id: prId,
           gym_id: gymId,
         })
-        .select(`
+        .select(
+          `
           *,
           profiles!posts_user_id_fkey(full_name, username, profile_picture)
-        `)
+        `,
+        )
         .single();
 
       if (error) {
@@ -54,20 +56,26 @@ export class SocialService {
     userId: string,
     gymId?: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<Post[]> {
     try {
       // Get posts from people the user follows + gym posts
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('posts')
-        .select(`
+        .select(
+          `
           *,
           profiles!posts_user_id_fkey(full_name, username, profile_picture),
           post_likes!left(id),
           post_comments!left(id)
-        `)
-        .or(`user_id.in.(${await this.getFollowingIds(userId)}),gym_id.eq.${gymId}`)
-        .order('created_at', {ascending: false})
+        `,
+        )
+        .or(
+          `user_id.in.(${await this.getFollowingIds(
+            userId,
+          )}),gym_id.eq.${gymId}`,
+        )
+        .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (error) {
@@ -82,27 +90,27 @@ export class SocialService {
     }
   }
 
-
-
   /**
    * Get gym-specific posts
    */
   static async getGymPosts(
     gymId: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<Post[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('posts')
-        .select(`
+        .select(
+          `
           *,
           profiles!posts_user_id_fkey(full_name, username, profile_picture),
           post_likes!left(id),
           post_comments!left(id)
-        `)
+        `,
+        )
         .eq('gym_id', gymId)
-        .order('created_at', {ascending: false})
+        .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (error) {
@@ -122,19 +130,21 @@ export class SocialService {
   static async getUserPosts(
     userId: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<Post[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('posts')
-        .select(`
+        .select(
+          `
           *,
           profiles!posts_user_id_fkey(full_name, username, profile_picture),
           post_likes!left(id),
           post_comments!left(id)
-        `)
+        `,
+        )
         .eq('user_id', userId)
-        .order('created_at', {ascending: false})
+        .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (error) {
@@ -151,10 +161,14 @@ export class SocialService {
   /**
    * Add reaction to a post (supports 5 reaction types)
    */
-  static async addReaction(postId: string, userId: string, reactionType: string = 'like'): Promise<boolean> {
+  static async addReaction(
+    postId: string,
+    userId: string,
+    reactionType: string = 'like',
+  ): Promise<boolean> {
     try {
       // Check if user already reacted
-      const {data: existingReaction} = await supabase
+      const { data: existingReaction } = await supabase
         .from('post_likes')
         .select('id, reaction_type')
         .eq('post_id', postId)
@@ -175,7 +189,7 @@ export class SocialService {
           // Different reaction - update it
           await supabase
             .from('post_likes')
-            .update({reaction_type: reactionType})
+            .update({ reaction_type: reactionType })
             .eq('post_id', postId)
             .eq('user_id', userId);
           return true;
@@ -183,13 +197,11 @@ export class SocialService {
       }
 
       // Add new reaction
-      await supabase
-        .from('post_likes')
-        .insert({
-          post_id: postId,
-          user_id: userId,
-          reaction_type: reactionType,
-        });
+      await supabase.from('post_likes').insert({
+        post_id: postId,
+        user_id: userId,
+        reaction_type: reactionType,
+      });
 
       return true;
     } catch (error) {
@@ -204,7 +216,7 @@ export class SocialService {
   static async toggleLike(postId: string, userId: string): Promise<boolean> {
     try {
       // Check if already liked
-      const {data: existingLike} = await supabase
+      const { data: existingLike } = await supabase
         .from('post_likes')
         .select('id')
         .eq('post_id', postId)
@@ -213,20 +225,24 @@ export class SocialService {
 
       if (existingLike) {
         // Unlike
-        const {error} = await supabase
+        const { error } = await supabase
           .from('post_likes')
           .delete()
           .eq('id', existingLike.id);
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
         return false;
       } else {
         // Like
-        const {error} = await supabase
+        const { error } = await supabase
           .from('post_likes')
-          .insert({post_id: postId, user_id: userId});
+          .insert({ post_id: postId, user_id: userId });
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
         return true;
       }
     } catch (error) {
@@ -241,20 +257,22 @@ export class SocialService {
   static async addComment(
     postId: string,
     userId: string,
-    content: string
+    content: string,
   ): Promise<PostComment> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('post_comments')
         .insert({
           post_id: postId,
           user_id: userId,
           content,
         })
-        .select(`
+        .select(
+          `
           *,
           profiles!post_comments_user_id_fkey(full_name, username, profile_picture)
-        `)
+        `,
+        )
         .single();
 
       if (error) {
@@ -276,14 +294,16 @@ export class SocialService {
    */
   static async getPostComments(postId: string): Promise<PostComment[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('post_comments')
-        .select(`
+        .select(
+          `
           *,
           profiles!post_comments_user_id_fkey(full_name, username, profile_picture)
-        `)
+        `,
+        )
         .eq('post_id', postId)
-        .order('created_at', {ascending: true});
+        .order('created_at', { ascending: true });
 
       if (error) {
         throw new Error(`Failed to fetch comments: ${error.message}`);
@@ -304,11 +324,11 @@ export class SocialService {
    */
   static async toggleFollow(
     followerId: string,
-    followingId: string
+    followingId: string,
   ): Promise<boolean> {
     try {
       // Check if already following
-      const {data: existingFollow} = await supabase
+      const { data: existingFollow } = await supabase
         .from('follows')
         .select('id')
         .eq('follower_id', followerId)
@@ -317,20 +337,24 @@ export class SocialService {
 
       if (existingFollow) {
         // Unfollow
-        const {error} = await supabase
+        const { error } = await supabase
           .from('follows')
           .delete()
           .eq('id', existingFollow.id);
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
         return false;
       } else {
         // Follow
-        const {error} = await supabase
+        const { error } = await supabase
           .from('follows')
-          .insert({follower_id: followerId, following_id: followingId});
+          .insert({ follower_id: followerId, following_id: followingId });
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
         return true;
       }
     } catch (error) {
@@ -342,13 +366,17 @@ export class SocialService {
   /**
    * Get user's followers
    */
-  static async getFollowers(userId: string): Promise<{id: string; full_name: string; username?: string}[]> {
+  static async getFollowers(
+    userId: string,
+  ): Promise<{ id: string; full_name: string; username?: string }[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('follows')
-        .select(`
+        .select(
+          `
           profiles!follows_follower_id_fkey(id, full_name, username)
-        `)
+        `,
+        )
         .eq('following_id', userId);
 
       if (error) {
@@ -365,13 +393,17 @@ export class SocialService {
   /**
    * Get users that user is following
    */
-  static async getFollowing(userId: string): Promise<{id: string; full_name: string; username?: string}[]> {
+  static async getFollowing(
+    userId: string,
+  ): Promise<{ id: string; full_name: string; username?: string }[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('follows')
-        .select(`
+        .select(
+          `
           profiles!follows_following_id_fkey(id, full_name, username)
-        `)
+        `,
+        )
         .eq('follower_id', userId);
 
       if (error) {
@@ -391,8 +423,10 @@ export class SocialService {
   static async searchUsers(
     query: string,
     gymId?: string,
-    limit: number = 20
-  ): Promise<{id: string; full_name: string; username?: string; gym_id?: string}[]> {
+    limit: number = 20,
+  ): Promise<
+    { id: string; full_name: string; username?: string; gym_id?: string }[]
+  > {
     try {
       let supabaseQuery = supabase
         .from('profiles')
@@ -404,13 +438,18 @@ export class SocialService {
         supabaseQuery = supabaseQuery.eq('gym_id', gymId);
       }
 
-      const {data, error} = await supabaseQuery;
+      const { data, error } = await supabaseQuery;
 
       if (error) {
         throw new Error(`Failed to search users: ${error.message}`);
       }
 
-      return data as {id: string; full_name: string; username?: string; gym_id?: string}[];
+      return data as {
+        id: string;
+        full_name: string;
+        username?: string;
+        gym_id?: string;
+      }[];
     } catch (error) {
       console.error('Search users error:', error);
       throw error;
@@ -420,7 +459,7 @@ export class SocialService {
   // Helper methods
   private static async getFollowingIds(userId: string): Promise<string> {
     try {
-      const {data} = await supabase
+      const { data } = await supabase
         .from('follows')
         .select('following_id')
         .eq('follower_id', userId);
@@ -439,8 +478,10 @@ export class SocialService {
       user: post.profiles,
       likes_count: post.post_likes?.length || 0,
       comments_count: post.post_comments?.length || 0,
-      is_liked: currentUserId ? 
-        post.post_likes?.some((like: any) => like.user_id === currentUserId) || false 
+      is_liked: currentUserId
+        ? post.post_likes?.some(
+            (like: any) => like.user_id === currentUserId,
+          ) || false
         : false,
     })) as Post[];
   }

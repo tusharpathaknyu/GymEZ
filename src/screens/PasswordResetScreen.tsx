@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,21 +11,24 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import {useAuth} from '../services/auth';
+import { useAuth } from '../services/auth';
 
 interface PasswordResetScreenProps {
   navigation: any;
   route: any;
 }
 
-const PasswordResetScreen: React.FC<PasswordResetScreenProps> = ({navigation, route}) => {
+const PasswordResetScreen: React.FC<PasswordResetScreenProps> = ({
+  navigation,
+  route,
+}) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [resetToken, setResetToken] = useState<string | null>(null);
+  const [_resetToken, setResetToken] = useState<string | null>(null);
 
-  const {updatePassword} = useAuth();
+  const { updatePassword } = useAuth();
 
   useEffect(() => {
     // Extract reset token from route params or deep link
@@ -65,16 +68,12 @@ const PasswordResetScreen: React.FC<PasswordResetScreenProps> = ({navigation, ro
     setLoading(true);
     try {
       await updatePassword(password);
-      Alert.alert(
-        'Success',
-        'Your password has been updated successfully!',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.replace('Login'),
-          },
-        ]
-      );
+      Alert.alert('Success', 'Your password has been updated successfully!', [
+        {
+          text: 'OK',
+          onPress: () => navigation.replace('Login'),
+        },
+      ]);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to update password');
     } finally {
@@ -83,8 +82,8 @@ const PasswordResetScreen: React.FC<PasswordResetScreenProps> = ({navigation, ro
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -107,7 +106,8 @@ const PasswordResetScreen: React.FC<PasswordResetScreenProps> = ({navigation, ro
             />
             <TouchableOpacity
               style={styles.passwordToggle}
-              onPress={() => setPasswordVisible(!passwordVisible)}>
+              onPress={() => setPasswordVisible(!passwordVisible)}
+            >
               <Text style={styles.passwordToggleText}>
                 {passwordVisible ? '🙈' : '👁️'}
               </Text>
@@ -124,15 +124,22 @@ const PasswordResetScreen: React.FC<PasswordResetScreenProps> = ({navigation, ro
 
           <View style={styles.passwordRequirements}>
             <Text style={styles.requirementsTitle}>Password Requirements:</Text>
-            <Text style={styles.requirementItem}>• At least 6 characters long</Text>
-            <Text style={styles.requirementItem}>• Contains uppercase and lowercase letters</Text>
-            <Text style={styles.requirementItem}>• Contains at least one number</Text>
+            <Text style={styles.requirementItem}>
+              • At least 6 characters long
+            </Text>
+            <Text style={styles.requirementItem}>
+              • Contains uppercase and lowercase letters
+            </Text>
+            <Text style={styles.requirementItem}>
+              • Contains at least one number
+            </Text>
           </View>
 
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handlePasswordReset}
-            disabled={loading}>
+            disabled={loading}
+          >
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
@@ -142,7 +149,8 @@ const PasswordResetScreen: React.FC<PasswordResetScreenProps> = ({navigation, ro
 
           <TouchableOpacity
             style={styles.linkButton}
-            onPress={() => navigation.goBack()}>
+            onPress={() => navigation.goBack()}
+          >
             <Text style={styles.linkText}>← Back to Login</Text>
           </TouchableOpacity>
         </View>

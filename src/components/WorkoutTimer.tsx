@@ -8,7 +8,7 @@ import {
   Alert,
   Vibration,
   AppState,
-  AppStateStatus
+  AppStateStatus,
 } from 'react-native';
 
 interface WorkoutTimerProps {
@@ -20,7 +20,7 @@ interface WorkoutTimerProps {
 export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
   onWorkoutComplete,
   onRestComplete,
-  initialRestSeconds = 60
+  initialRestSeconds = 60,
 }) => {
   const [workoutTime, setWorkoutTime] = useState(0);
   const [restTime, setRestTime] = useState(initialRestSeconds);
@@ -28,7 +28,7 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
   const [isRestActive, setIsRestActive] = useState(false);
   const [workoutStartTime, setWorkoutStartTime] = useState<Date | null>(null);
   const [restStartTime, setRestStartTime] = useState<Date | null>(null);
-  
+
   const workoutIntervalRef = useRef<ReturnType<typeof setInterval>>();
   const restIntervalRef = useRef<ReturnType<typeof setInterval>>();
   const appStateRef = useRef(AppState.currentState);
@@ -37,14 +37,21 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
-      if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
         // App came to foreground, update timers based on elapsed time
         if (isWorkoutActive && workoutStartTime) {
-          const elapsed = Math.floor((Date.now() - workoutStartTime.getTime()) / 1000);
+          const elapsed = Math.floor(
+            (Date.now() - workoutStartTime.getTime()) / 1000,
+          );
           setWorkoutTime(elapsed);
         }
         if (isRestActive && restStartTime) {
-          const elapsed = Math.floor((Date.now() - restStartTime.getTime()) / 1000);
+          const elapsed = Math.floor(
+            (Date.now() - restStartTime.getTime()) / 1000,
+          );
           const remaining = Math.max(0, initialRestSeconds - elapsed);
           setRestTime(remaining);
           if (remaining === 0 && isRestActive) {
@@ -55,9 +62,19 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
       appStateRef.current = nextAppState;
     };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
     return () => subscription?.remove();
-  }, [isWorkoutActive, isRestActive, workoutStartTime, restStartTime, initialRestSeconds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isWorkoutActive,
+    isRestActive,
+    workoutStartTime,
+    restStartTime,
+    initialRestSeconds,
+  ]);
 
   useEffect(() => {
     if (isWorkoutActive) {
@@ -87,6 +104,7 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
     }
 
     return () => clearInterval(restIntervalRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRestActive, restTime]);
 
   useEffect(() => {
@@ -95,6 +113,7 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
     } else {
       pulseAnim.setValue(1);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRestActive]);
 
   const startPulseAnimation = () => {
@@ -110,7 +129,7 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
           duration: 500,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
   };
 
@@ -126,12 +145,12 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
 
   const resumeWorkout = () => {
     setIsWorkoutActive(true);
-    setWorkoutStartTime(new Date(Date.now() - (workoutTime * 1000)));
+    setWorkoutStartTime(new Date(Date.now() - workoutTime * 1000));
   };
 
   const finishWorkout = () => {
     setIsWorkoutActive(false);
-    
+
     Alert.alert(
       'Workout Complete!',
       `Great job! You worked out for ${formatTime(workoutTime)}.`,
@@ -142,9 +161,9 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
             onWorkoutComplete?.(workoutTime);
             setWorkoutTime(0);
             setWorkoutStartTime(null);
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
@@ -153,7 +172,7 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
     setRestTime(restDuration);
     setIsRestActive(true);
     setRestStartTime(new Date());
-    
+
     // Fade out animation
     Animated.timing(fadeAnim, {
       toValue: 0.7,
@@ -166,19 +185,19 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
     setIsRestActive(false);
     setRestTime(initialRestSeconds);
     setRestStartTime(null);
-    
+
     // Vibrate and show alert
     Vibration.vibrate([500, 200, 500]);
-    
+
     // Fade in animation
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 300,
       useNativeDriver: true,
     }).start();
-    
+
     onRestComplete?.();
-    
+
     Alert.alert('Rest Complete!', 'Time to get back to work! 💪');
   };
 
@@ -196,14 +215,20 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
     const remainingSeconds = seconds % 60;
 
     if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds
+        .toString()
+        .padStart(2, '0')}`;
     }
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   const getRestTimeColor = (): string => {
-    if (restTime <= 10) return '#FF3B30';
-    if (restTime <= 30) return '#FF9500';
+    if (restTime <= 10) {
+      return '#FF3B30';
+    }
+    if (restTime <= 30) {
+      return '#FF9500';
+    }
     return '#007AFF';
   };
 
@@ -212,7 +237,7 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
       <View style={styles.timerSection}>
         <Text style={styles.sectionTitle}>Workout Time</Text>
         <Text style={styles.workoutTime}>{formatTime(workoutTime)}</Text>
-        
+
         <View style={styles.workoutControls}>
           {!isWorkoutActive ? (
             <TouchableOpacity
@@ -231,7 +256,7 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
               <Text style={styles.buttonText}>⏸️ Pause</Text>
             </TouchableOpacity>
           )}
-          
+
           {workoutTime > 0 && (
             <TouchableOpacity
               style={[styles.button, styles.finishButton]}
@@ -247,34 +272,36 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
 
       <View style={styles.timerSection}>
         <Text style={styles.sectionTitle}>Rest Timer</Text>
-        
+
         {!isRestActive ? (
           <View style={styles.restSetup}>
             <Text style={styles.restTimeDisplay}>
               Ready: {formatTime(restTime)}
             </Text>
-            
+
             <View style={styles.restControls}>
               <View style={styles.restTimeButtons}>
-                {[30, 45, 60, 90, 120].map((seconds) => (
+                {[30, 45, 60, 90, 120].map(seconds => (
                   <TouchableOpacity
                     key={seconds}
                     style={[
                       styles.timeButton,
-                      restTime === seconds && styles.selectedTimeButton
+                      restTime === seconds && styles.selectedTimeButton,
                     ]}
                     onPress={() => setRestTime(seconds)}
                   >
-                    <Text style={[
-                      styles.timeButtonText,
-                      restTime === seconds && styles.selectedTimeButtonText
-                    ]}>
+                    <Text
+                      style={[
+                        styles.timeButtonText,
+                        restTime === seconds && styles.selectedTimeButtonText,
+                      ]}
+                    >
                       {seconds}s
                     </Text>
                   </TouchableOpacity>
                 ))}
               </View>
-              
+
               <TouchableOpacity
                 style={[styles.button, styles.restButton]}
                 onPress={() => startRest()}
@@ -289,14 +316,16 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
             <Animated.View
               style={[
                 styles.restTimeContainer,
-                { transform: [{ scale: pulseAnim }] }
+                { transform: [{ scale: pulseAnim }] },
               ]}
             >
-              <Text style={[styles.restTimeActive, { color: getRestTimeColor() }]}>
+              <Text
+                style={[styles.restTimeActive, { color: getRestTimeColor() }]}
+              >
                 {formatTime(restTime)}
               </Text>
             </Animated.View>
-            
+
             <View style={styles.restActiveControls}>
               <TouchableOpacity
                 style={[styles.button, styles.skipButton]}
@@ -304,7 +333,7 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
               >
                 <Text style={styles.buttonText}>⏭️ Skip</Text>
               </TouchableOpacity>
-              
+
               <View style={styles.addTimeButtons}>
                 <TouchableOpacity
                   style={styles.addTimeButton}
@@ -323,13 +352,15 @@ export const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
           </View>
         )}
       </View>
-      
+
       {isRestActive && (
         <View style={styles.motivationContainer}>
           <Text style={styles.motivationText}>
-            {restTime > 30 ? '💪 Recovery time!' : 
-             restTime > 10 ? '🔥 Almost ready!' : 
-             '⚡ Get ready!'}
+            {restTime > 30
+              ? '💪 Recovery time!'
+              : restTime > 10
+              ? '🔥 Almost ready!'
+              : '⚡ Get ready!'}
           </Text>
         </View>
       )}

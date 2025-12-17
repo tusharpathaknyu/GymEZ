@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Alert,
-  Modal
+  Modal,
 } from 'react-native';
 import { ChallengeService } from '../services/challengeService';
 import type { Challenge, UserChallenge } from '../types';
@@ -16,13 +16,19 @@ interface ChallengeListProps {
   onChallengeJoin?: (challenge: Challenge) => void;
 }
 
-export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin }) => {
+export const ChallengeList: React.FC<ChallengeListProps> = ({
+  onChallengeJoin,
+}) => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [userChallenges, setUserChallenges] = useState<UserChallenge[]>([]);
-  const [activeTab, setActiveTab] = useState<'available' | 'my_challenges'>('available');
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'available' | 'my_challenges'>(
+    'available',
+  );
+  const [_loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(
+    null,
+  );
   const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
@@ -32,7 +38,9 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
 
   const loadChallenges = async () => {
     try {
-      const challengeData = await ChallengeService.getChallenges({ is_active: true });
+      const challengeData = await ChallengeService.getChallenges({
+        is_active: true,
+      });
       setChallenges(challengeData);
     } catch (error) {
       console.error('Error loading challenges:', error);
@@ -63,7 +71,10 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
       await loadUserChallenges();
       onChallengeJoin?.(challenge);
     } catch (error) {
-      Alert.alert('Error', 'Failed to join challenge. You may already be participating.');
+      Alert.alert(
+        'Error',
+        'Failed to join challenge. You may already be participating.',
+      );
       console.error('Error joining challenge:', error);
     }
   };
@@ -73,29 +84,43 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
   };
 
   const getUserProgress = (challengeId: string): number => {
-    const userChallenge = userChallenges.find(uc => uc.challenge_id === challengeId);
+    const userChallenge = userChallenges.find(
+      uc => uc.challenge_id === challengeId,
+    );
     return userChallenge?.current_progress || 0;
   };
 
   const getChallengeTypeIcon = (type: Challenge['challenge_type']): string => {
     switch (type) {
-      case 'pr_based': return '🏆';
-      case 'consistency': return '📅';
-      case 'total_volume': return '💪';
-      case 'specific_exercise': return '🎯';
-      case 'duration': return '⏱️';
-      default: return '🔥';
+      case 'pr_based':
+        return '🏆';
+      case 'consistency':
+        return '📅';
+      case 'total_volume':
+        return '💪';
+      case 'specific_exercise':
+        return '🎯';
+      case 'duration':
+        return '⏱️';
+      default:
+        return '🔥';
     }
   };
 
   const getChallengeTypeColor = (type: Challenge['challenge_type']): string => {
     switch (type) {
-      case 'pr_based': return '#FFD700';
-      case 'consistency': return '#32D74B';
-      case 'total_volume': return '#FF3B30';
-      case 'specific_exercise': return '#007AFF';
-      case 'duration': return '#AF52DE';
-      default: return '#8E8E93';
+      case 'pr_based':
+        return '#FFD700';
+      case 'consistency':
+        return '#32D74B';
+      case 'total_volume':
+        return '#FF3B30';
+      case 'specific_exercise':
+        return '#007AFF';
+      case 'duration':
+        return '#AF52DE';
+      default:
+        return '#8E8E93';
     }
   };
 
@@ -104,14 +129,20 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
     const now = new Date();
     const diffMs = end.getTime() - now.getTime();
     const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    
-    if (days <= 0) return 'Expired';
-    if (days === 1) return '1 day left';
+
+    if (days <= 0) {
+      return 'Expired';
+    }
+    if (days === 1) {
+      return '1 day left';
+    }
     return `${days} days left`;
   };
 
   const getProgressPercentage = (current: number, target?: number): number => {
-    if (!target || target === 0) return 0;
+    if (!target || target === 0) {
+      return 0;
+    }
     return Math.min((current / target) * 100, 100);
   };
 
@@ -119,7 +150,10 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
     const challenge = item;
     const isJoined = isUserInChallenge(challenge.id);
     const progress = getUserProgress(challenge.id);
-    const progressPercentage = getProgressPercentage(progress, challenge.target_value);
+    const progressPercentage = getProgressPercentage(
+      progress,
+      challenge.target_value,
+    );
 
     return (
       <TouchableOpacity
@@ -131,10 +165,16 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
       >
         <View style={styles.challengeHeader}>
           <View style={styles.challengeTypeContainer}>
-            <View style={[
-              styles.challengeTypeBadge,
-              { backgroundColor: getChallengeTypeColor(challenge.challenge_type) }
-            ]}>
+            <View
+              style={[
+                styles.challengeTypeBadge,
+                {
+                  backgroundColor: getChallengeTypeColor(
+                    challenge.challenge_type,
+                  ),
+                },
+              ]}
+            >
               <Text style={styles.challengeTypeIcon}>
                 {getChallengeTypeIcon(challenge.challenge_type)}
               </Text>
@@ -143,9 +183,11 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
               {challenge.challenge_type.replace('_', ' ').toUpperCase()}
             </Text>
           </View>
-          
+
           <View style={styles.rewardContainer}>
-            <Text style={styles.rewardPoints}>🪙 {challenge.reward_points}</Text>
+            <Text style={styles.rewardPoints}>
+              🪙 {challenge.reward_points}
+            </Text>
           </View>
         </View>
 
@@ -161,7 +203,7 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
               {challenge.target_value} {challenge.target_unit}
             </Text>
           </View>
-          
+
           <Text style={styles.timeRemaining}>
             {challenge.end_date && formatTimeRemaining(challenge.end_date)}
           </Text>
@@ -176,10 +218,10 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
               </Text>
             </View>
             <View style={styles.progressBarBackground}>
-              <View 
+              <View
                 style={[
                   styles.progressBarFill,
-                  { width: `${progressPercentage}%` }
+                  { width: `${progressPercentage}%` },
                 ]}
               />
             </View>
@@ -189,15 +231,17 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
         <TouchableOpacity
           style={[
             styles.actionButton,
-            isJoined ? styles.joinedButton : styles.joinButton
+            isJoined ? styles.joinedButton : styles.joinButton,
           ]}
           onPress={() => !isJoined && joinChallenge(challenge)}
           disabled={isJoined}
         >
-          <Text style={[
-            styles.actionButtonText,
-            isJoined ? styles.joinedButtonText : styles.joinButtonText
-          ]}>
+          <Text
+            style={[
+              styles.actionButtonText,
+              isJoined ? styles.joinedButtonText : styles.joinButtonText,
+            ]}
+          >
             {isJoined ? '✅ Joined' : '🚀 Join Challenge'}
           </Text>
         </TouchableOpacity>
@@ -205,33 +249,44 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
     );
   };
 
-  const renderUserChallenge = ({ item: userChallenge }: { item: UserChallenge }) => {
+  const renderUserChallenge = ({
+    item: userChallenge,
+  }: {
+    item: UserChallenge;
+  }) => {
     const challenge = userChallenge.challenge;
-    if (!challenge) return null;
+    if (!challenge) {
+      return null;
+    }
 
     const progressPercentage = getProgressPercentage(
       userChallenge.current_progress,
-      challenge.target_value
+      challenge.target_value,
     );
     const isCompleted = userChallenge.is_completed;
 
     return (
-      <View style={[
-        styles.challengeCard,
-        isCompleted && styles.completedChallenge
-      ]}>
+      <View
+        style={[styles.challengeCard, isCompleted && styles.completedChallenge]}
+      >
         <View style={styles.challengeHeader}>
           <View style={styles.challengeTypeContainer}>
-            <View style={[
-              styles.challengeTypeBadge,
-              { backgroundColor: getChallengeTypeColor(challenge.challenge_type) }
-            ]}>
+            <View
+              style={[
+                styles.challengeTypeBadge,
+                {
+                  backgroundColor: getChallengeTypeColor(
+                    challenge.challenge_type,
+                  ),
+                },
+              ]}
+            >
               <Text style={styles.challengeTypeIcon}>
                 {getChallengeTypeIcon(challenge.challenge_type)}
               </Text>
             </View>
           </View>
-          
+
           {isCompleted && (
             <View style={styles.completedBadge}>
               <Text style={styles.completedBadgeText}>✅ COMPLETED</Text>
@@ -245,15 +300,16 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
           <View style={styles.progressHeader}>
             <Text style={styles.progressLabel}>Progress</Text>
             <Text style={styles.progressText}>
-              {userChallenge.current_progress} / {challenge.target_value} {challenge.target_unit}
+              {userChallenge.current_progress} / {challenge.target_value}{' '}
+              {challenge.target_unit}
             </Text>
           </View>
           <View style={styles.progressBarBackground}>
-            <View 
+            <View
               style={[
                 styles.progressBarFill,
                 { width: `${progressPercentage}%` },
-                isCompleted && styles.completedProgressBar
+                isCompleted && styles.completedProgressBar,
               ]}
             />
           </View>
@@ -278,7 +334,9 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
   };
 
   const ChallengeDetailsModal = () => {
-    if (!selectedChallenge) return null;
+    if (!selectedChallenge) {
+      return null;
+    }
 
     const isJoined = isUserInChallenge(selectedChallenge.id);
     const progress = getUserProgress(selectedChallenge.id);
@@ -302,27 +360,40 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
 
           <View style={styles.modalContent}>
             <View style={styles.challengeTypeContainer}>
-              <View style={[
-                styles.challengeTypeBadge,
-                { backgroundColor: getChallengeTypeColor(selectedChallenge.challenge_type) }
-              ]}>
+              <View
+                style={[
+                  styles.challengeTypeBadge,
+                  {
+                    backgroundColor: getChallengeTypeColor(
+                      selectedChallenge.challenge_type,
+                    ),
+                  },
+                ]}
+              >
                 <Text style={styles.challengeTypeIcon}>
                   {getChallengeTypeIcon(selectedChallenge.challenge_type)}
                 </Text>
               </View>
               <Text style={styles.challengeType}>
-                {selectedChallenge.challenge_type.replace('_', ' ').toUpperCase()}
+                {selectedChallenge.challenge_type
+                  .replace('_', ' ')
+                  .toUpperCase()}
               </Text>
             </View>
 
-            <Text style={styles.modalChallengeName}>{selectedChallenge.name}</Text>
-            <Text style={styles.modalChallengeDescription}>{selectedChallenge.description}</Text>
+            <Text style={styles.modalChallengeName}>
+              {selectedChallenge.name}
+            </Text>
+            <Text style={styles.modalChallengeDescription}>
+              {selectedChallenge.description}
+            </Text>
 
             <View style={styles.detailsGrid}>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>Target</Text>
                 <Text style={styles.detailValue}>
-                  {selectedChallenge.target_value} {selectedChallenge.target_unit}
+                  {selectedChallenge.target_value}{' '}
+                  {selectedChallenge.target_unit}
                 </Text>
               </View>
 
@@ -353,14 +424,20 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
                 <View style={styles.progressHeader}>
                   <Text style={styles.progressLabel}>Your Progress</Text>
                   <Text style={styles.progressText}>
-                    {progress} / {selectedChallenge.target_value} {selectedChallenge.target_unit}
+                    {progress} / {selectedChallenge.target_value}{' '}
+                    {selectedChallenge.target_unit}
                   </Text>
                 </View>
                 <View style={styles.progressBarBackground}>
-                  <View 
+                  <View
                     style={[
                       styles.progressBarFill,
-                      { width: `${getProgressPercentage(progress, selectedChallenge.target_value)}%` }
+                      {
+                        width: `${getProgressPercentage(
+                          progress,
+                          selectedChallenge.target_value,
+                        )}%`,
+                      },
                     ]}
                   />
                 </View>
@@ -370,7 +447,7 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
             <TouchableOpacity
               style={[
                 styles.modalActionButton,
-                isJoined ? styles.joinedButton : styles.joinButton
+                isJoined ? styles.joinedButton : styles.joinButton,
               ]}
               onPress={() => {
                 if (!isJoined) {
@@ -380,10 +457,12 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
               }}
               disabled={isJoined}
             >
-              <Text style={[
-                styles.actionButtonText,
-                isJoined ? styles.joinedButtonText : styles.joinButtonText
-              ]}>
+              <Text
+                style={[
+                  styles.actionButtonText,
+                  isJoined ? styles.joinedButtonText : styles.joinButtonText,
+                ]}
+              >
                 {isJoined ? '✅ Already Joined' : '🚀 Join This Challenge'}
               </Text>
             </TouchableOpacity>
@@ -397,16 +476,15 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
     <View style={styles.container}>
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'available' && styles.activeTab
-          ]}
+          style={[styles.tab, activeTab === 'available' && styles.activeTab]}
           onPress={() => setActiveTab('available')}
         >
-          <Text style={[
-            styles.tabText,
-            activeTab === 'available' && styles.activeTabText
-          ]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'available' && styles.activeTabText,
+            ]}
+          >
             🔥 Available ({challenges.length})
           </Text>
         </TouchableOpacity>
@@ -414,14 +492,16 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'my_challenges' && styles.activeTab
+            activeTab === 'my_challenges' && styles.activeTab,
           ]}
           onPress={() => setActiveTab('my_challenges')}
         >
-          <Text style={[
-            styles.tabText,
-            activeTab === 'my_challenges' && styles.activeTabText
-          ]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'my_challenges' && styles.activeTabText,
+            ]}
+          >
             💪 My Challenges ({userChallenges.length})
           </Text>
         </TouchableOpacity>
@@ -431,7 +511,7 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
         <FlatList<Challenge>
           data={challenges}
           renderItem={renderChallengeCard}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -442,7 +522,7 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({ onChallengeJoin })
         <FlatList<UserChallenge>
           data={userChallenges}
           renderItem={renderUserChallenge}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }

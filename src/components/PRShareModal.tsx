@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,8 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import {PersonalRecord, ExerciseType} from '../types';
-import {PersonalRecordsService} from '../services/personalRecordsService';
+import { PersonalRecord } from '../types';
+import { PersonalRecordsService } from '../services/personalRecordsService';
 
 interface PRShareModalProps {
   visible: boolean;
@@ -18,7 +18,12 @@ interface PRShareModalProps {
   onShare: (content: string) => void;
 }
 
-const PRShareModal: React.FC<PRShareModalProps> = ({visible, pr, onClose, onShare}) => {
+const PRShareModal: React.FC<PRShareModalProps> = ({
+  visible,
+  pr,
+  onClose,
+  onShare,
+}) => {
   const [caption, setCaption] = useState('');
   const [isNewBest, setIsNewBest] = useState(false);
 
@@ -26,23 +31,27 @@ const PRShareModal: React.FC<PRShareModalProps> = ({visible, pr, onClose, onShar
     if (pr) {
       // Set default caption
       const exercise = PersonalRecordsService.getExerciseCategories().find(
-        e => e.type === pr.exercise_type
+        e => e.type === pr.exercise_type,
       );
-      
+
       if (['benchpress', 'squat', 'deadlift'].includes(pr.exercise_type)) {
-        setCaption(`Just hit ${pr.weight}kg × ${pr.reps} on ${exercise?.name}! 💪`);
+        setCaption(
+          `Just hit ${pr.weight}kg × ${pr.reps} on ${exercise?.name}! 💪`,
+        );
       } else {
         setCaption(`Just did ${pr.reps} reps of ${exercise?.name}! 🔥`);
       }
-      
+
       setIsNewBest(false); // Would check against previous best
     }
   }, [pr]);
 
-  if (!pr) return null;
+  if (!pr) {
+    return null;
+  }
 
   const exercise = PersonalRecordsService.getExerciseCategories().find(
-    e => e.type === pr.exercise_type
+    e => e.type === pr.exercise_type,
   );
 
   const formatPR = () => {
@@ -243,4 +252,3 @@ const styles = StyleSheet.create({
 });
 
 export default PRShareModal;
-

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,18 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {PersonalRecordsService} from '../services/personalRecordsService';
-import {SocialService} from '../services/socialService';
-import {PersonalRecord, ExerciseType, Post} from '../types';
+import { useAuth } from '../services/auth';
+import { PersonalRecordsService } from '../services/personalRecordsService';
+import { SocialService } from '../services/socialService';
+import { PersonalRecord, Post } from '../types';
 import WorkoutStreak from '../components/WorkoutStreak';
 import ProgressPhotos from '../components/ProgressPhotos';
 import QuickActions from '../components/QuickActions';
 import PRLogForm from '../components/PRLogForm';
 import PRAnalytics from '../components/PRAnalytics';
 
-const HomeScreen = ({navigation}: any) => {
-  const {user} = useAuth();
+const HomeScreen = ({ navigation }: any) => {
+  const { user } = useAuth();
   const [recentPRs, setRecentPRs] = useState<PersonalRecord[]>([]);
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [stats, setStats] = useState<any>(null);
@@ -29,10 +29,13 @@ const HomeScreen = ({navigation}: any) => {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadData = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     setLoading(true);
     try {
@@ -59,10 +62,11 @@ const HomeScreen = ({navigation}: any) => {
   };
 
   const formatPR = (pr: PersonalRecord) => {
-    const exercises = PersonalRecordsService.getExerciseCategories();
-    const exercise = exercises.find(e => e.type === pr.exercise_type);
-    
-    if (pr.exercise_type === 'pullup' || pr.exercise_type === 'pushup' || pr.exercise_type === 'dip') {
+    if (
+      pr.exercise_type === 'pullup' ||
+      pr.exercise_type === 'pushup' ||
+      pr.exercise_type === 'dip'
+    ) {
       return `${pr.reps} reps`;
     }
     return `${pr.weight}kg × ${pr.reps}`;
@@ -80,128 +84,142 @@ const HomeScreen = ({navigation}: any) => {
     <View style={styles.container}>
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#10b981" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor="#10b981"
+          />
         }
       >
-      {/* Welcome Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Welcome back,</Text>
-          <Text style={styles.userName}>{user?.full_name?.split(' ')[0] || 'Member'}! 👋</Text>
-        </View>
-      </View>
-
-      {/* Quick Stats */}
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statIcon}>🏆</Text>
-          <Text style={styles.statNumber}>{stats?.totalPRs || 0}</Text>
-          <Text style={styles.statLabel}>Total PRs</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statIcon}>💪</Text>
-          <Text style={styles.statNumber}>{stats?.exercisesWithPRs?.length || 0}</Text>
-          <Text style={styles.statLabel}>Exercises</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statIcon}>🔥</Text>
-          <Text style={styles.statNumber}>{recentPRs.length}</Text>
-          <Text style={styles.statLabel}>This Week</Text>
-        </View>
-      </View>
-
-      {/* Recent PRs Section */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent PRs 🏅</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('PRs')}>
-            <Text style={styles.seeAll}>See all →</Text>
-          </TouchableOpacity>
-        </View>
-        {recentPRs.length > 0 ? (
-          <View style={styles.listContainer}>
-            {recentPRs.map(pr => {
-              const exercise = PersonalRecordsService.getExerciseCategories().find(
-                e => e.type === pr.exercise_type
-              );
-              return (
-                <View key={pr.id} style={styles.prCard}>
-                  <Text style={styles.exerciseIcon}>{exercise?.icon}</Text>
-                  <View style={styles.prDetails}>
-                    <Text style={styles.prExercise}>{exercise?.name}</Text>
-                    <Text style={styles.prValue}>{formatPR(pr)}</Text>
-                  </View>
-                  <Text style={styles.prDate}>
-                    {new Date(pr.achieved_at).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </Text>
-                </View>
-              );
-            })}
+        {/* Welcome Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Welcome back,</Text>
+            <Text style={styles.userName}>
+              {user?.full_name?.split(' ')[0] || 'Member'}! 👋
+            </Text>
           </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No PRs yet</Text>
-            <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('Workouts')}>
-              <Text style={styles.addButtonText}>Record Your First PR</Text>
+        </View>
+
+        {/* Quick Stats */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <Text style={styles.statIcon}>🏆</Text>
+            <Text style={styles.statNumber}>{stats?.totalPRs || 0}</Text>
+            <Text style={styles.statLabel}>Total PRs</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statIcon}>💪</Text>
+            <Text style={styles.statNumber}>
+              {stats?.exercisesWithPRs?.length || 0}
+            </Text>
+            <Text style={styles.statLabel}>Exercises</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statIcon}>🔥</Text>
+            <Text style={styles.statNumber}>{recentPRs.length}</Text>
+            <Text style={styles.statLabel}>This Week</Text>
+          </View>
+        </View>
+
+        {/* Recent PRs Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recent PRs 🏅</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('PRs')}>
+              <Text style={styles.seeAll}>See all →</Text>
             </TouchableOpacity>
           </View>
-        )}
-      </View>
-
-      {/* Recent Activity */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Activity 📰</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Social')}>
-            <Text style={styles.seeAll}>See all →</Text>
-          </TouchableOpacity>
-        </View>
-        {recentPosts.length > 0 ? (
-          <View style={styles.listContainer}>
-            {recentPosts.map(post => (
-              <View key={post.id} style={styles.activityCard}>
-                <View style={styles.activityHeader}>
-                  <Text style={styles.activityUser}>{post.user?.full_name || 'Someone'}</Text>
-                  <Text style={styles.activityTime}>
-                    {new Date(post.created_at).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </Text>
-                </View>
-                <Text style={styles.activityContent} numberOfLines={2}>
-                  {post.content}
-                </Text>
-                {post.post_type === 'pr_achievement' && (
-                  <View style={styles.prBadge}>
-                    <Text style={styles.prBadgeText}>🎉 New PR!</Text>
+          {recentPRs.length > 0 ? (
+            <View style={styles.listContainer}>
+              {recentPRs.map(pr => {
+                const exercise =
+                  PersonalRecordsService.getExerciseCategories().find(
+                    e => e.type === pr.exercise_type,
+                  );
+                return (
+                  <View key={pr.id} style={styles.prCard}>
+                    <Text style={styles.exerciseIcon}>{exercise?.icon}</Text>
+                    <View style={styles.prDetails}>
+                      <Text style={styles.prExercise}>{exercise?.name}</Text>
+                      <Text style={styles.prValue}>{formatPR(pr)}</Text>
+                    </View>
+                    <Text style={styles.prDate}>
+                      {new Date(pr.achieved_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </Text>
                   </View>
-                )}
-              </View>
-            ))}
+                );
+              })}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No PRs yet</Text>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate('Workouts')}
+              >
+                <Text style={styles.addButtonText}>Record Your First PR</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* Recent Activity */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recent Activity 📰</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Social')}>
+              <Text style={styles.seeAll}>See all →</Text>
+            </TouchableOpacity>
           </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No activity yet</Text>
-          </View>
-        )}
-      </View>
+          {recentPosts.length > 0 ? (
+            <View style={styles.listContainer}>
+              {recentPosts.map(post => (
+                <View key={post.id} style={styles.activityCard}>
+                  <View style={styles.activityHeader}>
+                    <Text style={styles.activityUser}>
+                      {post.user?.full_name || 'Someone'}
+                    </Text>
+                    <Text style={styles.activityTime}>
+                      {new Date(post.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </Text>
+                  </View>
+                  <Text style={styles.activityContent} numberOfLines={2}>
+                    {post.content}
+                  </Text>
+                  {post.post_type === 'pr_achievement' && (
+                    <View style={styles.prBadge}>
+                      <Text style={styles.prBadgeText}>🎉 New PR!</Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No activity yet</Text>
+            </View>
+          )}
+        </View>
 
-      {/* Workout Streak */}
-      <WorkoutStreak />
+        {/* Workout Streak */}
+        <WorkoutStreak />
 
-      {/* Progress Photos */}
-      <ProgressPhotos />
+        {/* Progress Photos */}
+        <ProgressPhotos />
 
-      {/* Quick Actions */}
-      <QuickActions onPress={() => setShowPRForm(true)} />
+        {/* Quick Actions */}
+        <QuickActions onPress={() => setShowPRForm(true)} />
 
-      {/* PR Analytics */}
-      <PRAnalytics />
-    </ScrollView>
+        {/* PR Analytics */}
+        <PRAnalytics />
+      </ScrollView>
 
       {/* PR Log Form Modal */}
       <PRLogForm
@@ -234,7 +252,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 3,
@@ -261,7 +279,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
@@ -310,7 +328,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -342,7 +360,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -386,7 +404,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -412,10 +430,9 @@ const styles = StyleSheet.create({
 HomeScreen.options = {
   topBar: {
     title: {
-      text: 'GymEZ'
-    }
-  }
+      text: 'GymEZ',
+    },
+  },
 };
 
 export default HomeScreen;
-

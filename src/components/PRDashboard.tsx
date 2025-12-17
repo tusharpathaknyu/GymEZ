@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,9 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-import {PersonalRecordsService} from '../services/personalRecordsService';
-import {PersonalRecord, ExerciseType} from '../types';
-import {useAuth} from '../services/auth';
+import { PersonalRecordsService } from '../services/personalRecordsService';
+import { PersonalRecord, ExerciseType } from '../types';
+import { useAuth } from '../services/auth';
 
 interface PRCardProps {
   exerciseType: ExerciseType;
@@ -19,13 +19,17 @@ interface PRCardProps {
   onPress: () => void;
 }
 
-const PRCard: React.FC<PRCardProps> = ({exerciseType, bestPR, onPress}) => {
+const PRCard: React.FC<PRCardProps> = ({ exerciseType, bestPR, onPress }) => {
   const exercise = PersonalRecordsService.getExerciseCategories().find(
-    e => e.type === exerciseType
+    e => e.type === exerciseType,
   );
 
   const formatPR = (pr: PersonalRecord) => {
-    if (exerciseType === 'pullup' || exerciseType === 'pushup' || exerciseType === 'dip') {
+    if (
+      exerciseType === 'pullup' ||
+      exerciseType === 'pushup' ||
+      exerciseType === 'dip'
+    ) {
       return `${pr.reps} reps`;
     }
     return `${pr.weight}kg × ${pr.reps}`;
@@ -36,7 +40,7 @@ const PRCard: React.FC<PRCardProps> = ({exerciseType, bestPR, onPress}) => {
       <Text style={styles.exerciseIcon}>{exercise?.icon}</Text>
       <Text style={styles.exerciseName}>{exercise?.name}</Text>
       <Text style={styles.exerciseDescription}>{exercise?.description}</Text>
-      
+
       {bestPR ? (
         <>
           <Text style={styles.prValue}>{formatPR(bestPR)}</Text>
@@ -62,7 +66,7 @@ const PRHistoryModal: React.FC<PRHistoryModalProps> = ({
   exerciseType,
   onClose,
 }) => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [history, setHistory] = useState<PersonalRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -70,16 +74,19 @@ const PRHistoryModal: React.FC<PRHistoryModalProps> = ({
     if (visible && exerciseType && user) {
       loadHistory();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, exerciseType, user]);
 
   const loadHistory = async () => {
-    if (!exerciseType || !user?.id) return;
+    if (!exerciseType || !user?.id) {
+      return;
+    }
 
     setLoading(true);
     try {
       const data = await PersonalRecordsService.getPRHistoryForExercise(
         user.id,
-        exerciseType
+        exerciseType,
       );
       setHistory(data);
     } catch (error) {
@@ -90,10 +97,14 @@ const PRHistoryModal: React.FC<PRHistoryModalProps> = ({
   };
 
   const exercise = exerciseType
-    ? PersonalRecordsService.getExerciseCategories().find(e => e.type === exerciseType)
+    ? PersonalRecordsService.getExerciseCategories().find(
+        e => e.type === exerciseType,
+      )
     : null;
 
-  if (!visible || !exerciseType) return null;
+  if (!visible || !exerciseType) {
+    return null;
+  }
 
   return (
     <View style={styles.modalOverlay}>
@@ -106,11 +117,18 @@ const PRHistoryModal: React.FC<PRHistoryModalProps> = ({
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#059669" style={{marginTop: 20}} />
+          <ActivityIndicator
+            size="large"
+            color="#059669"
+            style={{ marginTop: 20 }}
+          />
         ) : history.length === 0 ? (
           <Text style={styles.emptyHistory}>No records yet</Text>
         ) : (
-          <ScrollView style={styles.historyList} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.historyList}
+            showsVerticalScrollIndicator={false}
+          >
             {history.map((pr, index) => (
               <View key={pr.id} style={styles.historyItem}>
                 <View style={styles.historyRank}>
@@ -118,7 +136,9 @@ const PRHistoryModal: React.FC<PRHistoryModalProps> = ({
                 </View>
                 <View style={styles.historyDetails}>
                   <Text style={styles.historyValue}>
-                    {exerciseType === 'pullup' || exerciseType === 'pushup' || exerciseType === 'dip'
+                    {exerciseType === 'pullup' ||
+                    exerciseType === 'pushup' ||
+                    exerciseType === 'dip'
                       ? `${pr.reps} reps`
                       : `${pr.weight}kg × ${pr.reps}`}
                   </Text>
@@ -141,39 +161,46 @@ const PRHistoryModal: React.FC<PRHistoryModalProps> = ({
 };
 
 const PRDashboard: React.FC = () => {
-  const {user} = useAuth();
-  const [prs, setPrs] = useState<{[key in ExerciseType]?: PersonalRecord}>({});
+  const { user } = useAuth();
+  const [prs, setPrs] = useState<{ [key in ExerciseType]?: PersonalRecord }>(
+    {},
+  );
   const [stats, setStats] = useState<{
     totalPRs: number;
     exercisesWithPRs: ExerciseType[];
     recentPRs: PersonalRecord[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedExercise, setSelectedExercise] = useState<ExerciseType | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<ExerciseType | null>(
+    null,
+  );
   const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
       loadPRData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadPRData = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     setLoading(true);
     try {
       const exercises = PersonalRecordsService.getExerciseCategories();
       const [statsData, ...prData] = await Promise.all([
         PersonalRecordsService.getUserPRStats(user.id),
-        ...exercises.map(ex => 
-          PersonalRecordsService.getBestPRForExercise(user.id, ex.type)
+        ...exercises.map(ex =>
+          PersonalRecordsService.getBestPRForExercise(user.id, ex.type),
         ),
       ]);
 
       setStats(statsData);
-      
-      const prMap: {[key in ExerciseType]?: PersonalRecord} = {};
+
+      const prMap: { [key in ExerciseType]?: PersonalRecord } = {};
       exercises.forEach((exercise, index) => {
         if (prData[index]) {
           prMap[exercise.type] = prData[index] || undefined;
@@ -193,7 +220,9 @@ const PRDashboard: React.FC = () => {
   };
 
   const getDaysAtGym = () => {
-    if (!user?.gym_start_date) return null;
+    if (!user?.gym_start_date) {
+      return null;
+    }
     const startDate = new Date(user.gym_start_date);
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - startDate.getTime());
@@ -219,12 +248,14 @@ const PRDashboard: React.FC = () => {
             <Text style={styles.statNumber}>{stats?.totalPRs || 0}</Text>
             <Text style={styles.statLabel}>Total PRs</Text>
           </View>
-          
+
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats?.exercisesWithPRs.length || 0}</Text>
+            <Text style={styles.statNumber}>
+              {stats?.exercisesWithPRs.length || 0}
+            </Text>
             <Text style={styles.statLabel}>Exercises</Text>
           </View>
-          
+
           {user?.gym_start_date && (
             <View style={styles.statItem}>
               <Text style={styles.statNumber}>{getDaysAtGym()}</Text>
@@ -251,18 +282,19 @@ const PRDashboard: React.FC = () => {
           <View style={styles.recentSection}>
             <Text style={styles.sectionTitle}>Recent Achievements</Text>
             {stats.recentPRs.map(pr => {
-              const exercise = PersonalRecordsService.getExerciseCategories().find(
-                e => e.type === pr.exercise_type
-              );
+              const exercise =
+                PersonalRecordsService.getExerciseCategories().find(
+                  e => e.type === pr.exercise_type,
+                );
               return (
                 <View key={pr.id} style={styles.recentItem}>
                   <Text style={styles.recentIcon}>{exercise?.icon}</Text>
                   <View style={styles.recentDetails}>
                     <Text style={styles.recentExercise}>{exercise?.name}</Text>
                     <Text style={styles.recentValue}>
-                      {pr.exercise_type === 'pullup' || 
-                       pr.exercise_type === 'pushup' || 
-                       pr.exercise_type === 'dip'
+                      {pr.exercise_type === 'pullup' ||
+                      pr.exercise_type === 'pushup' ||
+                      pr.exercise_type === 'dip'
                         ? `${pr.reps} reps`
                         : `${pr.weight}kg × ${pr.reps}`}
                     </Text>
@@ -286,7 +318,7 @@ const PRDashboard: React.FC = () => {
   );
 };
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const cardWidth = (width - 60) / 2; // 2 cards per row with margin
 
 const styles = StyleSheet.create({
@@ -314,7 +346,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -354,7 +386,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -404,7 +436,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,

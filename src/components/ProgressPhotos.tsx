@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -17,17 +17,20 @@ interface PhotoEntry {
 }
 
 const ProgressPhotos = () => {
-  const [photos, setPhotos] = useState<PhotoEntry[]>([]);
+  const [photos, _setPhotos] = useState<PhotoEntry[]>([]);
 
   const handleAddPhoto = () => {
     Alert.alert(
       'Add Progress Photo',
       'Take a new photo or select from gallery to track your progress visually.',
       [
-        {text: 'Cancel', style: 'cancel'},
-        {text: 'Take Photo', onPress: () => console.log('Open camera')},
-        {text: 'Choose from Gallery', onPress: () => console.log('Open gallery')},
-      ]
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Take Photo', onPress: () => console.log('Open camera') },
+        {
+          text: 'Choose from Gallery',
+          onPress: () => console.log('Open gallery'),
+        },
+      ],
     );
   };
 
@@ -52,7 +55,10 @@ const ProgressPhotos = () => {
           <Text style={styles.emptyDescription}>
             Start documenting your fitness journey with progress photos
           </Text>
-          <TouchableOpacity style={styles.addButtonLarge} onPress={handleAddPhoto}>
+          <TouchableOpacity
+            style={styles.addButtonLarge}
+            onPress={handleAddPhoto}
+          >
             <Text style={styles.addButtonText}>Add Your First Photo</Text>
           </TouchableOpacity>
         </View>
@@ -60,7 +66,7 @@ const ProgressPhotos = () => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {photos.map(photo => (
             <View key={photo.id} style={styles.photoCard}>
-              <Image source={{uri: photo.photoUrl}} style={styles.photo} />
+              <Image source={{ uri: photo.photoUrl }} style={styles.photo} />
               <Text style={styles.photoDate}>
                 {new Date(photo.date).toLocaleDateString()}
               </Text>
@@ -79,7 +85,7 @@ const styles = StyleSheet.create({
     margin: 16,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
@@ -155,4 +161,3 @@ const styles = StyleSheet.create({
 });
 
 export default ProgressPhotos;
-

@@ -7,28 +7,46 @@ import {
   ScrollView,
   TextInput,
   Alert,
-  Modal
+  Modal,
 } from 'react-native';
 import { WorkoutPlanService } from '../services/workoutPlanService';
-import type { Exercise, WorkoutPlan, CreateWorkoutPlanData, CreateWorkoutSessionData } from '../types';
+import type {
+  Exercise,
+  WorkoutPlan,
+  CreateWorkoutPlanData,
+  CreateWorkoutSessionData,
+} from '../types';
 
 interface WorkoutBuilderProps {
   onSave?: (plan: WorkoutPlan) => void;
   editingPlan?: WorkoutPlan;
 }
 
-export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingPlan }) => {
+export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({
+  onSave,
+  editingPlan,
+}) => {
   const [planName, setPlanName] = useState(editingPlan?.name || '');
-  const [description, setDescription] = useState(editingPlan?.description || '');
-  const [difficulty, setDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>(
-    editingPlan?.difficulty_level || 'beginner'
+  const [description, setDescription] = useState(
+    editingPlan?.description || '',
   );
-  const [goal, setGoal] = useState<'strength' | 'muscle_building' | 'weight_loss' | 'endurance' | 'general_fitness'>(
-    editingPlan?.goal || 'general_fitness'
+  const [difficulty, setDifficulty] = useState<
+    'beginner' | 'intermediate' | 'advanced'
+  >(editingPlan?.difficulty_level || 'beginner');
+  const [goal, setGoal] = useState<
+    | 'strength'
+    | 'muscle_building'
+    | 'weight_loss'
+    | 'endurance'
+    | 'general_fitness'
+  >(editingPlan?.goal || 'general_fitness');
+  const [durationWeeks, setDurationWeeks] = useState(
+    editingPlan?.duration_weeks?.toString() || '4',
   );
-  const [durationWeeks, setDurationWeeks] = useState(editingPlan?.duration_weeks?.toString() || '4');
   const [isPublic, setIsPublic] = useState(editingPlan?.is_public || false);
-  const [sessions, setSessions] = useState<Partial<CreateWorkoutSessionData>[]>([]);
+  const [sessions, setSessions] = useState<Partial<CreateWorkoutSessionData>[]>(
+    [],
+  );
   const [showExerciseLibrary, setShowExerciseLibrary] = useState(false);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selectedSession, setSelectedSession] = useState<number | null>(null);
@@ -48,15 +66,21 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
   };
 
   const addSession = () => {
-    setSessions([...sessions, {
-      name: `Day ${sessions.length + 1}`,
-      day_number: sessions.length + 1,
-      estimated_duration: 60,
-      exercises: []
-    }]);
+    setSessions([
+      ...sessions,
+      {
+        name: `Day ${sessions.length + 1}`,
+        day_number: sessions.length + 1,
+        estimated_duration: 60,
+        exercises: [],
+      },
+    ]);
   };
 
-  const updateSession = (index: number, updates: Partial<CreateWorkoutSessionData>) => {
+  const updateSession = (
+    index: number,
+    updates: Partial<CreateWorkoutSessionData>,
+  ) => {
     const updatedSessions = [...sessions];
     updatedSessions[index] = { ...updatedSessions[index], ...updates };
     setSessions(updatedSessions);
@@ -65,19 +89,19 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
   const addExerciseToSession = (sessionIndex: number, exercise: Exercise) => {
     const updatedSessions = [...sessions];
     const session = updatedSessions[sessionIndex];
-    
+
     if (!session.exercises) {
       session.exercises = [];
     }
-    
+
     session.exercises.push({
       exercise_library_id: exercise.id,
       exercise_order: session.exercises.length + 1,
       sets: 3,
       reps: '8-12',
-      rest_seconds: 60
+      rest_seconds: 60,
     });
-    
+
     setSessions(updatedSessions);
     setShowExerciseLibrary(false);
     setSelectedSession(null);
@@ -95,7 +119,7 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
     }
 
     setLoading(true);
-    
+
     try {
       const planData: CreateWorkoutPlanData = {
         name: planName,
@@ -103,26 +127,33 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
         difficulty_level: difficulty,
         goal,
         duration_weeks: parseInt(durationWeeks),
-        is_public: isPublic
+        is_public: isPublic,
       };
 
       let savedPlan: WorkoutPlan;
-      
+
       if (editingPlan) {
-        savedPlan = await WorkoutPlanService.updateWorkoutPlan(editingPlan.id, planData);
+        savedPlan = await WorkoutPlanService.updateWorkoutPlan(
+          editingPlan.id,
+          planData,
+        );
       } else {
         savedPlan = await WorkoutPlanService.createWorkoutPlan(planData);
       }
 
       // Save sessions
       for (const sessionData of sessions) {
-        if (sessionData.name && sessionData.day_number && sessionData.exercises) {
+        if (
+          sessionData.name &&
+          sessionData.day_number &&
+          sessionData.exercises
+        ) {
           await WorkoutPlanService.createWorkoutSession({
             workout_plan_id: savedPlan.id,
             name: sessionData.name,
             day_number: sessionData.day_number,
             estimated_duration: sessionData.estimated_duration,
-            exercises: sessionData.exercises
+            exercises: sessionData.exercises,
           });
         }
       }
@@ -153,17 +184,24 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
             <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
         </View>
-        
+
         <ScrollView style={styles.exerciseList}>
-          {exercises.map((exercise) => (
+          {exercises.map(exercise => (
             <TouchableOpacity
               key={exercise.id}
               style={styles.exerciseItem}
-              onPress={() => selectedSession !== null && addExerciseToSession(selectedSession, exercise)}
+              onPress={() =>
+                selectedSession !== null &&
+                addExerciseToSession(selectedSession, exercise)
+              }
             >
               <Text style={styles.exerciseName}>{exercise.name}</Text>
-              <Text style={styles.exerciseCategory}>{exercise.category.toUpperCase()}</Text>
-              <Text style={styles.exerciseDifficulty}>{exercise.difficulty_level}</Text>
+              <Text style={styles.exerciseCategory}>
+                {exercise.category.toUpperCase()}
+              </Text>
+              <Text style={styles.exerciseDifficulty}>
+                {exercise.difficulty_level}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -180,7 +218,7 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Plan Details</Text>
-          
+
           <TextInput
             style={styles.input}
             placeholder="Workout Plan Name"
@@ -201,19 +239,21 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
             <View style={styles.column}>
               <Text style={styles.label}>Difficulty</Text>
               <View style={styles.segmentedControl}>
-                {['beginner', 'intermediate', 'advanced'].map((level) => (
+                {['beginner', 'intermediate', 'advanced'].map(level => (
                   <TouchableOpacity
                     key={level}
                     style={[
                       styles.segment,
-                      difficulty === level && styles.selectedSegment
+                      difficulty === level && styles.selectedSegment,
                     ]}
                     onPress={() => setDifficulty(level as any)}
                   >
-                    <Text style={[
-                      styles.segmentText,
-                      difficulty === level && styles.selectedSegmentText
-                    ]}>
+                    <Text
+                      style={[
+                        styles.segmentText,
+                        difficulty === level && styles.selectedSegmentText,
+                      ]}
+                    >
                       {level}
                     </Text>
                   </TouchableOpacity>
@@ -241,20 +281,22 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
                 { key: 'muscle_building', label: 'Muscle Building' },
                 { key: 'weight_loss', label: 'Weight Loss' },
                 { key: 'endurance', label: 'Endurance' },
-                { key: 'general_fitness', label: 'General Fitness' }
-              ].map((goalOption) => (
+                { key: 'general_fitness', label: 'General Fitness' },
+              ].map(goalOption => (
                 <TouchableOpacity
                   key={goalOption.key}
                   style={[
                     styles.goalChip,
-                    goal === goalOption.key && styles.selectedGoalChip
+                    goal === goalOption.key && styles.selectedGoalChip,
                   ]}
                   onPress={() => setGoal(goalOption.key as any)}
                 >
-                  <Text style={[
-                    styles.goalChipText,
-                    goal === goalOption.key && styles.selectedGoalChipText
-                  ]}>
+                  <Text
+                    style={[
+                      styles.goalChipText,
+                      goal === goalOption.key && styles.selectedGoalChipText,
+                    ]}
+                  >
                     {goalOption.label}
                   </Text>
                 </TouchableOpacity>
@@ -268,7 +310,12 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
           >
             <Text style={styles.toggleLabel}>Make plan public</Text>
             <View style={[styles.toggle, isPublic && styles.toggleActive]}>
-              <View style={[styles.toggleThumb, isPublic && styles.toggleThumbActive]} />
+              <View
+                style={[
+                  styles.toggleThumb,
+                  isPublic && styles.toggleThumbActive,
+                ]}
+              />
             </View>
           </TouchableOpacity>
         </View>
@@ -287,7 +334,7 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
                 style={styles.sessionNameInput}
                 placeholder={`Day ${index + 1}`}
                 value={session.name}
-                onChangeText={(name) => updateSession(index, { name })}
+                onChangeText={name => updateSession(index, { name })}
               />
 
               <View style={styles.sessionDetails}>
@@ -296,7 +343,11 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
                   style={styles.durationInput}
                   placeholder="60"
                   value={session.estimated_duration?.toString()}
-                  onChangeText={(duration) => updateSession(index, { estimated_duration: parseInt(duration) })}
+                  onChangeText={duration =>
+                    updateSession(index, {
+                      estimated_duration: parseInt(duration),
+                    })
+                  }
                   keyboardType="numeric"
                 />
               </View>
@@ -304,16 +355,22 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
               <View style={styles.exercisesList}>
                 {session.exercises?.map((exercise, exerciseIndex) => (
                   <View key={exerciseIndex} style={styles.exerciseRow}>
-                    <Text style={styles.exerciseOrderNumber}>{exerciseIndex + 1}</Text>
+                    <Text style={styles.exerciseOrderNumber}>
+                      {exerciseIndex + 1}
+                    </Text>
                     <Text style={styles.exerciseDetails}>
-                      {exercises.find(e => e.id === exercise.exercise_library_id)?.name}
+                      {
+                        exercises.find(
+                          e => e.id === exercise.exercise_library_id,
+                        )?.name
+                      }
                     </Text>
                     <Text style={styles.exerciseSetsReps}>
                       {exercise.sets} × {exercise.reps}
                     </Text>
                   </View>
                 ))}
-                
+
                 <TouchableOpacity
                   style={styles.addExerciseButton}
                   onPress={() => {
@@ -321,7 +378,9 @@ export const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ onSave, editingP
                     setShowExerciseLibrary(true);
                   }}
                 >
-                  <Text style={styles.addExerciseButtonText}>+ Add Exercise</Text>
+                  <Text style={styles.addExerciseButtonText}>
+                    + Add Exercise
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

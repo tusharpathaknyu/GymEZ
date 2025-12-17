@@ -3,7 +3,6 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import { Alert } from 'react-native';
 
 export interface GoogleUser {
   id: string;
@@ -15,7 +14,7 @@ export interface GoogleUser {
 class GoogleAuthService {
   private static instance: GoogleAuthService;
   private isConfigured = false;
-  
+
   public static getInstance(): GoogleAuthService {
     if (!GoogleAuthService.instance) {
       GoogleAuthService.instance = new GoogleAuthService();
@@ -24,20 +23,19 @@ class GoogleAuthService {
   }
 
   async configure(): Promise<void> {
-    if (this.isConfigured) return;
-    
+    if (this.isConfigured) {
+      return;
+    }
+
     try {
       GoogleSignin.configure({
-        // For development/demo purposes - replace with your actual web client ID
-        webClientId: '1234567890-abcdefghijklmnopqrstuvwxyz1234567890.apps.googleusercontent.com',
+        // Using the web client ID from google-services.json
+        webClientId:
+          '895230403778-7a4klalvtmjr7iokdqrj17e7pdirli5p.apps.googleusercontent.com',
         offlineAccess: true,
-        hostedDomain: '',
         forceCodeForRefreshToken: true,
-        accountName: '',
-        iosClientId: '', // iOS client ID from GoogleService-Info.plist
-        googleServicePlistPath: '',
       });
-      
+
       this.isConfigured = true;
       console.log('Google Sign-In configured successfully');
     } catch (error) {
@@ -51,18 +49,20 @@ class GoogleAuthService {
     try {
       // Try to configure first
       await this.configure();
-      
+
       if (!this.isConfigured) {
         // Use mock authentication for demo
         return this.mockSignIn();
       }
 
       // Check if device has Google Play Services
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
       // Perform sign-in
       const result = await GoogleSignin.signIn();
-      
+
       if (result.data) {
         const googleUser: GoogleUser = {
           id: result.data.user.id,
@@ -70,14 +70,14 @@ class GoogleAuthService {
           email: result.data.user.email,
           photo: result.data.user.photo || undefined,
         };
-        
+
         return { user: googleUser };
       }
-      
+
       return { error: 'Failed to get user information' };
     } catch (error: any) {
       console.error('Google Sign-In error:', error);
-      
+
       // Handle specific error codes
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         return { error: 'Sign-in was cancelled by user' };
@@ -98,14 +98,14 @@ class GoogleAuthService {
   private async mockSignIn(): Promise<{ user?: GoogleUser; error?: string }> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     const mockGoogleUser: GoogleUser = {
       id: `google_mock_${Date.now()}`,
       name: 'Demo Google User',
       email: 'demo.user@gmail.com',
       photo: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
     };
-    
+
     return { user: mockGoogleUser };
   }
 
@@ -125,9 +125,9 @@ class GoogleAuthService {
       if (!this.isConfigured) {
         return null;
       }
-      
+
       const userInfo = await GoogleSignin.signInSilently();
-      
+
       if (userInfo.data) {
         return {
           id: userInfo.data.user.id,
@@ -136,7 +136,7 @@ class GoogleAuthService {
           photo: userInfo.data.user.photo || undefined,
         };
       }
-      
+
       return null;
     } catch (error) {
       console.error('Get current user error:', error);

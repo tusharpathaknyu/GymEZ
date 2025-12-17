@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {ExerciseType} from '../types';
-import {PersonalRecordsService} from '../services/personalRecordsService';
+import { useAuth } from '../services/auth';
+import { ExerciseType } from '../types';
+import { PersonalRecordsService } from '../services/personalRecordsService';
 
 interface Goal {
   exercise: ExerciseType;
@@ -21,18 +21,23 @@ interface Goal {
 }
 
 const PRGoals = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [addingGoal, setAddingGoal] = useState(false);
-  const [selectedExercise, setSelectedExercise] = useState<ExerciseType | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<ExerciseType | null>(
+    null,
+  );
   const [targetValue, setTargetValue] = useState('');
 
   useEffect(() => {
     loadGoals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadGoals = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     // Load goals from user preferences
     const exercises = PersonalRecordsService.getExerciseCategories();
@@ -40,7 +45,9 @@ const PRGoals = () => {
       exercise: exercise.type,
       target: 100,
       progress: Math.random() * 100,
-      unit: ['benchpress', 'squat', 'deadlift'].includes(exercise.type) ? 'kg' : 'reps',
+      unit: ['benchpress', 'squat', 'deadlift'].includes(exercise.type)
+        ? 'kg'
+        : 'reps',
     }));
 
     setGoals(userGoals);
@@ -52,12 +59,17 @@ const PRGoals = () => {
       return;
     }
 
-    setGoals(prev => [...prev, {
-      exercise: selectedExercise,
-      target: parseFloat(targetValue),
-      progress: 0,
-      unit: ['benchpress', 'squat', 'deadlift'].includes(selectedExercise) ? 'kg' : 'reps',
-    }]);
+    setGoals(prev => [
+      ...prev,
+      {
+        exercise: selectedExercise,
+        target: parseFloat(targetValue),
+        progress: 0,
+        unit: ['benchpress', 'squat', 'deadlift'].includes(selectedExercise)
+          ? 'kg'
+          : 'reps',
+      },
+    ]);
 
     setAddingGoal(false);
     setTargetValue('');
@@ -85,16 +97,21 @@ const PRGoals = () => {
         {goals.map((goal, index) => (
           <View key={index} style={styles.goalCard}>
             <View style={styles.goalHeader}>
-              <Text style={styles.goalExercise}>{getExerciseName(goal.exercise)}</Text>
+              <Text style={styles.goalExercise}>
+                {getExerciseName(goal.exercise)}
+              </Text>
               <Text style={styles.goalTarget}>
-                Target: {goal.target}{goal.unit}
+                Target: {goal.target}
+                {goal.unit}
               </Text>
             </View>
-            
+
             <View style={styles.progressBar}>
-              <View style={[styles.progressFill, {width: `${goal.progress}%`}]} />
+              <View
+                style={[styles.progressFill, { width: `${goal.progress}%` }]}
+              />
             </View>
-            
+
             <Text style={styles.progressText}>
               {goal.progress.toFixed(0)}% towards your goal
             </Text>
@@ -130,7 +147,8 @@ const PRGoals = () => {
                   key={exercise.type}
                   style={[
                     styles.exerciseOption,
-                    selectedExercise === exercise.type && styles.exerciseOptionActive,
+                    selectedExercise === exercise.type &&
+                      styles.exerciseOptionActive,
                   ]}
                   onPress={() => setSelectedExercise(exercise.type)}
                 >
@@ -169,7 +187,7 @@ const styles = StyleSheet.create({
     margin: 16,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
@@ -333,4 +351,3 @@ const styles = StyleSheet.create({
 });
 
 export default PRGoals;
-

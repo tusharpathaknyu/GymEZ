@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,9 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {supabase} from '../services/supabase';
-import {PersonalRecord, User} from '../types';
-import {PersonalRecordsService} from '../services/personalRecordsService';
+import { useAuth } from '../services/auth';
+import { supabase } from '../services/supabase';
+import { PersonalRecord, User } from '../types';
 
 interface GymMemberPR {
   user: User;
@@ -21,24 +20,29 @@ interface GymMemberPR {
 }
 
 const GymComparison = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [gymMembers, setGymMembers] = useState<GymMemberPR[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
+  const [_selectedExercise, setSelectedExercise] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (user?.gym_id) {
       loadGymMembers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadGymMembers = async () => {
-    if (!user?.gym_id || !user?.id) return;
+    if (!user?.gym_id || !user?.id) {
+      return;
+    }
 
     setLoading(true);
     try {
       // Get all members from the same gym
-      const {data: profiles} = await supabase
+      const { data: profiles } = await supabase
         .from('profiles')
         .select('id, full_name, username, profile_picture')
         .eq('gym_id', user.gym_id)
@@ -47,19 +51,19 @@ const GymComparison = () => {
 
       // Get PRs for each member
       const membersWithPRs: GymMemberPR[] = await Promise.all(
-        (profiles || []).map(async (member) => {
-          const {data: prs} = await supabase
+        (profiles || []).map(async member => {
+          const { data: prs } = await supabase
             .from('personal_records')
             .select('*')
             .eq('user_id', member.id)
-            .order('achieved_at', {ascending: false});
+            .order('achieved_at', { ascending: false });
 
           return {
             user: member as User,
-            prs: prs as PersonalRecord[] || [],
+            prs: (prs as PersonalRecord[]) || [],
             total_prs: prs?.length || 0,
           };
-        })
+        }),
       );
 
       // Sort by total PRs
@@ -73,13 +77,25 @@ const GymComparison = () => {
   };
 
   const getRank = (index: number) => {
-    if (index === 0) return '🥇';
-    if (index === 1) return '🥈';
-    if (index === 2) return '🥉';
+    if (index === 0) {
+      return '🥇';
+    }
+    if (index === 1) {
+      return '🥈';
+    }
+    if (index === 2) {
+      return '🥉';
+    }
     return `#${index + 1}`;
   };
 
-  const renderMember = ({item, index}: {item: GymMemberPR; index: number}) => (
+  const renderMember = ({
+    item,
+    index,
+  }: {
+    item: GymMemberPR;
+    index: number;
+  }) => (
     <View style={styles.memberCard}>
       <View style={styles.rankContainer}>
         <Text style={styles.rankIcon}>{getRank(index)}</Text>
@@ -87,7 +103,10 @@ const GymComparison = () => {
 
       <View style={styles.avatarContainer}>
         {item.user.profile_picture ? (
-          <Image source={{uri: item.user.profile_picture}} style={styles.avatar} />
+          <Image
+            source={{ uri: item.user.profile_picture }}
+            style={styles.avatar}
+          />
         ) : (
           <View style={styles.avatarPlaceholder}>
             <Text style={styles.avatarText}>
@@ -102,9 +121,7 @@ const GymComparison = () => {
         {item.user.username && (
           <Text style={styles.memberUsername}>@{item.user.username}</Text>
         )}
-        <Text style={styles.memberStats}>
-          🏆 {item.total_prs} PRs
-        </Text>
+        <Text style={styles.memberStats}>🏆 {item.total_prs} PRs</Text>
       </View>
 
       <TouchableOpacity
@@ -142,7 +159,10 @@ const GymComparison = () => {
               <Text style={styles.rankIcon}>{getRank(index)}</Text>
               <View style={styles.topMemberInfo}>
                 {member.user.profile_picture ? (
-                  <Image source={{uri: member.user.profile_picture}} style={styles.topAvatar} />
+                  <Image
+                    source={{ uri: member.user.profile_picture }}
+                    style={styles.topAvatar}
+                  />
                 ) : (
                   <View style={[styles.avatarPlaceholder, styles.topAvatar]}>
                     <Text style={styles.avatarText}>
@@ -151,7 +171,9 @@ const GymComparison = () => {
                   </View>
                 )}
                 <View style={styles.topMemberDetails}>
-                  <Text style={styles.topMemberName}>{member.user.full_name}</Text>
+                  <Text style={styles.topMemberName}>
+                    {member.user.full_name}
+                  </Text>
                   <Text style={styles.topMemberStats}>
                     {member.total_prs} Personal Records
                   </Text>
@@ -222,7 +244,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
@@ -263,7 +285,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -327,4 +349,3 @@ const styles = StyleSheet.create({
 });
 
 export default GymComparison;
-

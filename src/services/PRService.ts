@@ -56,39 +56,62 @@ export class PRService {
       {
         name: 'Strength Training',
         exercises: [
-          'Bench Press', 'Squat', 'Deadlift', 'Overhead Press', 'Pull-ups',
-          'Dips', 'Rows', 'Bicep Curls', 'Tricep Extensions', 'Leg Press'
+          'Bench Press',
+          'Squat',
+          'Deadlift',
+          'Overhead Press',
+          'Pull-ups',
+          'Dips',
+          'Rows',
+          'Bicep Curls',
+          'Tricep Extensions',
+          'Leg Press',
         ],
         measurement_type: 'weight_reps',
-        icon: '🏋️'
+        icon: '🏋️',
       },
       {
         name: 'Cardio',
         exercises: [
-          'Running', 'Cycling', 'Swimming', 'Rowing', 'Treadmill',
-          'Elliptical', 'Stair Climber', 'Jump Rope'
+          'Running',
+          'Cycling',
+          'Swimming',
+          'Rowing',
+          'Treadmill',
+          'Elliptical',
+          'Stair Climber',
+          'Jump Rope',
         ],
         measurement_type: 'distance_time',
-        icon: '🏃'
+        icon: '🏃',
       },
       {
         name: 'Endurance',
         exercises: [
-          'Plank', 'Wall Sit', 'Push-up Hold', 'Dead Hang',
-          'Single Leg Stand', 'Burpees (max time)'
+          'Plank',
+          'Wall Sit',
+          'Push-up Hold',
+          'Dead Hang',
+          'Single Leg Stand',
+          'Burpees (max time)',
         ],
         measurement_type: 'time_only',
-        icon: '⏱️'
+        icon: '⏱️',
       },
       {
         name: 'Repetition Based',
         exercises: [
-          'Push-ups', 'Sit-ups', 'Jump Squats', 'Mountain Climbers',
-          'Burpees', 'High Knees', 'Jumping Jacks'
+          'Push-ups',
+          'Sit-ups',
+          'Jump Squats',
+          'Mountain Climbers',
+          'Burpees',
+          'High Knees',
+          'Jumping Jacks',
         ],
         measurement_type: 'reps_only',
-        icon: '🔢'
-      }
+        icon: '🔢',
+      },
     ];
   }
 
@@ -101,7 +124,9 @@ export class PRService {
         .eq('user_id', userId)
         .order('date_achieved', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       return data || [];
     } catch (error) {
       console.error('Error fetching PRs:', error);
@@ -110,7 +135,9 @@ export class PRService {
   }
 
   // Add new personal record
-  static async addPR(pr: Omit<PersonalRecord, 'id' | 'created_at' | 'updated_at'>): Promise<PersonalRecord | null> {
+  static async addPR(
+    pr: Omit<PersonalRecord, 'id' | 'created_at' | 'updated_at'>,
+  ): Promise<PersonalRecord | null> {
     try {
       const newPR = {
         ...pr,
@@ -124,7 +151,9 @@ export class PRService {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       return data;
     } catch (error) {
       console.error('Error adding PR:', error);
@@ -140,25 +169,37 @@ export class PRService {
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-      const prsThisWeek = prs.filter(pr => new Date(pr.date_achieved) >= weekAgo);
-      const prsThisMonth = prs.filter(pr => new Date(pr.date_achieved) >= monthAgo);
+      const prsThisWeek = prs.filter(
+        pr => new Date(pr.date_achieved) >= weekAgo,
+      );
+      const prsThisMonth = prs.filter(
+        pr => new Date(pr.date_achieved) >= monthAgo,
+      );
 
       // Find favorite exercise (most PRs)
       const exerciseCounts = prs.reduce((acc, pr) => {
         acc[pr.exercise_name] = (acc[pr.exercise_name] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      
-      const favoriteExercise = Object.entries(exerciseCounts)
-        .sort(([,a], [,b]) => b - a)[0]?.[0] || 'N/A';
+
+      const favoriteExercise =
+        Object.entries(exerciseCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+        'N/A';
 
       // Calculate strength score (simplified)
-      const strengthScore = Math.min(100, prs.length * 2 + prsThisMonth.length * 5);
+      const strengthScore = Math.min(
+        100,
+        prs.length * 2 + prsThisMonth.length * 5,
+      );
 
       // Calculate consistency score
-      const uniqueWeeks = new Set(prs.map(pr => 
-        Math.floor(new Date(pr.date_achieved).getTime() / (7 * 24 * 60 * 60 * 1000))
-      )).size;
+      const uniqueWeeks = new Set(
+        prs.map(pr =>
+          Math.floor(
+            new Date(pr.date_achieved).getTime() / (7 * 24 * 60 * 60 * 1000),
+          ),
+        ),
+      ).size;
       const consistencyScore = Math.min(100, uniqueWeeks * 10);
 
       return {
@@ -180,10 +221,12 @@ export class PRService {
   // Get biggest improvement
   static async getBiggestImprovement(userId: string): Promise<PRProgress> {
     const prs = await this.getUserPRs(userId);
-    
+
     // Group PRs by exercise
     const prsByExercise = prs.reduce((acc, pr) => {
-      if (!acc[pr.exercise_name]) acc[pr.exercise_name] = [];
+      if (!acc[pr.exercise_name]) {
+        acc[pr.exercise_name] = [];
+      }
       acc[pr.exercise_name].push(pr);
       return acc;
     }, {} as Record<string, PersonalRecord[]>);
@@ -200,15 +243,18 @@ export class PRService {
     // Calculate improvements for each exercise
     Object.entries(prsByExercise).forEach(([exerciseName, exercisePRs]) => {
       if (exercisePRs.length >= 2) {
-        const sortedPRs = exercisePRs.sort((a, b) => 
-          new Date(b.date_achieved).getTime() - new Date(a.date_achieved).getTime()
+        const sortedPRs = exercisePRs.sort(
+          (a, b) =>
+            new Date(b.date_achieved).getTime() -
+            new Date(a.date_achieved).getTime(),
         );
-        
+
         const current = sortedPRs[0];
         const previous = sortedPRs[1];
-        
+
         if (current.weight && previous.weight) {
-          const improvement = ((current.weight - previous.weight) / previous.weight) * 100;
+          const improvement =
+            ((current.weight - previous.weight) / previous.weight) * 100;
           if (improvement > biggestImprovement.improvement_percentage) {
             biggestImprovement = {
               exercise_name: exerciseName,
@@ -217,7 +263,9 @@ export class PRService {
               improvement_percentage: improvement,
               improvement_absolute: current.weight - previous.weight,
               days_since_last_pr: Math.floor(
-                (new Date().getTime() - new Date(current.date_achieved).getTime()) / (24 * 60 * 60 * 1000)
+                (new Date().getTime() -
+                  new Date(current.date_achieved).getTime()) /
+                  (24 * 60 * 60 * 1000),
               ),
               total_attempts: exercisePRs.length,
             };
@@ -230,7 +278,10 @@ export class PRService {
   }
 
   // Get PR progress for specific exercise
-  static async getExerciseProgress(userId: string, exerciseName: string): Promise<PersonalRecord[]> {
+  static async getExerciseProgress(
+    userId: string,
+    exerciseName: string,
+  ): Promise<PersonalRecord[]> {
     try {
       const { data, error } = await supabase
         .from('personal_records')
@@ -239,7 +290,9 @@ export class PRService {
         .eq('exercise_name', exerciseName)
         .order('date_achieved', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       return data || [];
     } catch (error) {
       console.error('Error fetching exercise progress:', error);
@@ -346,16 +399,16 @@ export class PRService {
 
   // Check if a workout represents a new PR
   static async checkForNewPR(
-    userId: string, 
-    exerciseName: string, 
-    weight?: number, 
+    userId: string,
+    exerciseName: string,
+    weight?: number,
     reps?: number,
     distance?: number,
-    duration?: number
+    duration?: number,
   ): Promise<boolean> {
     try {
       const existingPRs = await this.getExerciseProgress(userId, exerciseName);
-      
+
       if (existingPRs.length === 0) {
         return true; // First time doing this exercise
       }

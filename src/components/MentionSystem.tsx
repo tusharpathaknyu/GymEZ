@@ -1,15 +1,11 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 
 interface MentionSystemProps {
   content: string;
 }
 
-const MentionSystem: React.FC<MentionSystemProps> = ({content}) => {
+const MentionSystem: React.FC<MentionSystemProps> = ({ content }) => {
   // Parse mentions from content (format: @username)
   const parseMentions = (text: string) => {
     const mentionRegex = /@(\w+)/g;
@@ -57,7 +53,7 @@ const MentionSystem: React.FC<MentionSystemProps> = ({content}) => {
           </Text>
         ) : (
           <Text key={index}>{part.content}</Text>
-        )
+        ),
       )}
     </Text>
   );
@@ -76,4 +72,3 @@ const styles = StyleSheet.create({
 });
 
 export default MentionSystem;
-

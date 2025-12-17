@@ -9,7 +9,12 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import { PRService, PersonalRecord, PRAnalytics, ExerciseCategory } from '../services/PRService';
+import {
+  PRService,
+  PersonalRecord,
+  PRAnalytics,
+  ExerciseCategory,
+} from '../services/PRService';
 import { useAuth } from '../context/AuthContext';
 
 interface PRScreenProps {
@@ -22,8 +27,10 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
   const [recentPRs, setRecentPRs] = useState<PersonalRecord[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showAddPR, setShowAddPR] = useState(false);
-  const [categories] = useState<ExerciseCategory[]>(PRService.getExerciseCategories());
-  
+  const [categories] = useState<ExerciseCategory[]>(
+    PRService.getExerciseCategories(),
+  );
+
   const [newPR, setNewPR] = useState({
     exercise_name: '',
     exercise_type: 'strength' as const,
@@ -37,17 +44,20 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
 
   useEffect(() => {
     loadPRData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadPRData = async () => {
-    if (!state.user) return;
-    
+    if (!state.user) {
+      return;
+    }
+
     try {
       const [analyticsData, prs] = await Promise.all([
         PRService.getPRAnalytics(state.user.id),
-        PRService.getUserPRs(state.user.id)
+        PRService.getUserPRs(state.user.id),
       ]);
-      
+
       setAnalytics(analyticsData);
       setRecentPRs(prs);
     } catch (error) {
@@ -79,7 +89,7 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
       };
 
       const result = await PRService.addPR(prData);
-      
+
       if (result) {
         Alert.alert('Success!', 'New personal record added! 🎉');
         setShowAddPR(false);
@@ -108,17 +118,25 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
 
   const formatPRDisplay = (pr: PersonalRecord): string => {
     const parts = [];
-    
-    if (pr.weight) parts.push(`${pr.weight} lbs`);
-    if (pr.reps) parts.push(`${pr.reps} reps`);
-    if (pr.sets) parts.push(`${pr.sets} sets`);
-    if (pr.distance) parts.push(`${pr.distance}m`);
+
+    if (pr.weight) {
+      parts.push(`${pr.weight} lbs`);
+    }
+    if (pr.reps) {
+      parts.push(`${pr.reps} reps`);
+    }
+    if (pr.sets) {
+      parts.push(`${pr.sets} sets`);
+    }
+    if (pr.distance) {
+      parts.push(`${pr.distance}m`);
+    }
     if (pr.duration) {
       const minutes = Math.floor(pr.duration / 60);
       const seconds = pr.duration % 60;
       parts.push(`${minutes}:${seconds.toString().padStart(2, '0')}`);
     }
-    
+
     return parts.join(' × ');
   };
 
@@ -127,27 +145,36 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+
+    if (diffDays === 1) {
+      return 'Yesterday';
+    }
+    if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    }
+    if (diffDays < 30) {
+      return `${Math.ceil(diffDays / 7)} weeks ago`;
+    }
     return date.toLocaleDateString();
   };
 
-  const filteredPRs = selectedCategory === 'all' 
-    ? recentPRs 
-    : recentPRs.filter(pr => {
-        const category = categories.find(cat => 
-          cat.exercises.includes(pr.exercise_name)
-        );
-        return category?.name === selectedCategory;
-      });
+  const filteredPRs =
+    selectedCategory === 'all'
+      ? recentPRs
+      : recentPRs.filter(pr => {
+          const category = categories.find(cat =>
+            cat.exercises.includes(pr.exercise_name),
+          );
+          return category?.name === selectedCategory;
+        });
 
   if (!analytics) {
     return (
       <View style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading your personal records...</Text>
+          <Text style={styles.loadingText}>
+            Loading your personal records...
+          </Text>
         </View>
       </View>
     );
@@ -158,7 +185,9 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Personal Records</Text>
-        <Text style={styles.subtitle}>Track your strength and achievements</Text>
+        <Text style={styles.subtitle}>
+          Track your strength and achievements
+        </Text>
       </View>
 
       {/* Analytics Cards */}
@@ -173,7 +202,7 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
             <Text style={styles.statLabel}>This Month</Text>
           </View>
         </View>
-        
+
         <View style={styles.analyticsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{analytics.strength_score}</Text>
@@ -189,9 +218,12 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
       {/* Biggest Improvement */}
       <View style={styles.improvementCard}>
         <Text style={styles.improvementTitle}>💪 Biggest Improvement</Text>
-        <Text style={styles.improvementExercise}>{analytics.biggest_improvement.exercise_name}</Text>
+        <Text style={styles.improvementExercise}>
+          {analytics.biggest_improvement.exercise_name}
+        </Text>
         <Text style={styles.improvementText}>
-          +{analytics.biggest_improvement.improvement_percentage.toFixed(1)}% improvement
+          +{analytics.biggest_improvement.improvement_percentage.toFixed(1)}%
+          improvement
         </Text>
         <Text style={styles.improvementSubtext}>
           {analytics.biggest_improvement.days_since_last_pr} days since last PR
@@ -202,21 +234,37 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
-            style={[styles.filterChip, selectedCategory === 'all' && styles.filterChipActive]}
+            style={[
+              styles.filterChip,
+              selectedCategory === 'all' && styles.filterChipActive,
+            ]}
             onPress={() => setSelectedCategory('all')}
           >
-            <Text style={[styles.filterText, selectedCategory === 'all' && styles.filterTextActive]}>
+            <Text
+              style={[
+                styles.filterText,
+                selectedCategory === 'all' && styles.filterTextActive,
+              ]}
+            >
               All
             </Text>
           </TouchableOpacity>
-          
-          {categories.map((category) => (
+
+          {categories.map(category => (
             <TouchableOpacity
               key={category.name}
-              style={[styles.filterChip, selectedCategory === category.name && styles.filterChipActive]}
+              style={[
+                styles.filterChip,
+                selectedCategory === category.name && styles.filterChipActive,
+              ]}
               onPress={() => setSelectedCategory(category.name)}
             >
-              <Text style={[styles.filterText, selectedCategory === category.name && styles.filterTextActive]}>
+              <Text
+                style={[
+                  styles.filterText,
+                  selectedCategory === category.name && styles.filterTextActive,
+                ]}
+              >
                 {category.icon} {category.name}
               </Text>
             </TouchableOpacity>
@@ -236,19 +284,17 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
           </TouchableOpacity>
         </View>
 
-        {filteredPRs.map((pr) => (
+        {filteredPRs.map(pr => (
           <View key={pr.id} style={styles.prCard}>
             <View style={styles.prHeader}>
               <Text style={styles.prExercise}>{pr.exercise_name}</Text>
               <Text style={styles.prDate}>{formatDate(pr.date_achieved)}</Text>
             </View>
-            
+
             <Text style={styles.prDetails}>{formatPRDisplay(pr)}</Text>
-            
-            {pr.notes && (
-              <Text style={styles.prNotes}>"{pr.notes}"</Text>
-            )}
-            
+
+            {pr.notes && <Text style={styles.prNotes}>"{pr.notes}"</Text>}
+
             {pr.verified && (
               <View style={styles.verifiedBadge}>
                 <Text style={styles.verifiedText}>✓ Verified</Text>
@@ -260,13 +306,19 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
         {filteredPRs.length === 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>No records found</Text>
-            <Text style={styles.emptyStateSubtext}>Start tracking your personal records!</Text>
+            <Text style={styles.emptyStateSubtext}>
+              Start tracking your personal records!
+            </Text>
           </View>
         )}
       </View>
 
       {/* Add PR Modal */}
-      <Modal visible={showAddPR} animationType="slide" presentationStyle="pageSheet">
+      <Modal
+        visible={showAddPR}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowAddPR(false)}>
@@ -284,7 +336,9 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
               <TextInput
                 style={styles.input}
                 value={newPR.exercise_name}
-                onChangeText={(text) => setNewPR({...newPR, exercise_name: text})}
+                onChangeText={text =>
+                  setNewPR({ ...newPR, exercise_name: text })
+                }
                 placeholder="e.g., Bench Press, Squat, Running"
               />
             </View>
@@ -295,18 +349,18 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
                 <TextInput
                   style={styles.input}
                   value={newPR.weight}
-                  onChangeText={(text) => setNewPR({...newPR, weight: text})}
+                  onChangeText={text => setNewPR({ ...newPR, weight: text })}
                   keyboardType="numeric"
                   placeholder="225"
                 />
               </View>
-              
+
               <View style={styles.inputHalf}>
                 <Text style={styles.inputLabel}>Reps</Text>
                 <TextInput
                   style={styles.input}
                   value={newPR.reps}
-                  onChangeText={(text) => setNewPR({...newPR, reps: text})}
+                  onChangeText={text => setNewPR({ ...newPR, reps: text })}
                   keyboardType="numeric"
                   placeholder="5"
                 />
@@ -319,18 +373,18 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
                 <TextInput
                   style={styles.input}
                   value={newPR.distance}
-                  onChangeText={(text) => setNewPR({...newPR, distance: text})}
+                  onChangeText={text => setNewPR({ ...newPR, distance: text })}
                   keyboardType="numeric"
                   placeholder="5000"
                 />
               </View>
-              
+
               <View style={styles.inputHalf}>
                 <Text style={styles.inputLabel}>Time (seconds)</Text>
                 <TextInput
                   style={styles.input}
                   value={newPR.duration}
-                  onChangeText={(text) => setNewPR({...newPR, duration: text})}
+                  onChangeText={text => setNewPR({ ...newPR, duration: text })}
                   keyboardType="numeric"
                   placeholder="1380"
                 />
@@ -342,7 +396,7 @@ export const PRScreen: React.FC<PRScreenProps> = ({ onBackToHome }) => {
               <TextInput
                 style={[styles.input, styles.inputMultiline]}
                 value={newPR.notes}
-                onChangeText={(text) => setNewPR({...newPR, notes: text})}
+                onChangeText={text => setNewPR({ ...newPR, notes: text })}
                 placeholder="How did this feel? Any tips for next time?"
                 multiline
                 numberOfLines={3}

@@ -1,5 +1,5 @@
-import {supabase} from './supabase';
-import {Video} from '../types';
+import { supabase } from './supabase';
+import { Video } from '../types';
 
 export class VideoService {
   /**
@@ -8,7 +8,7 @@ export class VideoService {
   static async uploadVideo(
     videoUri: string,
     fileName: string,
-    memberId: string
+    memberId: string,
   ): Promise<string> {
     try {
       // Create FormData for file upload
@@ -20,7 +20,7 @@ export class VideoService {
       } as any);
 
       // Upload to Supabase Storage
-      const {data, error} = await supabase.storage
+      const { data, error } = await supabase.storage
         .from('workout-videos')
         .upload(`${memberId}/${fileName}`, formData);
 
@@ -29,7 +29,7 @@ export class VideoService {
       }
 
       // Get public URL
-      const {data: urlData} = supabase.storage
+      const { data: urlData } = supabase.storage
         .from('workout-videos')
         .getPublicUrl(data.path);
 
@@ -50,10 +50,10 @@ export class VideoService {
     title: string,
     description: string,
     exerciseType: string,
-    duration: number
+    duration: number,
   ): Promise<Video> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('videos')
         .insert({
           member_id: memberId,
@@ -88,7 +88,7 @@ export class VideoService {
     title: string,
     description: string,
     exerciseType: string,
-    duration: number
+    duration: number,
   ): Promise<Video> {
     try {
       // Generate unique filename
@@ -106,7 +106,7 @@ export class VideoService {
         title,
         description,
         exerciseType,
-        duration
+        duration,
       );
 
       return videoRecord;
@@ -121,11 +121,11 @@ export class VideoService {
    */
   static async getMemberVideos(memberId: string): Promise<Video[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('videos')
         .select('*')
         .eq('member_id', memberId)
-        .order('created_at', {ascending: false});
+        .order('created_at', { ascending: false });
 
       if (error) {
         throw new Error(`Failed to fetch member videos: ${error.message}`);
@@ -143,15 +143,17 @@ export class VideoService {
    */
   static async getPendingVideos(gymId: string): Promise<Video[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('videos')
-        .select(`
+        .select(
+          `
           *,
           profiles!videos_member_id_fkey(full_name, email)
-        `)
+        `,
+        )
         .eq('gym_id', gymId)
         .eq('status', 'pending')
-        .order('created_at', {ascending: false});
+        .order('created_at', { ascending: false });
 
       if (error) {
         throw new Error(`Failed to fetch pending videos: ${error.message}`);
@@ -169,14 +171,16 @@ export class VideoService {
    */
   static async getGymVideos(gymId: string): Promise<Video[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('videos')
-        .select(`
+        .select(
+          `
           *,
           profiles!videos_member_id_fkey(full_name, email)
-        `)
+        `,
+        )
         .eq('gym_id', gymId)
-        .order('created_at', {ascending: false});
+        .order('created_at', { ascending: false });
 
       if (error) {
         throw new Error(`Failed to fetch gym videos: ${error.message}`);
@@ -194,10 +198,10 @@ export class VideoService {
    */
   static async approveVideo(
     videoId: string,
-    approvedBy: string
+    approvedBy: string,
   ): Promise<Video> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('videos')
         .update({
           status: 'approved',
@@ -226,10 +230,10 @@ export class VideoService {
   static async rejectVideo(
     videoId: string,
     approvedBy: string,
-    rejectionReason: string
+    rejectionReason: string,
   ): Promise<Video> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('videos')
         .update({
           status: 'rejected',

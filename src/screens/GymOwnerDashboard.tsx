@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,9 +11,9 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {VideoService} from '../services/videoService';
-import {Video} from '../types';
+import { useAuth } from '../services/auth';
+import { VideoService } from '../services/videoService';
+import { Video } from '../types';
 
 interface VideoApprovalModalProps {
   visible: boolean;
@@ -45,7 +45,7 @@ const VideoApprovalModal: React.FC<VideoApprovalModalProps> = ({
       Alert.alert('Error', 'Please provide a reason for rejection');
       return;
     }
-    
+
     if (video) {
       onReject(video.id, rejectionReason);
       setRejectionReason('');
@@ -54,36 +54,44 @@ const VideoApprovalModal: React.FC<VideoApprovalModalProps> = ({
     }
   };
 
-  if (!video) return null;
+  if (!video) {
+    return null;
+  }
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Review Workout Video</Text>
-          
+
           <ScrollView style={styles.modalContent}>
             <View style={styles.videoDetails}>
               <Text style={styles.videoDetailTitle}>{video.title}</Text>
-              <Text style={styles.videoDetailExercise}>Exercise: {video.exercise_type}</Text>
-              
+              <Text style={styles.videoDetailExercise}>
+                Exercise: {video.exercise_type}
+              </Text>
+
               {video.description && (
-                <Text style={styles.videoDetailDescription}>{video.description}</Text>
+                <Text style={styles.videoDetailDescription}>
+                  {video.description}
+                </Text>
               )}
-              
+
               <Text style={styles.videoDetailDuration}>
-                Duration: {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
+                Duration: {Math.floor(video.duration / 60)}:
+                {(video.duration % 60).toString().padStart(2, '0')}
               </Text>
-              
+
               <Text style={styles.videoDetailMember}>
-                Submitted by: {(video as any).profiles?.full_name || 'Unknown Member'}
+                Submitted by:{' '}
+                {(video as any).profiles?.full_name || 'Unknown Member'}
               </Text>
-              
+
               <Text style={styles.videoDetailDate}>
                 Submitted: {new Date(video.created_at).toLocaleDateString()}
               </Text>
             </View>
-            
+
             {showRejectForm && (
               <View style={styles.rejectForm}>
                 <Text style={styles.rejectFormTitle}>Rejection Reason</Text>
@@ -98,19 +106,21 @@ const VideoApprovalModal: React.FC<VideoApprovalModalProps> = ({
               </View>
             )}
           </ScrollView>
-          
+
           <View style={styles.modalActions}>
             {!showRejectForm ? (
               <>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.approveButton]}
-                  onPress={handleApprove}>
+                  onPress={handleApprove}
+                >
                   <Text style={styles.modalButtonText}>✓ Approve</Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity
                   style={[styles.modalButton, styles.rejectButton]}
-                  onPress={() => setShowRejectForm(true)}>
+                  onPress={() => setShowRejectForm(true)}
+                >
                   <Text style={styles.modalButtonText}>✕ Reject</Text>
                 </TouchableOpacity>
               </>
@@ -121,21 +131,24 @@ const VideoApprovalModal: React.FC<VideoApprovalModalProps> = ({
                   onPress={() => {
                     setShowRejectForm(false);
                     setRejectionReason('');
-                  }}>
+                  }}
+                >
                   <Text style={styles.modalButtonText}>Cancel</Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity
                   style={[styles.modalButton, styles.confirmRejectButton]}
-                  onPress={handleReject}>
+                  onPress={handleReject}
+                >
                   <Text style={styles.modalButtonText}>Confirm Reject</Text>
                 </TouchableOpacity>
               </>
             )}
-            
+
             <TouchableOpacity
               style={[styles.modalButton, styles.closeButton]}
-              onPress={onClose}>
+              onPress={onClose}
+            >
               <Text style={styles.modalButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -146,7 +159,7 @@ const VideoApprovalModal: React.FC<VideoApprovalModalProps> = ({
 };
 
 const GymOwnerDashboard = () => {
-  const {user, signOut} = useAuth();
+  const { user, signOut } = useAuth();
   const [pendingVideos, setPendingVideos] = useState<Video[]>([]);
   const [allVideos, setAllVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(false);
@@ -158,22 +171,25 @@ const GymOwnerDashboard = () => {
     if (user?.id) {
       loadVideos();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadVideos = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     setLoading(true);
     try {
       // For demo purposes, we'll use user.id as gym_id
       // In production, you'd get the gym_id from the gym owner's profile
       const gymId = user.id;
-      
+
       const [pending, all] = await Promise.all([
         VideoService.getPendingVideos(gymId),
         VideoService.getGymVideos(gymId),
       ]);
-      
+
       setPendingVideos(pending);
       setAllVideos(all);
     } catch (error: any) {
@@ -190,7 +206,9 @@ const GymOwnerDashboard = () => {
   };
 
   const handleApproveVideo = async (videoId: string) => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     try {
       await VideoService.approveVideo(videoId, user.id);
@@ -203,7 +221,9 @@ const GymOwnerDashboard = () => {
   };
 
   const handleRejectVideo = async (videoId: string, reason: string) => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     try {
       await VideoService.rejectVideo(videoId, user.id, reason);
@@ -223,7 +243,7 @@ const GymOwnerDashboard = () => {
     }
   };
 
-  const renderVideoItem = ({item}: {item: Video}) => {
+  const renderVideoItem = ({ item }: { item: Video }) => {
     const getStatusColor = (status: string) => {
       switch (status) {
         case 'approved':
@@ -249,22 +269,29 @@ const GymOwnerDashboard = () => {
     return (
       <TouchableOpacity
         style={styles.videoItem}
-        onPress={() => handleVideoPress(item)}>
+        onPress={() => handleVideoPress(item)}
+      >
         <View style={styles.videoHeader}>
           <Text style={styles.videoTitle}>{item.title}</Text>
-          <View style={[styles.statusBadge, {backgroundColor: getStatusColor(item.status)}]}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: getStatusColor(item.status) },
+            ]}
+          >
             <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
           </View>
         </View>
-        
+
         <Text style={styles.videoMember}>
           Member: {(item as any).profiles?.full_name || 'Unknown'}
         </Text>
         <Text style={styles.videoExercise}>{item.exercise_type}</Text>
-        
+
         <View style={styles.videoFooter}>
           <Text style={styles.videoDuration}>
-            {Math.floor(item.duration / 60)}:{(item.duration % 60).toString().padStart(2, '0')}
+            {Math.floor(item.duration / 60)}:
+            {(item.duration % 60).toString().padStart(2, '0')}
           </Text>
           <Text style={styles.videoDate}>
             {new Date(item.created_at).toLocaleDateString()}
@@ -285,54 +312,76 @@ const GymOwnerDashboard = () => {
         <View style={styles.menuContainer}>
           <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.menuText}>Manage Gym</Text>
-            <Text style={styles.menuDescription}>Update gym information and settings</Text>
+            <Text style={styles.menuDescription}>
+              Update gym information and settings
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.menuText}>Members</Text>
-            <Text style={styles.menuDescription}>View and manage gym members</Text>
+            <Text style={styles.menuDescription}>
+              View and manage gym members
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.menuText}>Revenue</Text>
-            <Text style={styles.menuDescription}>Track payments and revenue</Text>
+            <Text style={styles.menuDescription}>
+              Track payments and revenue
+            </Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.videosSection}>
           <Text style={styles.sectionTitle}>Member Workout Videos</Text>
-          
+
           <View style={styles.tabContainer}>
             <TouchableOpacity
               style={[styles.tab, activeTab === 'pending' && styles.activeTab]}
-              onPress={() => setActiveTab('pending')}>
-              <Text style={[styles.tabText, activeTab === 'pending' && styles.activeTabText]}>
+              onPress={() => setActiveTab('pending')}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === 'pending' && styles.activeTabText,
+                ]}
+              >
                 Pending ({pendingVideos.length})
               </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.tab, activeTab === 'all' && styles.activeTab]}
-              onPress={() => setActiveTab('all')}>
-              <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>
+              onPress={() => setActiveTab('all')}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === 'all' && styles.activeTabText,
+                ]}
+              >
                 All Videos ({allVideos.length})
               </Text>
             </TouchableOpacity>
           </View>
-          
+
           {loading ? (
-            <ActivityIndicator size="large" color="#2563eb" style={{marginTop: 20}} />
+            <ActivityIndicator
+              size="large"
+              color="#2563eb"
+              style={{ marginTop: 20 }}
+            />
           ) : (
             <FlatList
               data={activeTab === 'pending' ? pendingVideos : allVideos}
               renderItem={renderVideoItem}
-              keyExtractor={(item) => item.id}
+              keyExtractor={item => item.id}
               scrollEnabled={false}
               showsVerticalScrollIndicator={false}
               ListEmptyComponent={() => (
                 <Text style={styles.emptyText}>
-                  {activeTab === 'pending' 
-                    ? 'No pending videos to review' 
+                  {activeTab === 'pending'
+                    ? 'No pending videos to review'
                     : 'No videos submitted yet'}
                 </Text>
               )}
@@ -391,7 +440,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -452,7 +501,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
     elevation: 2,

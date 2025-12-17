@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,9 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
-import {GymService} from '../services/gymService';
-import {Gym} from '../types';
-import {useAuth} from '../services/auth';
+import { GymService } from '../services/gymService';
+import { Gym } from '../types';
+import { useAuth } from '../services/auth';
 import nycGyms from '../data/nycGyms';
 
 interface GymSelectionProps {
@@ -28,7 +28,7 @@ const GymSelection: React.FC<GymSelectionProps> = ({
   onGymSelected,
   isLookingForGym = true,
 }) => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [pincode, setPincode] = useState('');
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [loading, setLoading] = useState(false);
@@ -53,7 +53,7 @@ const GymSelection: React.FC<GymSelectionProps> = ({
     setLoading(true);
     try {
       let results: Gym[] = [];
-      
+
       if (pincode.trim()) {
         results = await GymService.getNearbyGyms(pincode.trim());
       } else if (searchQuery.trim()) {
@@ -62,10 +62,10 @@ const GymSelection: React.FC<GymSelectionProps> = ({
 
       // Get member counts for each gym
       const gymsWithCounts = await Promise.all(
-        results.map(async (gym) => {
+        results.map(async gym => {
           const memberCount = await GymService.getGymMemberCount(gym.id);
-          return {...gym, memberCount};
-        })
+          return { ...gym, memberCount };
+        }),
       );
 
       setGyms(gymsWithCounts);
@@ -91,20 +91,25 @@ const GymSelection: React.FC<GymSelectionProps> = ({
     }
   };
 
-  const renderGymItem = ({item: gym}: {item: Gym & {memberCount?: number}}) => (
+  const renderGymItem = ({
+    item: gym,
+  }: {
+    item: Gym & { memberCount?: number };
+  }) => (
     <TouchableOpacity
       style={styles.gymCard}
-      onPress={() => handleSelectGym(gym)}>
+      onPress={() => handleSelectGym(gym)}
+    >
       <View style={styles.gymHeader}>
         <Text style={styles.gymName}>{gym.name}</Text>
         {gym.distance !== undefined && (
           <Text style={styles.distance}>~{gym.distance} units away</Text>
         )}
       </View>
-      
+
       <Text style={styles.gymAddress}>{gym.address}</Text>
       <Text style={styles.pincode}>📍 NYC - {gym.pincode}</Text>
-      
+
       {gym.description && (
         <Text style={styles.description} numberOfLines={2}>
           {gym.description}
@@ -120,7 +125,7 @@ const GymSelection: React.FC<GymSelectionProps> = ({
             <Text style={styles.cost}>💰 ${gym.membership_cost}/month</Text>
           )}
         </View>
-        
+
         {gym.facilities && gym.facilities.length > 0 && (
           <View style={styles.facilities}>
             {gym.facilities.slice(0, 3).map((facility, index) => (
@@ -129,7 +134,9 @@ const GymSelection: React.FC<GymSelectionProps> = ({
               </Text>
             ))}
             {gym.facilities.length > 3 && (
-              <Text style={styles.facility}>+{gym.facilities.length - 3} more</Text>
+              <Text style={styles.facility}>
+                +{gym.facilities.length - 3} more
+              </Text>
             )}
           </View>
         )}
@@ -146,13 +153,14 @@ const GymSelection: React.FC<GymSelectionProps> = ({
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {isLookingForGym ? 'Find Your Perfect Gym' : 'Find Your Current Gym'}
+            {isLookingForGym
+              ? 'Find Your Perfect Gym'
+              : 'Find Your Current Gym'}
           </Text>
           <Text style={styles.subtitle}>
-            {isLookingForGym 
+            {isLookingForGym
               ? 'Discover gyms in your area and join our fitness community'
-              : 'Select the gym you currently attend'
-            }
+              : 'Select the gym you currently attend'}
           </Text>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>✕</Text>
@@ -177,11 +185,15 @@ const GymSelection: React.FC<GymSelectionProps> = ({
               onChangeText={setSearchQuery}
             />
           </View>
-          
+
           <TouchableOpacity
-            style={[styles.searchButton, loading && styles.searchButtonDisabled]}
+            style={[
+              styles.searchButton,
+              loading && styles.searchButtonDisabled,
+            ]}
             onPress={searchGyms}
-            disabled={loading}>
+            disabled={loading}
+          >
             {loading ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
@@ -194,7 +206,9 @@ const GymSelection: React.FC<GymSelectionProps> = ({
           <View style={styles.resultsSection}>
             {gyms.length === 0 ? (
               <View style={styles.noResults}>
-                <Text style={styles.noResultsText}>No gyms found in this area</Text>
+                <Text style={styles.noResultsText}>
+                  No gyms found in this area
+                </Text>
                 <Text style={styles.noResultsSubtext}>
                   Try a different pincode or search term
                 </Text>
@@ -325,7 +339,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 15,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,

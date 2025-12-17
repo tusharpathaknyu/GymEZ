@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { User, UserType } from '../types';
+import { UserType } from '../types';
 
 export interface LoginCredentials {
   email: string;
@@ -30,7 +30,9 @@ export interface AuthUser {
 
 export class AuthService {
   // Sign up new user
-  static async signUp(credentials: SignupCredentials): Promise<{ user: AuthUser | null; error: string | null }> {
+  static async signUp(
+    credentials: SignupCredentials,
+  ): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
       // Step 1: Create auth user in Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -40,8 +42,8 @@ export class AuthService {
           data: {
             full_name: credentials.fullName,
             user_type: credentials.userType,
-          }
-        }
+          },
+        },
       });
 
       if (authError) {
@@ -82,12 +84,15 @@ export class AuthService {
   }
 
   // Sign in existing user
-  static async signIn(credentials: LoginCredentials): Promise<{ user: AuthUser | null; error: string | null }> {
+  static async signIn(
+    credentials: LoginCredentials,
+  ): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: credentials.email,
+          password: credentials.password,
+        });
 
       if (authError) {
         return { user: null, error: authError.message };
@@ -125,10 +130,14 @@ export class AuthService {
   }
 
   // Get current user session
-  static async getCurrentUser(): Promise<{ user: AuthUser | null; error: string | null }> {
+  static async getCurrentUser(): Promise<{
+    user: AuthUser | null;
+    error: string | null;
+  }> {
     try {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+
       if (sessionError || !sessionData.session?.user) {
         return { user: null, error: null };
       }
@@ -163,10 +172,12 @@ export class AuthService {
   }
 
   // Update user profile
-  static async updateProfile(updates: Partial<AuthUser>): Promise<{ user: AuthUser | null; error: string | null }> {
+  static async updateProfile(
+    updates: Partial<AuthUser>,
+  ): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
-      
+
       if (!sessionData.session?.user) {
         return { user: null, error: 'Not authenticated' };
       }
@@ -216,7 +227,9 @@ export class AuthService {
   }
 
   // Mock authentication for development/demo
-  static async mockSignIn(email: string): Promise<{ user: AuthUser; error: null }> {
+  static async mockSignIn(
+    email: string,
+  ): Promise<{ user: AuthUser; error: null }> {
     const mockUser: AuthUser = {
       id: 'mock_user_' + Date.now(),
       email: email,
@@ -230,7 +243,9 @@ export class AuthService {
     return { user: mockUser, error: null };
   }
 
-  static async mockSignUp(credentials: SignupCredentials): Promise<{ user: AuthUser; error: null }> {
+  static async mockSignUp(
+    credentials: SignupCredentials,
+  ): Promise<{ user: AuthUser; error: null }> {
     const mockUser: AuthUser = {
       id: 'mock_user_' + Date.now(),
       email: credentials.email,

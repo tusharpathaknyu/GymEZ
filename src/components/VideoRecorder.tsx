@@ -1,16 +1,16 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 
 interface VideoRecorderProps {
   visible: boolean;
   onClose: () => void;
-  onVideoRecorded: (videoUri: string, title: string, description: string, exerciseType: string, duration: number) => void;
+  onVideoRecorded: (
+    videoUri: string,
+    title: string,
+    description: string,
+    exerciseType: string,
+    duration: number,
+  ) => void;
   exerciseType?: string;
 }
 
@@ -27,7 +27,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       'Sample Workout Video',
       'Recorded with placeholder camera',
       exerciseType || 'general',
-      30
+      30,
     );
     onClose();
   };

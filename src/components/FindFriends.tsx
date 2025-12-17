@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,15 +9,13 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
-  ScrollView,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {supabase} from '../services/supabase';
-import {SocialService} from '../services/socialService';
-import {User} from '../types';
+import { useAuth } from '../services/auth';
+import { supabase } from '../services/supabase';
+import { User } from '../types';
 
 const FindFriends = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [gymUsers, setGymUsers] = useState<User[]>([]);
   const [facebookFriends, setFacebookFriends] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -28,22 +26,27 @@ const FindFriends = () => {
   useEffect(() => {
     loadUsers();
     loadFollowing();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadUsers = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     setLoading(true);
     try {
       // Get all users from the same gym
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('gym_id', user.gym_id)
         .neq('id', user.id)
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       setGymUsers(data as User[]);
 
       // Load Facebook friends (simulated for now)
@@ -58,10 +61,12 @@ const FindFriends = () => {
   };
 
   const loadFollowing = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     try {
-      const {data} = await supabase
+      const { data } = await supabase
         .from('follows')
         .select('following_id')
         .eq('follower_id', user.id);
@@ -75,20 +80,24 @@ const FindFriends = () => {
   };
 
   const handleFollow = async (userId: string) => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     try {
       const isFollowing = followingIds.has(userId);
 
       if (isFollowing) {
         // Unfollow
-        const {error} = await supabase
+        const { error } = await supabase
           .from('follows')
           .delete()
           .eq('follower_id', user.id)
           .eq('following_id', userId);
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
         setFollowingIds(prev => {
           const newSet = new Set(prev);
           newSet.delete(userId);
@@ -96,11 +105,13 @@ const FindFriends = () => {
         });
       } else {
         // Follow
-        const {error} = await supabase
+        const { error } = await supabase
           .from('follows')
-          .insert({follower_id: user.id, following_id: userId});
+          .insert({ follower_id: user.id, following_id: userId });
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
         setFollowingIds(prev => new Set(prev).add(userId));
       }
     } catch (error) {
@@ -109,31 +120,35 @@ const FindFriends = () => {
     }
   };
 
-  const filteredGymUsers = gymUsers.filter(u =>
-    u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.username?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredGymUsers = gymUsers.filter(
+    u =>
+      u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.username?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const filteredFacebookFriends = facebookFriends.filter(u =>
-    u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.username?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredFacebookFriends = facebookFriends.filter(
+    u =>
+      u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.username?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const currentUsers = activeTab === 'gym' ? filteredGymUsers : filteredFacebookFriends;
+  const currentUsers =
+    activeTab === 'gym' ? filteredGymUsers : filteredFacebookFriends;
 
-  const renderUser = ({item}: {item: User}) => {
+  const renderUser = ({ item }: { item: User }) => {
     const isFollowing = followingIds.has(item.id);
 
     return (
       <View style={styles.userCard}>
         <View style={styles.userInfo}>
           {item.profile_picture ? (
-            <Image source={{uri: item.profile_picture}} style={styles.avatar} />
+            <Image
+              source={{ uri: item.profile_picture }}
+              style={styles.avatar}
+            />
           ) : (
             <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarText}>
-                {item.full_name.charAt(0)}
-              </Text>
+              <Text style={styles.avatarText}>{item.full_name.charAt(0)}</Text>
             </View>
           )}
           <View style={styles.userDetails}>
@@ -147,7 +162,12 @@ const FindFriends = () => {
           style={[styles.followButton, isFollowing && styles.unfollowButton]}
           onPress={() => handleFollow(item.id)}
         >
-          <Text style={[styles.followButtonText, isFollowing && styles.unfollowButtonText]}>
+          <Text
+            style={[
+              styles.followButtonText,
+              isFollowing && styles.unfollowButtonText,
+            ]}
+          >
             {isFollowing ? 'Following' : 'Follow'}
           </Text>
         </TouchableOpacity>
@@ -163,7 +183,12 @@ const FindFriends = () => {
           style={[styles.tab, activeTab === 'gym' && styles.activeTab]}
           onPress={() => setActiveTab('gym')}
         >
-          <Text style={[styles.tabText, activeTab === 'gym' && styles.activeTabText]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'gym' && styles.activeTabText,
+            ]}
+          >
             🏋️ Gym Members ({gymUsers.length})
           </Text>
         </TouchableOpacity>
@@ -171,7 +196,12 @@ const FindFriends = () => {
           style={[styles.tab, activeTab === 'facebook' && styles.activeTab]}
           onPress={() => setActiveTab('facebook')}
         >
-          <Text style={[styles.tabText, activeTab === 'facebook' && styles.activeTabText]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'facebook' && styles.activeTabText,
+            ]}
+          >
             📘 Facebook Friends ({facebookFriends.length})
           </Text>
         </TouchableOpacity>
@@ -181,7 +211,9 @@ const FindFriends = () => {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder={`Search ${activeTab === 'gym' ? 'gym members' : 'Facebook friends'}...`}
+          placeholder={`Search ${
+            activeTab === 'gym' ? 'gym members' : 'Facebook friends'
+          }...`}
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholderTextColor="#9ca3af"
@@ -205,7 +237,11 @@ const FindFriends = () => {
 
       {/* User List */}
       {loading ? (
-        <ActivityIndicator size="large" color="#10b981" style={{marginTop: 40}} />
+        <ActivityIndicator
+          size="large"
+          color="#10b981"
+          style={{ marginTop: 40 }}
+        />
       ) : (
         <FlatList
           data={currentUsers}
@@ -294,7 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -318,7 +354,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -387,4 +423,3 @@ const styles = StyleSheet.create({
 });
 
 export default FindFriends;
-

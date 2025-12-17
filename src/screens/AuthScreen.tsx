@@ -18,9 +18,7 @@ interface AuthScreenProps {
   onNavigateToApp: () => void;
 }
 
-export const AuthScreen: React.FC<AuthScreenProps> = ({ 
-  onNavigateToApp,
-}) => {
+export const AuthScreen: React.FC<AuthScreenProps> = ({ onNavigateToApp }) => {
   const { login, signup, state } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -42,7 +40,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
       Alert.alert('Validation Error', 'Email is required');
       return false;
     }
-    
+
     if (!validateEmail(formData.email)) {
       Alert.alert('Validation Error', 'Please enter a valid email address');
       return false;
@@ -54,7 +52,10 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     }
 
     if (formData.password.length < 6) {
-      Alert.alert('Validation Error', 'Password must be at least 6 characters long');
+      Alert.alert(
+        'Validation Error',
+        'Password must be at least 6 characters long',
+      );
       return false;
     }
 
@@ -84,29 +85,30 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
       if (isLogin) {
         await login(formData.email, formData.password);
         if (!state.error) {
-          Alert.alert(
-            'Success!', 
-            'Login successful! Welcome back to GYMEZ.',
-            [{ text: 'OK', onPress: onNavigateToApp }]
-          );
+          Alert.alert('Success!', 'Login successful! Welcome back to GYMEZ.', [
+            { text: 'OK', onPress: onNavigateToApp },
+          ]);
         }
       } else {
         await signup(
-          formData.email, 
-          formData.password, 
-          formData.fullName, 
-          formData.userType
+          formData.email,
+          formData.password,
+          formData.fullName,
+          formData.userType,
         );
         if (!state.error) {
           Alert.alert(
-            'Success!', 
+            'Success!',
             'Account created successfully! Welcome to GYMEZ.',
-            [{ text: 'OK', onPress: onNavigateToApp }]
+            [{ text: 'OK', onPress: onNavigateToApp }],
           );
         }
       }
     } catch (error) {
-      Alert.alert('Error', state.error || 'Authentication failed. Please try again.');
+      Alert.alert(
+        'Error',
+        state.error || 'Authentication failed. Please try again.',
+      );
     } finally {
       setLoading(false);
     }
@@ -133,20 +135,23 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
       const googleAuth = GoogleAuthService.getInstance();
       await googleAuth.configure();
       const { user, error } = await googleAuth.signIn();
-      
+
       if (error) {
         Alert.alert('Google Sign-In Error', error);
         return;
       }
-      
+
       if (user) {
         // Create a local user from Google user data
-        await signup(user.email, 'google_password_' + user.id, user.name, 'gym_member');
-        Alert.alert(
-          'Success!',
-          'Signed in with Google successfully!',
-          [{ text: 'OK', onPress: onNavigateToApp }]
+        await signup(
+          user.email,
+          'google_password_' + user.id,
+          user.name,
+          'gym_member',
         );
+        Alert.alert('Success!', 'Signed in with Google successfully!', [
+          { text: 'OK', onPress: onNavigateToApp },
+        ]);
       }
     } catch (error) {
       Alert.alert('Error', 'Google Sign-In failed. Please try again.');
@@ -156,8 +161,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -179,7 +184,9 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
               <TextInput
                 style={styles.input}
                 value={formData.fullName}
-                onChangeText={(text) => setFormData({...formData, fullName: text})}
+                onChangeText={text =>
+                  setFormData({ ...formData, fullName: text })
+                }
                 placeholder="Enter your full name"
                 autoCapitalize="words"
               />
@@ -191,7 +198,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
             <TextInput
               style={styles.input}
               value={formData.email}
-              onChangeText={(text) => setFormData({...formData, email: text})}
+              onChangeText={text => setFormData({ ...formData, email: text })}
               placeholder="Enter your email"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -204,7 +211,9 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
             <TextInput
               style={styles.input}
               value={formData.password}
-              onChangeText={(text) => setFormData({...formData, password: text})}
+              onChangeText={text =>
+                setFormData({ ...formData, password: text })
+              }
               placeholder="Enter your password"
               secureTextEntry
               autoComplete="password"
@@ -218,7 +227,9 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                 <TextInput
                   style={styles.input}
                   value={formData.confirmPassword}
-                  onChangeText={(text) => setFormData({...formData, confirmPassword: text})}
+                  onChangeText={text =>
+                    setFormData({ ...formData, confirmPassword: text })
+                  }
                   placeholder="Confirm your password"
                   secureTextEntry
                 />
@@ -230,29 +241,41 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                   <TouchableOpacity
                     style={[
                       styles.userTypeOption,
-                      formData.userType === 'gym_member' && styles.userTypeSelected
+                      formData.userType === 'gym_member' &&
+                        styles.userTypeSelected,
                     ]}
-                    onPress={() => setFormData({...formData, userType: 'gym_member'})}
+                    onPress={() =>
+                      setFormData({ ...formData, userType: 'gym_member' })
+                    }
                   >
-                    <Text style={[
-                      styles.userTypeText,
-                      formData.userType === 'gym_member' && styles.userTypeTextSelected
-                    ]}>
+                    <Text
+                      style={[
+                        styles.userTypeText,
+                        formData.userType === 'gym_member' &&
+                          styles.userTypeTextSelected,
+                      ]}
+                    >
                       Gym Member
                     </Text>
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity
                     style={[
                       styles.userTypeOption,
-                      formData.userType === 'gym_owner' && styles.userTypeSelected
+                      formData.userType === 'gym_owner' &&
+                        styles.userTypeSelected,
                     ]}
-                    onPress={() => setFormData({...formData, userType: 'gym_owner'})}
+                    onPress={() =>
+                      setFormData({ ...formData, userType: 'gym_owner' })
+                    }
                   >
-                    <Text style={[
-                      styles.userTypeText,
-                      formData.userType === 'gym_owner' && styles.userTypeTextSelected
-                    ]}>
+                    <Text
+                      style={[
+                        styles.userTypeText,
+                        formData.userType === 'gym_owner' &&
+                          styles.userTypeTextSelected,
+                      ]}
+                    >
                       Gym Owner
                     </Text>
                   </TouchableOpacity>
@@ -262,12 +285,19 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
           )}
 
           <TouchableOpacity
-            style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton,
+              loading && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit}
             disabled={loading}
           >
             <Text style={styles.submitButtonText}>
-              {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+              {loading
+                ? 'Please wait...'
+                : isLogin
+                ? 'Sign In'
+                : 'Create Account'}
             </Text>
           </TouchableOpacity>
 
@@ -300,10 +330,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
           )}
         </View>
 
-        <TouchableOpacity
-          style={styles.skipButton}
-          onPress={onNavigateToApp}
-        >
+        <TouchableOpacity style={styles.skipButton} onPress={onNavigateToApp}>
           <Text style={styles.skipButtonText}>Skip for now →</Text>
         </TouchableOpacity>
       </ScrollView>

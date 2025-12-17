@@ -13,12 +13,12 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Start in plank position with hands slightly wider than shoulders',
       'Lower your body until chest nearly touches the floor',
       'Push back up to starting position',
-      'Keep core tight throughout the movement'
+      'Keep core tight throughout the movement',
     ],
     difficulty: 'beginner',
     sets: 3,
     reps: 12,
-    rest_seconds: 60
+    rest_seconds: 60,
   },
   {
     id: 'pull_up',
@@ -31,12 +31,12 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Hang from pull-up bar with overhand grip',
       'Pull your body up until chin clears the bar',
       'Lower back down with control',
-      'Avoid swinging or kipping'
+      'Avoid swinging or kipping',
     ],
     difficulty: 'intermediate',
     sets: 3,
     reps: 8,
-    rest_seconds: 90
+    rest_seconds: 90,
   },
   {
     id: 'bench_press',
@@ -49,14 +49,14 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Lie on bench with feet flat on floor',
       'Grip bar slightly wider than shoulder width',
       'Lower bar to chest with control',
-      'Press bar back up to full arm extension'
+      'Press bar back up to full arm extension',
     ],
     difficulty: 'intermediate',
     sets: 4,
     reps: 10,
-    rest_seconds: 120
+    rest_seconds: 120,
   },
-  
+
   // Strength Training - Lower Body
   {
     id: 'squat',
@@ -69,12 +69,12 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Stand with feet shoulder-width apart',
       'Lower your body as if sitting back into a chair',
       'Keep knees in line with toes',
-      'Return to starting position'
+      'Return to starting position',
     ],
     difficulty: 'beginner',
     sets: 3,
     reps: 15,
-    rest_seconds: 60
+    rest_seconds: 60,
   },
   {
     id: 'deadlift',
@@ -87,14 +87,14 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Stand with bar over mid-foot',
       'Bend at hips and knees to grip bar',
       'Keep back straight and chest up',
-      'Drive through heels to stand up straight'
+      'Drive through heels to stand up straight',
     ],
     difficulty: 'intermediate',
     sets: 4,
     reps: 8,
-    rest_seconds: 150
+    rest_seconds: 150,
   },
-  
+
   // Cardio Exercises
   {
     id: 'jumping_jacks',
@@ -107,11 +107,11 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Start standing with feet together, arms at sides',
       'Jump feet apart while raising arms overhead',
       'Jump back to starting position',
-      'Maintain steady rhythm'
+      'Maintain steady rhythm',
     ],
     difficulty: 'beginner',
     duration_minutes: 2,
-    rest_seconds: 30
+    rest_seconds: 30,
   },
   {
     id: 'burpees',
@@ -124,12 +124,12 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Start standing, then squat down and place hands on floor',
       'Jump feet back into plank position',
       'Do a push-up (optional)',
-      'Jump feet back to squat, then jump up with arms overhead'
+      'Jump feet back to squat, then jump up with arms overhead',
     ],
     difficulty: 'advanced',
     sets: 3,
     reps: 10,
-    rest_seconds: 90
+    rest_seconds: 90,
   },
   {
     id: 'mountain_climbers',
@@ -142,13 +142,13 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Start in plank position',
       'Bring right knee toward chest',
       'Switch legs quickly, like running in place',
-      'Keep hips level and core engaged'
+      'Keep hips level and core engaged',
     ],
     difficulty: 'intermediate',
     duration_minutes: 1,
-    rest_seconds: 30
+    rest_seconds: 30,
   },
-  
+
   // Core/Flexibility
   {
     id: 'plank',
@@ -161,15 +161,15 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Start in push-up position',
       'Lower onto forearms',
       'Keep body in straight line from head to heels',
-      'Hold position while breathing normally'
+      'Hold position while breathing normally',
     ],
     difficulty: 'beginner',
     duration_minutes: 1,
-    rest_seconds: 60
+    rest_seconds: 60,
   },
   {
     id: 'yoga_child_pose',
-    name: 'Child\'s Pose',
+    name: "Child's Pose",
     category: 'flexibility',
     muscle_groups: ['back', 'hips', 'shoulders'],
     equipment: ['yoga mat'],
@@ -178,12 +178,12 @@ export const EXERCISES_DATABASE: Exercise[] = [
       'Kneel on floor with big toes touching',
       'Sit back on heels and separate knees',
       'Fold forward, extending arms in front',
-      'Rest forehead on mat and breathe deeply'
+      'Rest forehead on mat and breathe deeply',
     ],
     difficulty: 'beginner',
     duration_minutes: 2,
-    rest_seconds: 0
-  }
+    rest_seconds: 0,
+  },
 ];
 
 export const WORKOUT_TEMPLATES: WorkoutTemplate[] = [
@@ -196,10 +196,10 @@ export const WORKOUT_TEMPLATES: WorkoutTemplate[] = [
       EXERCISES_DATABASE.find(e => e.id === 'squat')!,
       EXERCISES_DATABASE.find(e => e.id === 'push_up')!,
       EXERCISES_DATABASE.find(e => e.id === 'plank')!,
-      EXERCISES_DATABASE.find(e => e.id === 'jumping_jacks')!
+      EXERCISES_DATABASE.find(e => e.id === 'jumping_jacks')!,
     ],
     estimated_duration_minutes: 25,
-    difficulty: 'beginner'
+    difficulty: 'beginner',
   },
   {
     id: 'upper_body_strength',
@@ -210,10 +210,10 @@ export const WORKOUT_TEMPLATES: WorkoutTemplate[] = [
       EXERCISES_DATABASE.find(e => e.id === 'push_up')!,
       EXERCISES_DATABASE.find(e => e.id === 'pull_up')!,
       EXERCISES_DATABASE.find(e => e.id === 'bench_press')!,
-      EXERCISES_DATABASE.find(e => e.id === 'plank')!
+      EXERCISES_DATABASE.find(e => e.id === 'plank')!,
     ],
     estimated_duration_minutes: 45,
-    difficulty: 'intermediate'
+    difficulty: 'intermediate',
   },
   {
     id: 'cardio_hiit',
@@ -224,10 +224,10 @@ export const WORKOUT_TEMPLATES: WorkoutTemplate[] = [
       EXERCISES_DATABASE.find(e => e.id === 'jumping_jacks')!,
       EXERCISES_DATABASE.find(e => e.id === 'burpees')!,
       EXERCISES_DATABASE.find(e => e.id === 'mountain_climbers')!,
-      EXERCISES_DATABASE.find(e => e.id === 'squat')!
+      EXERCISES_DATABASE.find(e => e.id === 'squat')!,
     ],
     estimated_duration_minutes: 20,
-    difficulty: 'advanced'
+    difficulty: 'advanced',
   },
   {
     id: 'lower_body_power',
@@ -238,10 +238,10 @@ export const WORKOUT_TEMPLATES: WorkoutTemplate[] = [
       EXERCISES_DATABASE.find(e => e.id === 'squat')!,
       EXERCISES_DATABASE.find(e => e.id === 'deadlift')!,
       EXERCISES_DATABASE.find(e => e.id === 'mountain_climbers')!,
-      EXERCISES_DATABASE.find(e => e.id === 'plank')!
+      EXERCISES_DATABASE.find(e => e.id === 'plank')!,
     ],
     estimated_duration_minutes: 40,
-    difficulty: 'intermediate'
+    difficulty: 'intermediate',
   },
   {
     id: 'flexibility_recovery',
@@ -250,11 +250,11 @@ export const WORKOUT_TEMPLATES: WorkoutTemplate[] = [
     category: 'yoga',
     exercises: [
       EXERCISES_DATABASE.find(e => e.id === 'yoga_child_pose')!,
-      EXERCISES_DATABASE.find(e => e.id === 'plank')!
+      EXERCISES_DATABASE.find(e => e.id === 'plank')!,
     ],
     estimated_duration_minutes: 15,
-    difficulty: 'beginner'
-  }
+    difficulty: 'beginner',
+  },
 ];
 
 export class WorkoutService {
@@ -263,18 +263,27 @@ export class WorkoutService {
   }
 
   static getExercisesByCategory(category: string): Exercise[] {
-    return EXERCISES_DATABASE.filter(exercise => exercise.category === category);
+    return EXERCISES_DATABASE.filter(
+      exercise => exercise.category === category,
+    );
   }
 
   static getWorkoutTemplates(): WorkoutTemplate[] {
     return WORKOUT_TEMPLATES;
   }
 
-  static getWorkoutTemplatesByDifficulty(difficulty: string): WorkoutTemplate[] {
-    return WORKOUT_TEMPLATES.filter(template => template.difficulty === difficulty);
+  static getWorkoutTemplatesByDifficulty(
+    difficulty: string,
+  ): WorkoutTemplate[] {
+    return WORKOUT_TEMPLATES.filter(
+      template => template.difficulty === difficulty,
+    );
   }
 
-  static createCustomWorkout(name: string, exercises: Exercise[]): WorkoutTemplate {
+  static createCustomWorkout(
+    name: string,
+    exercises: Exercise[],
+  ): WorkoutTemplate {
     return {
       id: `custom_${Date.now()}`,
       name,
@@ -282,9 +291,11 @@ export class WorkoutService {
       category: 'custom',
       exercises,
       estimated_duration_minutes: exercises.reduce((total, ex) => {
-        return total + (ex.duration_minutes || ((ex.sets || 1) * (ex.reps || 1) * 0.5));
+        return (
+          total + (ex.duration_minutes || (ex.sets || 1) * (ex.reps || 1) * 0.5)
+        );
       }, 0),
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
     };
   }
 
@@ -297,7 +308,7 @@ export class WorkoutService {
       sets: [],
       total_duration_minutes: 0,
       difficulty: template.difficulty,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // Initialize sets for each exercise
@@ -311,7 +322,7 @@ export class WorkoutService {
           weight: 0,
           duration_seconds: (exercise.duration_minutes || 0) * 60,
           rest_seconds: exercise.rest_seconds || 60,
-          completed: false
+          completed: false,
         });
       }
     });

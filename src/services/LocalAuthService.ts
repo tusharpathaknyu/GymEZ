@@ -56,17 +56,22 @@ export class LocalAuthService {
   // Validate password strength
   private static isValidPassword(password: string): boolean {
     // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
     return passwordRegex.test(password);
   }
 
   // Generate unique user ID
   private static generateUserId(): string {
-    return 'local_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+    return (
+      'local_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15)
+    );
   }
 
   // Sign up new user with local storage
-  static async signUp(credentials: SignupCredentials): Promise<{ user: AuthUser | null; error: string | null }> {
+  static async signUp(
+    credentials: SignupCredentials,
+  ): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
       // Validate input
       if (!this.isValidEmail(credentials.email)) {
@@ -74,7 +79,11 @@ export class LocalAuthService {
       }
 
       if (!this.isValidPassword(credentials.password)) {
-        return { user: null, error: 'Password must be at least 8 characters with uppercase, lowercase, and number' };
+        return {
+          user: null,
+          error:
+            'Password must be at least 8 characters with uppercase, lowercase, and number',
+        };
       }
 
       if (!credentials.fullName.trim()) {
@@ -83,10 +92,15 @@ export class LocalAuthService {
 
       // Check if user already exists
       const existingUsers = await this.getStoredUsers();
-      const existingUser = existingUsers.find(user => user.email.toLowerCase() === credentials.email.toLowerCase());
-      
+      const existingUser = existingUsers.find(
+        user => user.email.toLowerCase() === credentials.email.toLowerCase(),
+      );
+
       if (existingUser) {
-        return { user: null, error: 'An account with this email already exists' };
+        return {
+          user: null,
+          error: 'An account with this email already exists',
+        };
       }
 
       // Create new user
@@ -103,19 +117,24 @@ export class LocalAuthService {
       // Save user to storage
       const updatedUsers = [...existingUsers, newUser];
       await this.saveUsers(updatedUsers);
-      
+
       // Set as current user
       await this.setCurrentUser(newUser);
 
       return { user: newUser, error: null };
     } catch (error) {
       console.error('Signup failed:', error);
-      return { user: null, error: 'Account creation failed. Please try again.' };
+      return {
+        user: null,
+        error: 'Account creation failed. Please try again.',
+      };
     }
   }
 
   // Sign in existing user
-  static async signIn(credentials: LoginCredentials): Promise<{ user: AuthUser | null; error: string | null }> {
+  static async signIn(
+    credentials: LoginCredentials,
+  ): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
       if (!this.isValidEmail(credentials.email)) {
         return { user: null, error: 'Please enter a valid email address' };
@@ -127,12 +146,15 @@ export class LocalAuthService {
 
       // Find user in storage
       const existingUsers = await this.getStoredUsers();
-      const user = existingUsers.find(u => 
-        u.email.toLowerCase() === credentials.email.toLowerCase()
+      const user = existingUsers.find(
+        u => u.email.toLowerCase() === credentials.email.toLowerCase(),
       );
 
       if (!user) {
-        return { user: null, error: 'No account found with this email address' };
+        return {
+          user: null,
+          error: 'No account found with this email address',
+        };
       }
 
       // In a real app, you'd verify the password hash
@@ -146,9 +168,11 @@ export class LocalAuthService {
       };
 
       // Update user in storage
-      const updatedUsers = existingUsers.map(u => u.id === user.id ? updatedUser : u);
+      const updatedUsers = existingUsers.map(u =>
+        u.id === user.id ? updatedUser : u,
+      );
       await this.saveUsers(updatedUsers);
-      
+
       // Set as current user
       await this.setCurrentUser(updatedUser);
 
@@ -171,11 +195,14 @@ export class LocalAuthService {
   }
 
   // Get current user from storage
-  static async getCurrentUser(): Promise<{ user: AuthUser | null; error: string | null }> {
+  static async getCurrentUser(): Promise<{
+    user: AuthUser | null;
+    error: string | null;
+  }> {
     try {
       const userJson = await AsyncStorage.getItem(CURRENT_USER_KEY);
       const sessionJson = await AsyncStorage.getItem(SESSION_KEY);
-      
+
       if (!userJson || !sessionJson) {
         return { user: null, error: null };
       }
@@ -183,11 +210,11 @@ export class LocalAuthService {
       const user = JSON.parse(userJson) as AuthUser;
       const sessionDate = new Date(sessionJson);
       const now = new Date();
-      
+
       // Check if session is older than 30 days (optional)
       const sessionAgeMs = now.getTime() - sessionDate.getTime();
       const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-      
+
       if (sessionAgeMs > thirtyDaysMs) {
         await this.clearCurrentUser();
         return { user: null, error: 'Session expired' };
@@ -207,10 +234,12 @@ export class LocalAuthService {
   }
 
   // Update user profile
-  static async updateProfile(updates: Partial<AuthUser>): Promise<{ user: AuthUser | null; error: string | null }> {
+  static async updateProfile(
+    updates: Partial<AuthUser>,
+  ): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
       const { user: currentUser } = await this.getCurrentUser();
-      
+
       if (!currentUser) {
         return { user: null, error: 'Not authenticated' };
       }
@@ -225,16 +254,21 @@ export class LocalAuthService {
 
       // Update user in storage
       const existingUsers = await this.getStoredUsers();
-      const updatedUsers = existingUsers.map(u => u.id === currentUser.id ? updatedUser : u);
+      const updatedUsers = existingUsers.map(u =>
+        u.id === currentUser.id ? updatedUser : u,
+      );
       await this.saveUsers(updatedUsers);
-      
+
       // Update current user session
       await this.setCurrentUser(updatedUser);
 
       return { user: updatedUser, error: null };
     } catch (error) {
       console.error('Profile update failed:', error);
-      return { user: null, error: 'Failed to update profile. Please try again.' };
+      return {
+        user: null,
+        error: 'Failed to update profile. Please try again.',
+      };
     }
   }
 
@@ -246,8 +280,10 @@ export class LocalAuthService {
       }
 
       const existingUsers = await this.getStoredUsers();
-      const user = existingUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-      
+      const user = existingUsers.find(
+        u => u.email.toLowerCase() === email.toLowerCase(),
+      );
+
       if (!user) {
         return { error: 'No account found with this email address' };
       }
@@ -269,7 +305,11 @@ export class LocalAuthService {
   // Clear all user data (for testing/reset purposes)
   static async clearAllData(): Promise<void> {
     try {
-      await AsyncStorage.multiRemove([USERS_KEY, CURRENT_USER_KEY, SESSION_KEY]);
+      await AsyncStorage.multiRemove([
+        USERS_KEY,
+        CURRENT_USER_KEY,
+        SESSION_KEY,
+      ]);
     } catch (error) {
       console.error('Failed to clear all data:', error);
     }
@@ -296,7 +336,7 @@ export class LocalAuthService {
         gym_id: 'demo_gym_1',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      }
+      },
     ];
 
     await this.saveUsers(demoUsers);

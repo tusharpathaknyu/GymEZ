@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,15 +8,15 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {VideoService} from '../services/videoService';
-import {Video} from '../types';
-import {WorkoutBuilder} from '../components/WorkoutBuilder';
-import {WorkoutTimer} from '../components/WorkoutTimer';
+import { useAuth } from '../services/auth';
+import { VideoService } from '../services/videoService';
+import { Video } from '../types';
+import { WorkoutBuilder } from '../components/WorkoutBuilder';
+import { WorkoutTimer } from '../components/WorkoutTimer';
 import VideoRecorder from '../components/VideoRecorder';
 
 const WorkoutsScreen = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [showVideoRecorder, setShowVideoRecorder] = useState(false);
   const [showWorkoutBuilder, setShowWorkoutBuilder] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
@@ -27,10 +27,13 @@ const WorkoutsScreen = () => {
     if (user?.id) {
       loadMyVideos();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadMyVideos = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     setLoading(true);
     try {
@@ -48,9 +51,11 @@ const WorkoutsScreen = () => {
     title: string,
     description: string,
     exerciseType: string,
-    duration: number
+    duration: number,
   ) => {
-    if (!user?.id || !user?.gym_id) return;
+    if (!user?.id || !user?.gym_id) {
+      return;
+    }
 
     try {
       await VideoService.submitVideoForApproval(
@@ -60,7 +65,7 @@ const WorkoutsScreen = () => {
         title,
         description,
         exerciseType,
-        duration
+        duration,
       );
       loadMyVideos();
     } catch (error: any) {
@@ -95,7 +100,9 @@ const WorkoutsScreen = () => {
       <View style={styles.header}>
         <View>
           <Text style={styles.headerTitle}>Workouts</Text>
-          <Text style={styles.headerSubtitle}>Track your training progress</Text>
+          <Text style={styles.headerSubtitle}>
+            Track your training progress
+          </Text>
         </View>
       </View>
 
@@ -108,7 +115,9 @@ const WorkoutsScreen = () => {
           >
             <Text style={styles.actionIcon}>📹</Text>
             <Text style={styles.actionTitle}>Record Video</Text>
-            <Text style={styles.actionDescription}>Record your workout set</Text>
+            <Text style={styles.actionDescription}>
+              Record your workout set
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -126,7 +135,9 @@ const WorkoutsScreen = () => {
           >
             <Text style={styles.actionIcon}>🏗️</Text>
             <Text style={styles.actionTitle}>Create Plan</Text>
-            <Text style={styles.actionDescription}>Build a workout routine</Text>
+            <Text style={styles.actionDescription}>
+              Build a workout routine
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -134,7 +145,11 @@ const WorkoutsScreen = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>My Workout Videos</Text>
           {loading ? (
-            <ActivityIndicator size="large" color="#10b981" style={{marginTop: 20}} />
+            <ActivityIndicator
+              size="large"
+              color="#10b981"
+              style={{ marginTop: 20 }}
+            />
           ) : myVideos.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyIcon}>📹</Text>
@@ -149,11 +164,20 @@ const WorkoutsScreen = () => {
                 <View key={video.id} style={styles.videoCard}>
                   <View style={styles.videoHeader}>
                     <Text style={styles.videoTitle}>{video.title}</Text>
-                    <View style={[styles.statusBadge, {backgroundColor: getStatusColor(video.status)}]}>
-                      <Text style={styles.statusText}>{getStatusText(video.status)}</Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: getStatusColor(video.status) },
+                      ]}
+                    >
+                      <Text style={styles.statusText}>
+                        {getStatusText(video.status)}
+                      </Text>
                     </View>
                   </View>
-                  <Text style={styles.videoExercise}>{video.exercise_type}</Text>
+                  <Text style={styles.videoExercise}>
+                    {video.exercise_type}
+                  </Text>
                   {video.description && (
                     <Text style={styles.videoDescription} numberOfLines={2}>
                       {video.description}
@@ -188,7 +212,7 @@ const WorkoutsScreen = () => {
             <Text style={styles.modalTitle}>Create Workout Plan</Text>
           </View>
           <WorkoutBuilder
-            onSave={(workoutPlan) => {
+            onSave={_workoutPlan => {
               setShowWorkoutBuilder(false);
             }}
           />
@@ -208,7 +232,7 @@ const WorkoutsScreen = () => {
               </TouchableOpacity>
             </View>
             <WorkoutTimer
-              onWorkoutComplete={(duration) => {
+              onWorkoutComplete={_duration => {
                 setShowTimer(false);
               }}
             />
@@ -257,7 +281,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
@@ -295,7 +319,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -343,7 +367,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
@@ -388,4 +412,3 @@ const styles = StyleSheet.create({
 });
 
 export default WorkoutsScreen;
-

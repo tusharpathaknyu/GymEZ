@@ -1,5 +1,5 @@
-import {supabase} from './supabase';
-import {PersonalRecord, ExerciseType} from '../types';
+import { supabase } from './supabase';
+import { PersonalRecord, ExerciseType } from '../types';
 
 export class PersonalRecordsService {
   /**
@@ -7,11 +7,11 @@ export class PersonalRecordsService {
    */
   static async getUserPRs(userId: string): Promise<PersonalRecord[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('personal_records')
         .select('*')
         .eq('user_id', userId)
-        .order('achieved_at', {ascending: false});
+        .order('achieved_at', { ascending: false });
 
       if (error) {
         throw new Error(`Failed to fetch personal records: ${error.message}`);
@@ -29,23 +29,25 @@ export class PersonalRecordsService {
    */
   static async getBestPRForExercise(
     userId: string,
-    exerciseType: ExerciseType
+    exerciseType: ExerciseType,
   ): Promise<PersonalRecord | null> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('personal_records')
         .select('*')
         .eq('user_id', userId)
         .eq('exercise_type', exerciseType)
-        .order('weight', {ascending: false})
+        .order('weight', { ascending: false })
         .limit(1)
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        throw new Error(`Failed to fetch PR for ${exerciseType}: ${error.message}`);
+        throw new Error(
+          `Failed to fetch PR for ${exerciseType}: ${error.message}`,
+        );
       }
 
-      return data as PersonalRecord || null;
+      return (data as PersonalRecord) || null;
     } catch (error) {
       console.error('Get best PR error:', error);
       throw error;
@@ -57,15 +59,15 @@ export class PersonalRecordsService {
    */
   static async getPRHistoryForExercise(
     userId: string,
-    exerciseType: ExerciseType
+    exerciseType: ExerciseType,
   ): Promise<PersonalRecord[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('personal_records')
         .select('*')
         .eq('user_id', userId)
         .eq('exercise_type', exerciseType)
-        .order('achieved_at', {ascending: false});
+        .order('achieved_at', { ascending: false });
 
       if (error) {
         throw new Error(`Failed to fetch PR history: ${error.message}`);
@@ -86,10 +88,10 @@ export class PersonalRecordsService {
     exerciseType: ExerciseType,
     weight: number,
     reps: number,
-    videoId?: string
+    videoId?: string,
   ): Promise<PersonalRecord> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('personal_records')
         .insert({
           user_id: userId,
@@ -120,11 +122,11 @@ export class PersonalRecordsService {
     userId: string,
     exerciseType: ExerciseType,
     weight: number,
-    reps: number
+    reps: number,
   ): Promise<boolean> {
     try {
       const currentBest = await this.getBestPRForExercise(userId, exerciseType);
-      
+
       if (!currentBest) {
         return true; // First PR for this exercise
       }
@@ -146,24 +148,28 @@ export class PersonalRecordsService {
   static async getPRLeaderboard(
     exerciseType: ExerciseType,
     gymId?: string,
-    limit: number = 10
-  ): Promise<(PersonalRecord & {user: {full_name: string; username?: string}})[]> {
+    limit: number = 10,
+  ): Promise<
+    (PersonalRecord & { user: { full_name: string; username?: string } })[]
+  > {
     try {
       let query = supabase
         .from('personal_records')
-        .select(`
+        .select(
+          `
           *,
           profiles!personal_records_user_id_fkey(full_name, username)
-        `)
+        `,
+        )
         .eq('exercise_type', exerciseType)
-        .order('weight', {ascending: false})
+        .order('weight', { ascending: false })
         .limit(limit);
 
       if (gymId) {
         query = query.eq('profiles.gym_id', gymId);
       }
 
-      const {data, error} = await query;
+      const { data, error } = await query;
 
       if (error) {
         throw new Error(`Failed to fetch leaderboard: ${error.message}`);
@@ -171,8 +177,10 @@ export class PersonalRecordsService {
 
       return data.map(record => ({
         ...record,
-        user: record.profiles
-      })) as (PersonalRecord & {user: {full_name: string; username?: string}})[];
+        user: record.profiles,
+      })) as (PersonalRecord & {
+        user: { full_name: string; username?: string };
+      })[];
     } catch (error) {
       console.error('Get PR leaderboard error:', error);
       throw error;
@@ -182,13 +190,16 @@ export class PersonalRecordsService {
   /**
    * Get recent PRs for a user
    */
-  static async getRecentPRs(userId: string, limit: number = 10): Promise<PersonalRecord[]> {
+  static async getRecentPRs(
+    userId: string,
+    limit: number = 10,
+  ): Promise<PersonalRecord[]> {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('personal_records')
         .select('*')
         .eq('user_id', userId)
-        .order('achieved_at', {ascending: false})
+        .order('achieved_at', { ascending: false })
         .limit(limit);
 
       if (error) {
@@ -212,10 +223,12 @@ export class PersonalRecordsService {
   }> {
     try {
       const allPRs = await this.getUserPRs(userId);
-      
+
       // Get unique exercises
-      const exercisesWithPRs = [...new Set(allPRs.map(pr => pr.exercise_type))] as ExerciseType[];
-      
+      const exercisesWithPRs = [
+        ...new Set(allPRs.map(pr => pr.exercise_type)),
+      ] as ExerciseType[];
+
       // Get recent PRs (last 5)
       const recentPRs = allPRs.slice(0, 5);
 
@@ -244,38 +257,38 @@ export class PersonalRecordsService {
         type: 'benchpress',
         name: 'Bench Press',
         icon: '🏋️‍♂️',
-        description: 'Upper body strength'
+        description: 'Upper body strength',
       },
       {
         type: 'squat',
         name: 'Squat',
         icon: '🦵',
-        description: 'Lower body power'
+        description: 'Lower body power',
       },
       {
         type: 'deadlift',
         name: 'Deadlift',
         icon: '💪',
-        description: 'Full body strength'
+        description: 'Full body strength',
       },
       {
         type: 'pullup',
         name: 'Pull-ups',
         icon: '🔥',
-        description: 'Upper body endurance'
+        description: 'Upper body endurance',
       },
       {
         type: 'pushup',
         name: 'Push-ups',
         icon: '💯',
-        description: 'Bodyweight strength'
+        description: 'Bodyweight strength',
       },
       {
         type: 'dip',
         name: 'Dips',
         icon: '⚡',
-        description: 'Tricep power'
-      }
+        description: 'Tricep power',
+      },
     ];
   }
 }

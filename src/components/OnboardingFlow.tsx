@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import GymSelection from './GymSelection';
-import {Gym} from '../types';
+import { Gym } from '../types';
 
 interface OnboardingFlowProps {
   visible: boolean;
@@ -19,8 +19,12 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   visible,
   onComplete,
 }) => {
-  const [currentStep, setCurrentStep] = useState<'choice' | 'gymSelection'>('choice');
-  const [userChoice, setUserChoice] = useState<'existing' | 'looking' | null>(null);
+  const [currentStep, setCurrentStep] = useState<'choice' | 'gymSelection'>(
+    'choice',
+  );
+  const [userChoice, setUserChoice] = useState<'existing' | 'looking' | null>(
+    null,
+  );
   const [showGymSelection, setShowGymSelection] = useState(false);
 
   const handleUserChoice = (choice: 'existing' | 'looking') => {
@@ -53,20 +57,23 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               <Text style={styles.logo}>💪 GYMEZ</Text>
               <Text style={styles.welcomeTitle}>Welcome to the Community!</Text>
               <Text style={styles.welcomeSubtitle}>
-                Let's get you connected with the right gym to start your fitness journey
+                Let's get you connected with the right gym to start your fitness
+                journey
               </Text>
             </View>
 
             <View style={styles.choicesContainer}>
               <TouchableOpacity
                 style={styles.choiceCard}
-                onPress={() => handleUserChoice('existing')}>
+                onPress={() => handleUserChoice('existing')}
+              >
                 <View style={styles.choiceIcon}>
                   <Text style={styles.choiceEmoji}>🏋️‍♀️</Text>
                 </View>
                 <Text style={styles.choiceTitle}>I go to a gym</Text>
                 <Text style={styles.choiceDescription}>
-                  I'm already a member at a gym and want to connect with my gym community
+                  I'm already a member at a gym and want to connect with my gym
+                  community
                 </Text>
                 <View style={styles.choiceButton}>
                   <Text style={styles.choiceButtonText}>Find My Gym</Text>
@@ -75,13 +82,15 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 
               <TouchableOpacity
                 style={styles.choiceCard}
-                onPress={() => handleUserChoice('looking')}>
+                onPress={() => handleUserChoice('looking')}
+              >
                 <View style={styles.choiceIcon}>
                   <Text style={styles.choiceEmoji}>🔍</Text>
                 </View>
                 <Text style={styles.choiceTitle}>I'm looking for a gym</Text>
                 <Text style={styles.choiceDescription}>
-                  Help me discover gyms in my area and find the perfect fitness community
+                  Help me discover gyms in my area and find the perfect fitness
+                  community
                 </Text>
                 <View style={styles.choiceButton}>
                   <Text style={styles.choiceButtonText}>Discover Gyms</Text>
@@ -91,7 +100,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>
-                🌟 Join thousands of fitness enthusiasts tracking PRs and sharing their journey
+                🌟 Join thousands of fitness enthusiasts tracking PRs and
+                sharing their journey
               </Text>
             </View>
           </View>
@@ -153,7 +163,7 @@ const styles = StyleSheet.create({
     padding: 30,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,

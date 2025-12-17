@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,16 +6,13 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  Image,
   RefreshControl,
   TextInput,
   Modal,
-  Animated,
 } from 'react-native';
-import {SocialService} from '../services/socialService';
-import {useAuth} from '../services/auth';
-import {Post, PostComment} from '../types';
-import ReactionButtons from './ReactionButtons';
+import { SocialService } from '../services/socialService';
+import { useAuth } from '../services/auth';
+import { Post, PostComment } from '../types';
 import StoryView from './StoryView';
 import EnhancedPost from './EnhancedPost';
 
@@ -28,11 +25,11 @@ interface SocialFeedProps {
 const SocialFeed: React.FC<SocialFeedProps> = ({
   gymId,
   userId,
-  feedType = 'home'
+  feedType = 'home',
 }) => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showComments, setShowComments] = useState(false);
@@ -42,6 +39,7 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
 
   useEffect(() => {
     loadFeed();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedType, gymId, userId]);
 
   const loadFeed = async () => {
@@ -83,17 +81,19 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
   const handleLike = async (postId: string) => {
     try {
       const isLiked = await SocialService.toggleLike(postId, user!.id);
-      
+
       setPosts(prevPosts =>
         prevPosts.map(post =>
           post.id === postId
             ? {
                 ...post,
                 is_liked: isLiked,
-                likes_count: isLiked ? (post.likes_count || 0) + 1 : Math.max((post.likes_count || 0) - 1, 0),
+                likes_count: isLiked
+                  ? (post.likes_count || 0) + 1
+                  : Math.max((post.likes_count || 0) - 1, 0),
               }
-            : post
-        )
+            : post,
+        ),
       );
     } catch (error) {
       console.error('Error toggling like:', error);
@@ -113,14 +113,16 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
   };
 
   const submitComment = async () => {
-    if (!newComment.trim() || !selectedPost) return;
+    if (!newComment.trim() || !selectedPost) {
+      return;
+    }
 
     try {
       setCommentLoading(true);
       const comment = await SocialService.addComment(
         selectedPost.id,
         user!.id,
-        newComment.trim()
+        newComment.trim(),
       );
 
       setComments(prev => [...prev, comment]);
@@ -130,9 +132,9 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
       setPosts(prevPosts =>
         prevPosts.map(post =>
           post.id === selectedPost.id
-            ? {...post, comments_count: (post.comments_count || 0) + 1}
-            : post
-        )
+            ? { ...post, comments_count: (post.comments_count || 0) + 1 }
+            : post,
+        ),
       );
     } catch (error) {
       console.error('Error adding comment:', error);
@@ -159,64 +161,12 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
     }
   };
 
-  const renderPost = ({item: post}: {item: Post}) => (
-    <View style={styles.postCard}>
-      <View style={styles.postHeader}>
-        <View style={styles.userInfo}>
-          {post.user?.profile_picture ? (
-            <Image 
-              source={{uri: post.user.profile_picture}} 
-              style={styles.avatar}
-            />
-          ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarText}>
-                {post.user?.full_name?.charAt(0) || 'U'}
-              </Text>
-            </View>
-          )}
-          <View style={styles.userInfoText}>
-            <Text style={styles.userName}>{post.user?.full_name || 'Unknown User'}</Text>
-            {post.user?.username && (
-              <Text style={styles.username}>@{post.user.username}</Text>
-            )}
-          </View>
-        </View>
-        <Text style={styles.timeAgo}>{formatTime(post.created_at)}</Text>
-      </View>
-
-      <Text style={styles.postContent}>{post.content}</Text>
-
-      {post.post_type === 'pr_achievement' && (
-        <View style={styles.prBadge}>
-          <Text style={styles.prBadgeText}>🏆 PR Achievement</Text>
-        </View>
-      )}
-
-      <View style={styles.postActions}>
-        <ReactionButtons
-          postId={post.id}
-          initialLikes={post.likes_count || 0}
-          onLike={() => handleLike(post.id)}
-        />
-
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => handleComment(post)}>
-          <Text style={styles.actionText}>💬 {post.comments_count || 0}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionText}>📤 Share</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  const renderComment = ({item: comment}: {item: PostComment}) => (
+  const renderComment = ({ item: comment }: { item: PostComment }) => (
     <View style={styles.commentItem}>
       <View style={styles.commentHeader}>
-        <Text style={styles.commentUser}>{comment.user?.full_name || 'Unknown User'}</Text>
+        <Text style={styles.commentUser}>
+          {comment.user?.full_name || 'Unknown User'}
+        </Text>
         <Text style={styles.commentTime}>{formatTime(comment.created_at)}</Text>
       </View>
       <Text style={styles.commentContent}>{comment.content}</Text>
@@ -227,7 +177,7 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
     <View style={styles.container}>
       <FlatList
         data={posts}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <EnhancedPost
             post={item}
             onLike={handleLike}
@@ -238,7 +188,11 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
         ListHeaderComponent={<StoryView />}
         keyExtractor={item => item.id}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#10b981" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor="#10b981"
+          />
         }
         contentContainerStyle={styles.feedContainer}
         showsVerticalScrollIndicator={false}
@@ -248,7 +202,8 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
       <Modal
         visible={showComments}
         animationType="slide"
-        onRequestClose={() => setShowComments(false)}>
+        onRequestClose={() => setShowComments(false)}
+      >
         <View style={styles.commentsContainer}>
           <View style={styles.commentsHeader}>
             <Text style={styles.commentsTitle}>Comments</Text>
@@ -273,9 +228,13 @@ const SocialFeed: React.FC<SocialFeedProps> = ({
               multiline
             />
             <TouchableOpacity
-              style={[styles.sendButton, !newComment.trim() && styles.sendButtonDisabled]}
+              style={[
+                styles.sendButton,
+                !newComment.trim() && styles.sendButtonDisabled,
+              ]}
               onPress={submitComment}
-              disabled={!newComment.trim() || commentLoading}>
+              disabled={!newComment.trim() || commentLoading}
+            >
               <Text style={styles.sendButtonText}>
                 {commentLoading ? '...' : 'Send'}
               </Text>
@@ -301,7 +260,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,

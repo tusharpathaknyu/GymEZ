@@ -1,30 +1,36 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   TextInput,
   Modal,
   Alert,
 } from 'react-native';
-import {useAuth} from '../services/auth';
-import {SocialService} from '../services/socialService';
-import {Post, PostComment} from '../types';
+import { useAuth } from '../services/auth';
+import { SocialService } from '../services/socialService';
 import SocialFeed from '../components/SocialFeed';
 
 const SocialScreen = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [postContent, setPostContent] = useState('');
   const [postType, setPostType] = useState<'general' | 'workout'>('general');
 
   const handleCreatePost = async () => {
-    if (!postContent.trim() || !user?.id) return;
+    if (!postContent.trim() || !user?.id) {
+      return;
+    }
 
     try {
-      await SocialService.createPost(user.id, postContent, postType, undefined, user.gym_id);
+      await SocialService.createPost(
+        user.id,
+        postContent,
+        postType,
+        undefined,
+        user.gym_id,
+      );
       setShowCreatePost(false);
       setPostContent('');
       Alert.alert('Success', 'Post created successfully!');
@@ -38,7 +44,9 @@ const SocialScreen = () => {
       <View style={styles.header}>
         <View>
           <Text style={styles.headerTitle}>Social Feed</Text>
-          <Text style={styles.headerSubtitle}>Connect with your gym community</Text>
+          <Text style={styles.headerSubtitle}>
+            Connect with your gym community
+          </Text>
         </View>
         <TouchableOpacity
           style={styles.createButton}
@@ -73,10 +81,12 @@ const SocialScreen = () => {
                 ]}
                 onPress={() => setPostType('general')}
               >
-                <Text style={[
-                  styles.typeButtonText,
-                  postType === 'general' && styles.typeButtonTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    postType === 'general' && styles.typeButtonTextActive,
+                  ]}
+                >
                   General
                 </Text>
               </TouchableOpacity>
@@ -87,10 +97,12 @@ const SocialScreen = () => {
                 ]}
                 onPress={() => setPostType('workout')}
               >
-                <Text style={[
-                  styles.typeButtonText,
-                  postType === 'workout' && styles.typeButtonTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    postType === 'workout' && styles.typeButtonTextActive,
+                  ]}
+                >
                   Workout
                 </Text>
               </TouchableOpacity>
@@ -107,7 +119,10 @@ const SocialScreen = () => {
             />
 
             <TouchableOpacity
-              style={[styles.submitButton, !postContent.trim() && styles.submitButtonDisabled]}
+              style={[
+                styles.submitButton,
+                !postContent.trim() && styles.submitButtonDisabled,
+              ]}
               onPress={handleCreatePost}
               disabled={!postContent.trim()}
             >
@@ -237,4 +252,3 @@ const styles = StyleSheet.create({
 });
 
 export default SocialScreen;
-

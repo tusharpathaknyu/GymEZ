@@ -1,11 +1,5 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface CalendarDay {
   date: number;
@@ -15,28 +9,28 @@ interface CalendarDay {
 
 const WorkoutCalendar = () => {
   const [currentMonth] = useState(new Date());
-  
+
   const generateCalendar = (): CalendarDay[] => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     const days: CalendarDay[] = [];
-    
+
     // Add empty slots for days before month starts
     for (let i = 0; i < firstDay; i++) {
-      days.push({date: 0, hasWorkout: false, hasPR: false});
+      days.push({ date: 0, hasWorkout: false, hasPR: false });
     }
-    
+
     // Add days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       // Random data for demo
       const hasWorkout = Math.random() > 0.5;
       const hasPR = Math.random() > 0.8;
-      days.push({date: i, hasWorkout, hasPR});
+      days.push({ date: i, hasWorkout, hasPR });
     }
-    
+
     return days;
   };
 
@@ -54,9 +48,7 @@ const WorkoutCalendar = () => {
             <Text style={styles.prIcon}>🏆</Text>
           </View>
         )}
-        {day.hasWorkout && (
-          <View style={styles.workoutDot} />
-        )}
+        {day.hasWorkout && <View style={styles.workoutDot} />}
         <Text style={[styles.dayText, day.hasWorkout && styles.dayActive]}>
           {day.date}
         </Text>
@@ -64,7 +56,7 @@ const WorkoutCalendar = () => {
     );
   };
 
-  const monthName = currentMonth.toLocaleDateString('en-US', {month: 'long'});
+  const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long' });
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
@@ -84,9 +76,7 @@ const WorkoutCalendar = () => {
         ))}
       </View>
 
-      <View style={styles.calendarGrid}>
-        {calendar.map(renderDay)}
-      </View>
+      <View style={styles.calendarGrid}>{calendar.map(renderDay)}</View>
 
       <View style={styles.legend}>
         <View style={styles.legendItem}>
@@ -109,7 +99,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     margin: 16,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
@@ -208,4 +198,3 @@ const styles = StyleSheet.create({
 });
 
 export default WorkoutCalendar;
-

@@ -1,0 +1,34 @@
+{
+  "CallerReference": "gymez-cloudfront-2025",
+  "Comment": "GYMEZ Workout Video CDN",
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "gymez-videos-origin",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "TrustedSigners": {
+      "Enabled": false
+    },
+    "ForwardedValues": {
+      "QueryString": false,
+      "Cookies": {
+        "Forward": "none"
+      }
+    },
+    "MinTTL": 0,
+    "DefaultTTL": 86400,
+    "MaxTTL": 31536000
+  },
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "gymez-videos-origin",
+        "DomainName": "gymez-workout-videos.s3.amazonaws.com",
+        "S3OriginConfig": {
+          "OriginAccessIdentity": ""
+        }
+      }
+    ]
+  },
+  "Enabled": true,
+  "PriceClass": "PriceClass_100"
+}

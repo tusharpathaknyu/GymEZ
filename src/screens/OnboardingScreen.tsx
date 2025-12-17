@@ -13,9 +13,9 @@ interface OnboardingScreenProps {
   onComplete: () => void;
 }
 
-export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ 
-  user, 
-  onComplete 
+export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
+  user,
+  onComplete,
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [preferences, setPreferences] = useState({
@@ -31,27 +31,36 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   ];
 
   const fitnessGoals = [
-    'Weight Loss', 'Muscle Gain', 'Strength Building', 
-    'Endurance', 'Flexibility', 'General Health'
+    'Weight Loss',
+    'Muscle Gain',
+    'Strength Building',
+    'Endurance',
+    'Flexibility',
+    'General Health',
   ];
 
   const interests = [
-    'Weightlifting', 'Cardio', 'Yoga', 'CrossFit', 
-    'Swimming', 'Running', 'Cycling', 'Sports'
+    'Weightlifting',
+    'Cardio',
+    'Yoga',
+    'CrossFit',
+    'Swimming',
+    'Running',
+    'Cycling',
+    'Sports',
   ];
 
   const steps = [
     {
       title: `Welcome to GYMEZ, ${user?.full_name}!`,
-      subtitle: 'Let\'s personalize your fitness journey',
+      subtitle: "Let's personalize your fitness journey",
       content: (
         <View style={styles.welcomeContent}>
           <Text style={styles.welcomeEmoji}>🎉</Text>
           <Text style={styles.welcomeText}>
-            {user?.user_type === 'gym_owner' 
-              ? 'Ready to manage your gym and connect with members?' 
-              : 'Ready to start your fitness journey and connect with gyms?'
-            }
+            {user?.user_type === 'gym_owner'
+              ? 'Ready to manage your gym and connect with members?'
+              : 'Ready to start your fitness journey and connect with gyms?'}
           </Text>
           <View style={styles.featureList}>
             <Text style={styles.featureItem}>✅ Track your workouts</Text>
@@ -60,99 +69,111 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
             <Text style={styles.featureItem}>✅ Connect with community</Text>
           </View>
         </View>
-      )
+      ),
     },
     {
-      title: 'What\'s your fitness level?',
+      title: "What's your fitness level?",
       subtitle: 'This helps us recommend the right workouts',
       content: (
         <View style={styles.optionsContainer}>
-          {fitnessLevels.map((level) => (
+          {fitnessLevels.map(level => (
             <TouchableOpacity
               key={level.id}
               style={[
                 styles.optionCard,
-                preferences.fitnessLevel === level.id && styles.selectedOption
+                preferences.fitnessLevel === level.id && styles.selectedOption,
               ]}
-              onPress={() => setPreferences({...preferences, fitnessLevel: level.id})}
+              onPress={() =>
+                setPreferences({ ...preferences, fitnessLevel: level.id })
+              }
             >
-              <Text style={[
-                styles.optionTitle,
-                preferences.fitnessLevel === level.id && styles.selectedText
-              ]}>
+              <Text
+                style={[
+                  styles.optionTitle,
+                  preferences.fitnessLevel === level.id && styles.selectedText,
+                ]}
+              >
                 {level.name}
               </Text>
-              <Text style={[
-                styles.optionDesc,
-                preferences.fitnessLevel === level.id && styles.selectedText
-              ]}>
+              <Text
+                style={[
+                  styles.optionDesc,
+                  preferences.fitnessLevel === level.id && styles.selectedText,
+                ]}
+              >
                 {level.desc}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
-      )
+      ),
     },
     {
       title: 'What are your fitness goals?',
       subtitle: 'Select all that apply',
       content: (
         <View style={styles.gridContainer}>
-          {fitnessGoals.map((goal) => (
+          {fitnessGoals.map(goal => (
             <TouchableOpacity
               key={goal}
               style={[
                 styles.gridItem,
-                preferences.goals.includes(goal) && styles.selectedOption
+                preferences.goals.includes(goal) && styles.selectedOption,
               ]}
               onPress={() => {
                 const newGoals = preferences.goals.includes(goal)
                   ? preferences.goals.filter(g => g !== goal)
                   : [...preferences.goals, goal];
-                setPreferences({...preferences, goals: newGoals});
+                setPreferences({ ...preferences, goals: newGoals });
               }}
             >
-              <Text style={[
-                styles.gridText,
-                preferences.goals.includes(goal) && styles.selectedText
-              ]}>
+              <Text
+                style={[
+                  styles.gridText,
+                  preferences.goals.includes(goal) && styles.selectedText,
+                ]}
+              >
                 {goal}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
-      )
+      ),
     },
     {
       title: 'What interests you most?',
-      subtitle: 'We\'ll show you relevant content',
+      subtitle: "We'll show you relevant content",
       content: (
         <View style={styles.gridContainer}>
-          {interests.map((interest) => (
+          {interests.map(interest => (
             <TouchableOpacity
               key={interest}
               style={[
                 styles.gridItem,
-                preferences.interests.includes(interest) && styles.selectedOption
+                preferences.interests.includes(interest) &&
+                  styles.selectedOption,
               ]}
               onPress={() => {
                 const newInterests = preferences.interests.includes(interest)
                   ? preferences.interests.filter(i => i !== interest)
                   : [...preferences.interests, interest];
-                setPreferences({...preferences, interests: newInterests});
+                setPreferences({ ...preferences, interests: newInterests });
               }}
             >
-              <Text style={[
-                styles.gridText,
-                preferences.interests.includes(interest) && styles.selectedText
-              ]}>
+              <Text
+                style={[
+                  styles.gridText,
+                  preferences.interests.includes(interest) &&
+                    styles.selectedText,
+                ]}
+              >
                 {interest}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
-      )
-    }
+      ),
+    },
   ];
 
   const handleNext = () => {
@@ -160,7 +181,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       Alert.alert('Selection Required', 'Please select your fitness level');
       return;
     }
-    
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -171,9 +192,9 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   const handleComplete = () => {
     // In a real app, save preferences to backend
     Alert.alert(
-      'Setup Complete!', 
-      'Your preferences have been saved. Let\'s start your fitness journey!',
-      [{ text: 'Continue', onPress: onComplete }]
+      'Setup Complete!',
+      "Your preferences have been saved. Let's start your fitness journey!",
+      [{ text: 'Continue', onPress: onComplete }],
     );
   };
 
@@ -188,7 +209,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
               key={index}
               style={[
                 styles.progressDot,
-                index <= currentStep && styles.activeDot
+                index <= currentStep && styles.activeDot,
               ]}
             />
           ))}
@@ -201,7 +222,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       <View style={styles.content}>
         <Text style={styles.title}>{currentStepData.title}</Text>
         <Text style={styles.subtitle}>{currentStepData.subtitle}</Text>
-        
+
         {currentStepData.content}
       </View>
 
@@ -214,12 +235,9 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
             <Text style={styles.backButtonText}>Back</Text>
           </TouchableOpacity>
         )}
-        
+
         <TouchableOpacity
-          style={[
-            styles.nextButton,
-            currentStep === 0 && { flex: 1 }
-          ]}
+          style={[styles.nextButton, currentStep === 0 && { flex: 1 }]}
           onPress={handleNext}
         >
           <Text style={styles.nextButtonText}>

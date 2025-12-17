@@ -1,11 +1,5 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 
 interface ReactionButtonsProps {
   postId: string;
@@ -16,20 +10,22 @@ interface ReactionButtonsProps {
 type ReactionType = 'like' | 'fire' | 'clap' | 'strong' | 'trophy';
 
 const ReactionButtons: React.FC<ReactionButtonsProps> = ({
-  postId,
+  postId: _postId,
   initialLikes,
   onLike,
 }) => {
-  const [selectedReaction, setSelectedReaction] = useState<ReactionType | null>(null);
+  const [selectedReaction, setSelectedReaction] = useState<ReactionType | null>(
+    null,
+  );
   const [showReactions, setShowReactions] = useState(false);
   const [likeCount, setLikeCount] = useState(initialLikes);
 
   const reactions = [
-    {type: 'like' as ReactionType, icon: '❤️', label: 'Like'},
-    {type: 'fire' as ReactionType, icon: '🔥', label: 'Fire'},
-    {type: 'clap' as ReactionType, icon: '👏', label: 'Clap'},
-    {type: 'strong' as ReactionType, icon: '💪', label: 'Strong'},
-    {type: 'trophy' as ReactionType, icon: '🏆', label: 'Trophy'},
+    { type: 'like' as ReactionType, icon: '❤️', label: 'Like' },
+    { type: 'fire' as ReactionType, icon: '🔥', label: 'Fire' },
+    { type: 'clap' as ReactionType, icon: '👏', label: 'Clap' },
+    { type: 'strong' as ReactionType, icon: '💪', label: 'Strong' },
+    { type: 'trophy' as ReactionType, icon: '🏆', label: 'Trophy' },
   ];
 
   const handleReaction = (reaction: ReactionType) => {
@@ -53,7 +49,9 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
         onPress={() => setShowReactions(true)}
       >
         <Text style={styles.reactionIcon}>
-          {selectedReaction ? reactions.find(r => r.type === selectedReaction)?.icon : '🤍'}
+          {selectedReaction
+            ? reactions.find(r => r.type === selectedReaction)?.icon
+            : '🤍'}
         </Text>
         <Text style={styles.reactionCount}>{likeCount}</Text>
       </TouchableOpacity>
@@ -75,7 +73,8 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
                 key={reaction.type}
                 style={[
                   styles.reactionOption,
-                  selectedReaction === reaction.type && styles.reactionOptionActive,
+                  selectedReaction === reaction.type &&
+                    styles.reactionOptionActive,
                 ]}
                 onPress={() => handleReaction(reaction.type)}
               >
@@ -119,7 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     padding: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
@@ -146,4 +145,3 @@ const styles = StyleSheet.create({
 });
 
 export default ReactionButtons;
-
