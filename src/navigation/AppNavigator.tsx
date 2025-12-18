@@ -34,6 +34,7 @@ import WorkoutProgramsScreen from '../screens/WorkoutProgramsScreen';
 import SmartNotificationsScreen from '../screens/SmartNotificationsScreen';
 import ThemeSettingsScreen from '../screens/ThemeSettingsScreen';
 import WeeklyChallengesScreen from '../screens/WeeklyChallengesScreen';
+import GymCheckinScreen from '../screens/GymCheckinScreen';
 // Fitness RPG Game screens
 import FitnessRPGScreen from '../screens/games/FitnessRPGScreen';
 import GuildScreen from '../screens/games/GuildScreen';
@@ -134,6 +135,7 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen name="SmartNotifications" component={SmartNotificationsScreen} />
     <HomeStack.Screen name="ThemeSettings" component={ThemeSettingsScreen} />
     <HomeStack.Screen name="WeeklyChallenges" component={WeeklyChallengesScreen} />
+    <HomeStack.Screen name="GymCheckin" component={GymCheckinScreen} />
     {/* AI Feature Screens */}
     <HomeStack.Screen name="AIHub" component={AIHubScreen} />
     <HomeStack.Screen name="AICoach" component={AICoachScreen} />

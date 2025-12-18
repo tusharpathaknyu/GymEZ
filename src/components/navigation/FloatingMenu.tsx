@@ -31,6 +31,7 @@ interface FloatingMenuProps {
 const MENU_ITEMS: MenuItem[] = [
   // Quick Actions
   { id: 'workout', icon: '🏋️', label: 'Start Workout', screen: 'LiveWorkout', color: '#10b981' },
+  { id: 'checkin', icon: '📍', label: 'Check In', screen: 'GymCheckin', color: '#ef4444', badge: 'LIVE' },
   { id: 'programs', icon: '📋', label: 'Programs', screen: 'WorkoutPrograms', color: '#10b981', badge: 'NEW' },
   { id: 'progress', icon: '📊', label: 'Progress', screen: 'ProgressDashboard', color: '#6366f1' },
   { id: 'exercises', icon: '📚', label: 'Exercise Library', screen: 'ExerciseLibrary', color: '#f59e0b' },
