@@ -185,6 +185,44 @@ const HomeScreen = ({ navigation }: any) => {
           </View>
         </SlideInView>
 
+        {/* AI Features Banner */}
+        <SlideInView direction="up" delay={175}>
+          <TouchableOpacity 
+            style={styles.aiBanner}
+            onPress={() => navigation.navigate('AIHub')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.aiIconContainer}>
+              <Text style={styles.aiIcon}>🧠</Text>
+            </View>
+            <View style={styles.aiBannerContent}>
+              <Text style={styles.aiBannerTitle}>AI Features</Text>
+              <Text style={styles.aiBannerSubtitle}>Coach, Workout Generator, Meal Planner & more</Text>
+            </View>
+            <Text style={styles.aiBannerArrow}>→</Text>
+          </TouchableOpacity>
+        </SlideInView>
+
+        {/* Fitness RPG Banner */}
+        <SlideInView direction="up" delay={185}>
+          <TouchableOpacity 
+            style={styles.gamesBanner}
+            onPress={() => navigation.navigate('FitnessRPG')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.gamesIconContainer}>
+              <Text style={styles.gamesIcon}>⚔️</Text>
+            </View>
+            <View style={styles.gamesBannerContent}>
+              <Text style={styles.gamesBannerTitle}>Fitness RPG</Text>
+              <Text style={styles.gamesBannerSubtitle}>Guilds, Boss Raids, Tournaments & more!</Text>
+            </View>
+            <View style={styles.gamesNewBadge}>
+              <Text style={styles.gamesNewBadgeText}>NEW</Text>
+            </View>
+          </TouchableOpacity>
+        </SlideInView>
+
         {/* Quick Stats */}
         <SlideInView direction="up" delay={200}>
           <View style={styles.statsContainer}>
@@ -605,6 +643,104 @@ const styles = StyleSheet.create({
   actionSubtitle: {
     fontSize: 12,
     color: '#6b7280',
+  },
+  // AI Banner Styles
+  aiBanner: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    backgroundColor: '#8b5cf6',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  aiIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  aiIcon: {
+    fontSize: 26,
+  },
+  aiBannerContent: {
+    flex: 1,
+  },
+  aiBannerTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  aiBannerSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.85)',
+    marginTop: 2,
+  },
+  aiBannerArrow: {
+    fontSize: 22,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  // Games Banner Styles
+  gamesBanner: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    backgroundColor: '#1a1a2e',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#e94560',
+  },
+  gamesIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: '#e94560',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  gamesIcon: {
+    fontSize: 26,
+  },
+  gamesBannerContent: {
+    flex: 1,
+  },
+  gamesBannerTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  gamesBannerSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 2,
+  },
+  gamesNewBadge: {
+    backgroundColor: '#e94560',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  gamesNewBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#fff',
   },
 });
 

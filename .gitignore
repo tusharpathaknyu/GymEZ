@@ -90,3 +90,6 @@ Thumbs.db
 # Build outputs
 android/app/build/
 *.apk
+
+# Gradle cache
+android/.gradle/
