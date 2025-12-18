@@ -31,9 +31,11 @@ interface FloatingMenuProps {
 const MENU_ITEMS: MenuItem[] = [
   // Quick Actions
   { id: 'workout', icon: '🏋️', label: 'Start Workout', screen: 'LiveWorkout', color: '#10b981' },
+  { id: 'programs', icon: '📋', label: 'Programs', screen: 'WorkoutPrograms', color: '#10b981', badge: 'NEW' },
+  { id: 'progress', icon: '📊', label: 'Progress', screen: 'ProgressDashboard', color: '#6366f1' },
   { id: 'exercises', icon: '📚', label: 'Exercise Library', screen: 'ExerciseLibrary', color: '#f59e0b' },
-  { id: 'nutrition', icon: '🥗', label: 'Nutrition', screen: 'Nutrition', color: '#22c55e' },
   { id: 'goals', icon: '🎯', label: 'Goals', screen: 'Goals', color: '#8b5cf6' },
+  { id: 'challenges', icon: '🏅', label: 'Challenges', screen: 'WeeklyChallenges', color: '#ef4444', badge: 'NEW' },
   
   // AI Features
   { id: 'ai-coach', icon: '🤖', label: 'AI Coach', screen: 'AICoach', color: '#6366f1', badge: 'AI' },
@@ -42,15 +44,19 @@ const MENU_ITEMS: MenuItem[] = [
   { id: 'ai-insights', icon: '📈', label: 'AI Insights', screen: 'AIProgressInsights', color: '#f97316', badge: 'AI' },
   
   // Tracking
+  { id: 'streaks', icon: '🔥', label: 'Streaks', screen: 'SmartNotifications', color: '#ef4444', badge: 'NEW' },
   { id: 'history', icon: '📅', label: 'Workout History', screen: 'WorkoutHistory', color: '#3b82f6' },
   { id: 'measurements', icon: '📏', label: 'Body Stats', screen: 'BodyMeasurements', color: '#ef4444' },
-  { id: 'calculator', icon: '🧮', label: '1RM Calculator', screen: 'OneRMCalculator', color: '#84cc16' },
+  { id: 'nutrition', icon: '🥗', label: 'Nutrition', screen: 'Nutrition', color: '#22c55e' },
   
   // Games
   { id: 'rpg', icon: '⚔️', label: 'Fitness RPG', screen: 'FitnessRPG', color: '#a855f7', badge: 'NEW' },
   { id: 'guild', icon: '🏰', label: 'Guild', screen: 'Guild', color: '#f43f5e' },
   { id: 'raids', icon: '🐉', label: 'Boss Raids', screen: 'BossRaid', color: '#0ea5e9' },
   { id: 'tournament', icon: '🏆', label: 'Tournament', screen: 'Tournament', color: '#eab308' },
+  
+  // Settings
+  { id: 'themes', icon: '🎨', label: 'Themes', screen: 'ThemeSettings', color: '#8b5cf6' },
 ];
 
 const FloatingMenu: React.FC<FloatingMenuProps> = ({ navigation, visible, onClose }) => {

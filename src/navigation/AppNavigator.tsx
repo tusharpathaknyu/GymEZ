@@ -29,6 +29,11 @@ import AIWorkoutGeneratorScreen from '../screens/AIWorkoutGeneratorScreen';
 import AIProgressInsightsScreen from '../screens/AIProgressInsightsScreen';
 import AIMealPlannerScreen from '../screens/AIMealPlannerScreen';
 import WhatsAppIntegrationScreen from '../screens/WhatsAppIntegrationScreen';
+import ProgressDashboardScreen from '../screens/ProgressDashboardScreen';
+import WorkoutProgramsScreen from '../screens/WorkoutProgramsScreen';
+import SmartNotificationsScreen from '../screens/SmartNotificationsScreen';
+import ThemeSettingsScreen from '../screens/ThemeSettingsScreen';
+import WeeklyChallengesScreen from '../screens/WeeklyChallengesScreen';
 // Fitness RPG Game screens
 import FitnessRPGScreen from '../screens/games/FitnessRPGScreen';
 import GuildScreen from '../screens/games/GuildScreen';
@@ -124,6 +129,11 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen name="WorkoutHistory" component={WorkoutHistoryScreen} />
     <HomeStack.Screen name="Goals" component={GoalsScreen} />
     <HomeStack.Screen name="OneRMCalculator" component={OneRMCalculatorScreen} />
+    <HomeStack.Screen name="ProgressDashboard" component={ProgressDashboardScreen} />
+    <HomeStack.Screen name="WorkoutPrograms" component={WorkoutProgramsScreen} />
+    <HomeStack.Screen name="SmartNotifications" component={SmartNotificationsScreen} />
+    <HomeStack.Screen name="ThemeSettings" component={ThemeSettingsScreen} />
+    <HomeStack.Screen name="WeeklyChallenges" component={WeeklyChallengesScreen} />
     {/* AI Feature Screens */}
     <HomeStack.Screen name="AIHub" component={AIHubScreen} />
     <HomeStack.Screen name="AICoach" component={AICoachScreen} />
