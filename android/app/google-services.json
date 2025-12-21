@@ -1,20 +1,20 @@
 {
   "project_info": {
-    "project_number": "895230403778",
-    "project_id": "gymez-fitness-app",
-    "storage_bucket": "gymez-fitness-app.appspot.com"
+    "project_number": "86467948830",
+    "project_id": "gymez-bee17",
+    "storage_bucket": "gymez-bee17.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:895230403778:android:a1b2c3d4e5f6g7h8i9j0k1",
+        "mobilesdk_app_id": "1:86467948830:android:8f210ca3a5e07cd307190f",
         "android_client_info": {
           "package_name": "com.gymez.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "895230403778-androidclientidforandroidapp123456.apps.googleusercontent.com",
+          "client_id": "86467948830-cg33gfit4o3tuj1412r56iq9u37e91fi.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.gymez.app",
@@ -22,20 +22,28 @@
           }
         },
         {
-          "client_id": "895230403778-7a4klalvtmjr7iokdqrj17e7pdirli5p.apps.googleusercontent.com",
+          "client_id": "86467948830-i7m0j3odik2jaek5o7vc78p6dpk7nrnb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gymez.app",
+            "certificate_hash": "a46669f7d35b72d201cdde7be6098cd896eb2be8"
+          }
+        },
+        {
+          "client_id": "86467948830-mso681ekb171rqnmqoqm8bpk80ahbv2l.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDmockApiKeyForGymezDevelopmentTesting123456"
+          "current_key": "AIzaSyC9ro1sCPIx0lMCUFgf-1RcMau-QCvNsho"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "895230403778-7a4klalvtmjr7iokdqrj17e7pdirli5p.apps.googleusercontent.com",
+              "client_id": "86467948830-mso681ekb171rqnmqoqm8bpk80ahbv2l.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

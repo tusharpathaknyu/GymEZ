@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { useAuth } from '../services/auth';
 import { PersonalRecordsService } from '../services/personalRecordsService';
@@ -20,6 +21,35 @@ import PRAnalytics from '../components/PRAnalytics';
 import SearchBar from '../components/SearchBar';
 import CheckInButton from '../components/CheckInButton';
 import { SlideInView, FadeInView } from '../components/AnimatedComponents';
+import WorkoutTemplates from '../components/WorkoutTemplates';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Motivational quotes for fitness
+const MOTIVATIONAL_QUOTES = [
+  { quote: "The only bad workout is the one that didn't happen.", author: "Unknown" },
+  { quote: "Your body can stand almost anything. It's your mind you have to convince.", author: "Unknown" },
+  { quote: "Strength does not come from the body. It comes from the will.", author: "Gandhi" },
+  { quote: "The pain you feel today will be the strength you feel tomorrow.", author: "Arnold Schwarzenegger" },
+  { quote: "Success isn't always about greatness. It's about consistency.", author: "Dwayne Johnson" },
+  { quote: "Don't limit your challenges. Challenge your limits.", author: "Unknown" },
+  { quote: "The only way to define your limits is by going beyond them.", author: "Arthur C. Clarke" },
+  { quote: "Wake up with determination. Go to bed with satisfaction.", author: "Unknown" },
+  { quote: "Your only limit is you.", author: "Unknown" },
+  { quote: "Sweat is just fat crying.", author: "Unknown" },
+  { quote: "Champions train, losers complain.", author: "Unknown" },
+  { quote: "Be stronger than your excuses.", author: "Unknown" },
+];
+
+// Quick workout suggestions based on day/time
+const QUICK_WORKOUTS = [
+  { name: "Push Day Express", duration: "15 min", exercises: ["Push-ups", "Dips", "Shoulder Press"], icon: "💪", color: "#ef4444" },
+  { name: "Leg Burner", duration: "20 min", exercises: ["Squats", "Lunges", "Calf Raises"], icon: "🦵", color: "#f59e0b" },
+  { name: "Core Crusher", duration: "10 min", exercises: ["Planks", "Crunches", "Russian Twists"], icon: "🔥", color: "#10b981" },
+  { name: "Full Body HIIT", duration: "25 min", exercises: ["Burpees", "Mountain Climbers", "Jump Squats"], icon: "⚡", color: "#8b5cf6" },
+  { name: "Upper Body Strength", duration: "30 min", exercises: ["Bench Press", "Rows", "Curls"], icon: "🏋️", color: "#3b82f6" },
+  { name: "Cardio Blast", duration: "20 min", exercises: ["Jump Rope", "High Knees", "Box Jumps"], icon: "🏃", color: "#ec4899" },
+];
 
 const HomeScreen = ({ navigation }: any) => {
   const { user } = useAuth();
@@ -29,6 +59,28 @@ const HomeScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showPRForm, setShowPRForm] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+
+  // Get daily motivational quote (changes each day)
+  const dailyQuote = useMemo(() => {
+    const today = new Date();
+    const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+    return MOTIVATIONAL_QUOTES[dayOfYear % MOTIVATIONAL_QUOTES.length];
+  }, []);
+
+  // Get suggested workout based on day of week
+  const suggestedWorkout = useMemo(() => {
+    const dayOfWeek = new Date().getDay();
+    return QUICK_WORKOUTS[dayOfWeek % QUICK_WORKOUTS.length];
+  }, []);
+
+  // Get greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  };
 
   useEffect(() => {
     loadData();
@@ -99,7 +151,7 @@ const HomeScreen = ({ navigation }: any) => {
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <View>
-              <Text style={styles.greeting}>Welcome back,</Text>
+              <Text style={styles.greeting}>{getGreeting()},</Text>
               <Text style={styles.userName}>
                 {user?.full_name?.split(' ')[0] || 'Member'}! 👋
               </Text>
@@ -124,6 +176,49 @@ const HomeScreen = ({ navigation }: any) => {
             />
           </View>
         </View>
+
+        {/* Daily Motivational Quote */}
+        <FadeInView delay={50}>
+          <View style={styles.quoteCard}>
+            <View style={styles.quoteIconContainer}>
+              <Text style={styles.quoteIcon}>💭</Text>
+            </View>
+            <View style={styles.quoteContent}>
+              <Text style={styles.quoteText}>"{dailyQuote.quote}"</Text>
+              <Text style={styles.quoteAuthor}>— {dailyQuote.author}</Text>
+            </View>
+          </View>
+        </FadeInView>
+
+        {/* Today's Suggested Workout */}
+        <FadeInView delay={75}>
+          <TouchableOpacity 
+            style={[styles.suggestedWorkoutCard, { borderLeftColor: suggestedWorkout.color }]}
+            onPress={() => navigation.navigate('LiveWorkout')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.suggestedWorkoutHeader}>
+              <View style={[styles.suggestedWorkoutIcon, { backgroundColor: suggestedWorkout.color + '20' }]}>
+                <Text style={styles.suggestedWorkoutEmoji}>{suggestedWorkout.icon}</Text>
+              </View>
+              <View style={styles.suggestedWorkoutInfo}>
+                <Text style={styles.suggestedWorkoutLabel}>TODAY'S SUGGESTED WORKOUT</Text>
+                <Text style={styles.suggestedWorkoutName}>{suggestedWorkout.name}</Text>
+                <Text style={styles.suggestedWorkoutDuration}>⏱️ {suggestedWorkout.duration}</Text>
+              </View>
+              <View style={[styles.startButton, { backgroundColor: suggestedWorkout.color }]}>
+                <Text style={styles.startButtonText}>Start</Text>
+              </View>
+            </View>
+            <View style={styles.suggestedWorkoutExercises}>
+              {suggestedWorkout.exercises.map((exercise, index) => (
+                <View key={index} style={styles.exerciseChip}>
+                  <Text style={styles.exerciseChipText}>{exercise}</Text>
+                </View>
+              ))}
+            </View>
+          </TouchableOpacity>
+        </FadeInView>
 
         {/* Quick Check-in Card */}
         <FadeInView delay={100}>
@@ -183,6 +278,24 @@ const HomeScreen = ({ navigation }: any) => {
               <Text style={styles.actionSubtitle}>Rankings</Text>
             </TouchableOpacity>
           </View>
+        </SlideInView>
+
+        {/* Workout Templates Banner */}
+        <SlideInView direction="up" delay={160}>
+          <TouchableOpacity 
+            style={styles.templatesBanner}
+            onPress={() => setShowTemplates(true)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.templatesIconContainer}>
+              <Text style={styles.templatesIcon}>📋</Text>
+            </View>
+            <View style={styles.templatesBannerContent}>
+              <Text style={styles.templatesBannerTitle}>Workout Templates</Text>
+              <Text style={styles.templatesBannerSubtitle}>Push, Pull, Leg Day, HIIT & more</Text>
+            </View>
+            <Text style={styles.templatesBannerArrow}>→</Text>
+          </TouchableOpacity>
         </SlideInView>
 
         {/* AI Features Banner */}
@@ -366,6 +479,16 @@ const HomeScreen = ({ navigation }: any) => {
         onClose={() => setShowPRForm(false)}
         onSuccess={() => {
           loadData();
+        }}
+      />
+
+      {/* Workout Templates Modal */}
+      <WorkoutTemplates
+        visible={showTemplates}
+        onClose={() => setShowTemplates(false)}
+        onSelectTemplate={(template) => {
+          console.log('Selected template:', template.name);
+          navigation.navigate('LiveWorkout', { template });
         }}
       />
     </View>
@@ -741,6 +864,173 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
     color: '#fff',
+  },
+  // Workout Templates Banner Styles
+  templatesBanner: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  templatesIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: '#dbeafe',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  templatesIcon: {
+    fontSize: 26,
+  },
+  templatesBannerContent: {
+    flex: 1,
+  },
+  templatesBannerTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  templatesBannerSubtitle: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 2,
+  },
+  templatesBannerArrow: {
+    fontSize: 22,
+    color: '#3b82f6',
+    fontWeight: '600',
+  },
+  // Motivational Quote Styles
+  quoteCard: {
+    marginHorizontal: 20,
+    marginTop: 16,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: '#10b981',
+  },
+  quoteIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#d1fae5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  quoteIcon: {
+    fontSize: 20,
+  },
+  quoteContent: {
+    flex: 1,
+  },
+  quoteText: {
+    fontSize: 14,
+    color: '#374151',
+    fontStyle: 'italic',
+    lineHeight: 20,
+  },
+  quoteAuthor: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 6,
+    fontWeight: '500',
+  },
+  // Suggested Workout Styles
+  suggestedWorkoutCard: {
+    marginHorizontal: 20,
+    marginTop: 12,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    borderLeftWidth: 4,
+  },
+  suggestedWorkoutHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  suggestedWorkoutIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  suggestedWorkoutEmoji: {
+    fontSize: 24,
+  },
+  suggestedWorkoutInfo: {
+    flex: 1,
+  },
+  suggestedWorkoutLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#9ca3af',
+    letterSpacing: 0.5,
+  },
+  suggestedWorkoutName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111827',
+    marginTop: 2,
+  },
+  suggestedWorkoutDuration: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 2,
+  },
+  startButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  startButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  suggestedWorkoutExercises: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 12,
+    gap: 8,
+  },
+  exerciseChip: {
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+  exerciseChipText: {
+    fontSize: 12,
+    color: '#4b5563',
+    fontWeight: '500',
   },
 });
 

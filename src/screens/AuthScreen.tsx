@@ -26,7 +26,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onNavigateToApp }) => {
     password: '',
     fullName: '',
     confirmPassword: '',
-    userType: 'gym_member' as 'gym_member' | 'gym_owner',
   });
   const [loading, setLoading] = useState(false);
 
@@ -94,7 +93,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onNavigateToApp }) => {
           formData.email,
           formData.password,
           formData.fullName,
-          formData.userType,
+          'gym_member',
         );
         if (!state.error) {
           Alert.alert(
@@ -120,7 +119,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onNavigateToApp }) => {
       password: '',
       fullName: '',
       confirmPassword: '',
-      userType: 'gym_member',
     });
   };
 
@@ -188,6 +186,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onNavigateToApp }) => {
                   setFormData({ ...formData, fullName: text })
                 }
                 placeholder="Enter your full name"
+                placeholderTextColor="#9CA3AF"
                 autoCapitalize="words"
               />
             </View>
@@ -200,6 +199,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onNavigateToApp }) => {
               value={formData.email}
               onChangeText={text => setFormData({ ...formData, email: text })}
               placeholder="Enter your email"
+              placeholderTextColor="#9CA3AF"
               keyboardType="email-address"
               autoCapitalize="none"
               autoComplete="email"
@@ -215,73 +215,26 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onNavigateToApp }) => {
                 setFormData({ ...formData, password: text })
               }
               placeholder="Enter your password"
+              placeholderTextColor="#9CA3AF"
               secureTextEntry
               autoComplete="password"
             />
           </View>
 
           {!isLogin && (
-            <>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Confirm Password</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.confirmPassword}
-                  onChangeText={text =>
-                    setFormData({ ...formData, confirmPassword: text })
-                  }
-                  placeholder="Confirm your password"
-                  secureTextEntry
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>I am a:</Text>
-                <View style={styles.userTypeContainer}>
-                  <TouchableOpacity
-                    style={[
-                      styles.userTypeOption,
-                      formData.userType === 'gym_member' &&
-                        styles.userTypeSelected,
-                    ]}
-                    onPress={() =>
-                      setFormData({ ...formData, userType: 'gym_member' })
-                    }
-                  >
-                    <Text
-                      style={[
-                        styles.userTypeText,
-                        formData.userType === 'gym_member' &&
-                          styles.userTypeTextSelected,
-                      ]}
-                    >
-                      Gym Member
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.userTypeOption,
-                      formData.userType === 'gym_owner' &&
-                        styles.userTypeSelected,
-                    ]}
-                    onPress={() =>
-                      setFormData({ ...formData, userType: 'gym_owner' })
-                    }
-                  >
-                    <Text
-                      style={[
-                        styles.userTypeText,
-                        formData.userType === 'gym_owner' &&
-                          styles.userTypeTextSelected,
-                      ]}
-                    >
-                      Gym Owner
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Confirm Password</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.confirmPassword}
+                onChangeText={text =>
+                  setFormData({ ...formData, confirmPassword: text })
+                }
+                placeholder="Confirm your password"
+                placeholderTextColor="#9CA3AF"
+                secureTextEntry
+              />
+            </View>
           )}
 
           <TouchableOpacity
@@ -393,6 +346,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     backgroundColor: '#ffffff',
+    color: '#1E293B',
   },
   userTypeContainer: {
     flexDirection: 'row',

@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
-import { createStackNavigator, TransitionPresets, CardStyleInterpolators } from '@react-navigation/stack';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+  Animated,
+  Easing,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+
+// Screens
 import LoginScreen from '../screens/LoginScreen';
 import GymOwnerDashboard from '../screens/GymOwnerDashboard';
 import HomeScreen from '../screens/HomeScreen';
-import SocialScreen from '../screens/SocialScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import MyGymScreen from '../screens/MyGymScreen';
-import RewardsScreen from '../screens/RewardsScreen';
 import WorkoutsScreen from '../screens/WorkoutsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
@@ -16,13 +29,11 @@ import StatsScreen from '../screens/StatsScreen';
 import ExerciseLibraryScreen from '../screens/ExerciseLibraryScreen';
 import LiveWorkoutScreen from '../screens/LiveWorkoutScreen';
 import LeaderboardScreen from '../screens/LeaderboardScreen';
-// New feature screens
 import BodyMeasurementsScreen from '../screens/BodyMeasurementsScreen';
 import NutritionScreen from '../screens/NutritionScreen';
 import WorkoutHistoryScreen from '../screens/WorkoutHistoryScreen';
 import GoalsScreen from '../screens/GoalsScreen';
 import { OneRMCalculatorScreen } from '../components/OneRMCalculator';
-// AI feature screens
 import AIHubScreen from '../screens/AIHubScreen';
 import AICoachScreen from '../screens/AICoachScreen';
 import AIWorkoutGeneratorScreen from '../screens/AIWorkoutGeneratorScreen';
@@ -35,149 +46,329 @@ import SmartNotificationsScreen from '../screens/SmartNotificationsScreen';
 import ThemeSettingsScreen from '../screens/ThemeSettingsScreen';
 import WeeklyChallengesScreen from '../screens/WeeklyChallengesScreen';
 import GymCheckinScreen from '../screens/GymCheckinScreen';
-// Fitness RPG Game screens
 import FitnessRPGScreen from '../screens/games/FitnessRPGScreen';
 import GuildScreen from '../screens/games/GuildScreen';
 import BossRaidScreen from '../screens/games/BossRaidScreen';
 import TournamentScreen from '../screens/games/TournamentScreen';
+
 // Navigation components
-import { FloatingMenu, QuickAccessTooltip, useQuickAccessTooltip } from '../components/navigation';
+import {
+  QuickAccessTooltip,
+  useQuickAccessTooltip,
+  QuickActionsSheet,
+} from '../components/navigation';
 import { useAuth } from '../services/auth';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Platform, Animated } from 'react-native';
-import { tabChangeHaptic, successHaptic } from '../utils/haptics';
-import { useNavigation } from '@react-navigation/native';
+import { tabChangeHaptic, successHaptic, mediumHaptic } from '../utils/haptics';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 
-const LoadingScreen = () => (
-  <View style={styles.loadingContainer}>
-    <View style={styles.loadingContent}>
-      <Text style={styles.loadingLogo}>💪</Text>
-      <Text style={styles.loadingTitle}>GymEZ</Text>
-      <ActivityIndicator size="large" color="#10b981" style={styles.spinner} />
-      <Text style={styles.loadingText}>Loading your fitness journey...</Text>
-    </View>
-  </View>
-);
+// ============================================
+// CONSTANTS & CONFIGURATION
+// ============================================
+const COLORS = {
+  primary: '#10b981',
+  primaryDark: '#059669',
+  primaryLight: '#d1fae5',
+  secondary: '#6366f1',
+  background: '#f9fafb',
+  surface: '#ffffff',
+  text: '#1f2937',
+  textSecondary: '#6b7280',
+  border: '#e5e7eb',
+  inactive: '#9ca3af',
+  error: '#ef4444',
+  warning: '#f59e0b',
+  success: '#22c55e',
+};
 
-// Custom Tab Bar Button with haptic feedback and scale animation
-const TabBarButton = ({ children, onPress, accessibilityState }: any) => {
-  const focused = accessibilityState?.selected;
-  const scaleValue = React.useRef(new Animated.Value(1)).current;
+const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 88 : 68;
+const CENTER_BUTTON_SIZE = 62;
+
+// ============================================
+// LOADING SCREEN
+// ============================================
+const LoadingScreen = () => {
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Fade in
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+
+    // Pulse animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.1,
+          duration: 800,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 800,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Subtle rotation
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 8000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
+
+  const rotate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  return (
+    <Animated.View style={[styles.loadingContainer, { opacity: fadeAnim }]}>
+      <View style={styles.loadingContent}>
+        {/* Animated background rings */}
+        <View style={styles.loadingRings}>
+          {[1, 2, 3].map((ring) => (
+            <Animated.View
+              key={ring}
+              style={[
+                styles.loadingRing,
+                {
+                  width: 80 + ring * 30,
+                  height: 80 + ring * 30,
+                  borderRadius: (80 + ring * 30) / 2,
+                  opacity: 0.1 / ring,
+                  transform: [{ rotate }],
+                },
+              ]}
+            />
+          ))}
+        </View>
+
+        <Animated.Text 
+          style={[
+            styles.loadingLogo,
+            { transform: [{ scale: pulseAnim }] }
+          ]}
+        >
+          💪
+        </Animated.Text>
+        <Text style={styles.loadingTitle}>GymEZ</Text>
+        <Text style={styles.loadingSubtitle}>Your Fitness Journey Awaits</Text>
+        
+        <View style={styles.loadingIndicator}>
+          <View style={styles.loadingDots}>
+            {[0, 1, 2].map((dot) => (
+              <LoadingDot key={dot} delay={dot * 200} />
+            ))}
+          </View>
+        </View>
+      </View>
+    </Animated.View>
+  );
+};
+
+// Animated loading dot
+const LoadingDot = ({ delay }: { delay: number }) => {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.delay(600 - delay),
+      ])
+    ).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.loadingDot,
+        {
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, -8],
+              }),
+            },
+          ],
+          opacity: anim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.3, 1],
+          }),
+        },
+      ]}
+    />
+  );
+};
+
+// ============================================
+// ENHANCED TAB BAR
+// ============================================
+interface TabConfig {
+  name: string;
+  label: string;
+  icon: string;
+  activeIcon: string;
+}
+
+const TAB_CONFIG: TabConfig[] = [
+  { name: 'HomeTab', label: 'Home', icon: '🏠', activeIcon: '🏡' },
+  { name: 'Activity', label: 'Activity', icon: '📊', activeIcon: '📈' },
+  { name: 'QuickAction', label: '', icon: '➕', activeIcon: '➕' },
+  { name: 'Leaderboard', label: 'Ranks', icon: '🏆', activeIcon: '👑' },
+  { name: 'ProfileTab', label: 'Profile', icon: '👤', activeIcon: '🙂' },
+];
+
+// Custom Tab Button with smooth animations
+const AnimatedTabButton = ({ 
+  focused, 
+  icon, 
+  activeIcon,
+  label, 
+  onPress,
+  isCenter = false,
+}: {
+  focused: boolean;
+  icon: string;
+  activeIcon: string;
+  label: string;
+  onPress: () => void;
+  isCenter?: boolean;
+}) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const translateYAnim = useRef(new Animated.Value(0)).current;
+  const indicatorWidth = useRef(new Animated.Value(focused ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(translateYAnim, {
+        toValue: focused ? -2 : 0,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      Animated.timing(indicatorWidth, {
+        toValue: focused ? 1 : 0,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  }, [focused]);
 
   const handlePressIn = () => {
-    Animated.spring(scaleValue, {
-      toValue: 0.9,
-      useNativeDriver: true,
+    Animated.spring(scaleAnim, {
+      toValue: 0.85,
       friction: 5,
+      useNativeDriver: true,
     }).start();
   };
 
   const handlePressOut = () => {
-    Animated.spring(scaleValue, {
+    Animated.spring(scaleAnim, {
       toValue: 1,
-      useNativeDriver: true,
       friction: 3,
+      useNativeDriver: true,
     }).start();
   };
 
   const handlePress = () => {
     tabChangeHaptic();
-    onPress?.();
+    onPress();
   };
+
+  if (isCenter) return null;
 
   return (
     <TouchableOpacity
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={handlePress}
-      style={[
-        styles.tabBarButton,
-        focused && styles.tabBarButtonFocused,
-      ]}
+      style={styles.tabButton}
       activeOpacity={1}
     >
-      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-        {children}
+      <Animated.View
+        style={[
+          styles.tabButtonInner,
+          {
+            transform: [
+              { scale: scaleAnim },
+              { translateY: translateYAnim },
+            ],
+          },
+        ]}
+      >
+        <Text style={[styles.tabIcon, focused && styles.tabIconFocused]}>
+          {focused ? activeIcon : icon}
+        </Text>
+        {label ? (
+          <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
+            {label}
+          </Text>
+        ) : null}
+        <Animated.View
+          style={[
+            styles.tabIndicator,
+            {
+              width: indicatorWidth.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 24],
+              }),
+              opacity: indicatorWidth,
+            },
+          ]}
+        />
       </Animated.View>
     </TouchableOpacity>
   );
 };
 
-// Smooth screen transitions
-const screenOptions = {
-  headerShown: false,
-  ...TransitionPresets.SlideFromRightIOS,
-  gestureEnabled: true,
-  gestureResponseDistance: 50,
-  cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-};
+// Center Action Button with enhanced animations
+const CenterActionButton = ({ onPress }: { onPress: () => void }) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
 
-// Home Stack Navigator for nested navigation
-const HomeStackNavigator = () => (
-  <HomeStack.Navigator screenOptions={screenOptions}>
-    <HomeStack.Screen name="HomeMain" component={HomeScreen} />
-    <HomeStack.Screen name="Workouts" component={WorkoutsScreen} />
-    <HomeStack.Screen name="LiveWorkout" component={LiveWorkoutScreen} />
-    <HomeStack.Screen name="ExerciseLibrary" component={ExerciseLibraryScreen} />
-    <HomeStack.Screen name="Activity" component={ActivityScreen} />
-    <HomeStack.Screen name="Notifications" component={NotificationsScreen} />
-    <HomeStack.Screen name="BodyMeasurements" component={BodyMeasurementsScreen} />
-    <HomeStack.Screen name="Nutrition" component={NutritionScreen} />
-    <HomeStack.Screen name="WorkoutHistory" component={WorkoutHistoryScreen} />
-    <HomeStack.Screen name="Goals" component={GoalsScreen} />
-    <HomeStack.Screen name="OneRMCalculator" component={OneRMCalculatorScreen} />
-    <HomeStack.Screen name="ProgressDashboard" component={ProgressDashboardScreen} />
-    <HomeStack.Screen name="WorkoutPrograms" component={WorkoutProgramsScreen} />
-    <HomeStack.Screen name="SmartNotifications" component={SmartNotificationsScreen} />
-    <HomeStack.Screen name="ThemeSettings" component={ThemeSettingsScreen} />
-    <HomeStack.Screen name="WeeklyChallenges" component={WeeklyChallengesScreen} />
-    <HomeStack.Screen name="GymCheckin" component={GymCheckinScreen} />
-    {/* AI Feature Screens */}
-    <HomeStack.Screen name="AIHub" component={AIHubScreen} />
-    <HomeStack.Screen name="AICoach" component={AICoachScreen} />
-    <HomeStack.Screen name="AIWorkoutGenerator" component={AIWorkoutGeneratorScreen} />
-    <HomeStack.Screen name="AIProgressInsights" component={AIProgressInsightsScreen} />
-    <HomeStack.Screen name="AIMealPlanner" component={AIMealPlannerScreen} />
-    <HomeStack.Screen name="WhatsAppIntegration" component={WhatsAppIntegrationScreen} />
-    {/* Fitness RPG Game */}
-    <HomeStack.Screen name="FitnessRPG" component={FitnessRPGScreen} />
-    <HomeStack.Screen name="Guild" component={GuildScreen} />
-    <HomeStack.Screen name="BossRaid" component={BossRaidScreen} />
-    <HomeStack.Screen name="Tournament" component={TournamentScreen} />
-  </HomeStack.Navigator>
-);
-
-// Profile Stack Navigator
-const ProfileStackNavigator = () => (
-  <ProfileStack.Navigator screenOptions={screenOptions}>
-    <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
-    <ProfileStack.Screen name="Settings" component={SettingsScreen} />
-    <ProfileStack.Screen name="Stats" component={StatsScreen} />
-    <ProfileStack.Screen name="Notifications" component={NotificationsScreen} />
-  </ProfileStack.Navigator>
-);
-
-// Center Quick Action Button Component
-const CenterTabButton = ({ onPress }: { onPress: () => void }) => {
-  const scaleAnim = React.useRef(new Animated.Value(1)).current;
-  const glowAnim = React.useRef(new Animated.Value(0)).current;
-
-  React.useEffect(() => {
-    // Subtle glow animation
+  useEffect(() => {
+    // Continuous subtle glow
     Animated.loop(
       Animated.sequence([
         Animated.timing(glowAnim, {
           toValue: 1,
-          duration: 2000,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(glowAnim, {
           toValue: 0,
-          duration: 2000,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
       ])
@@ -186,144 +377,253 @@ const CenterTabButton = ({ onPress }: { onPress: () => void }) => {
 
   const handlePress = () => {
     successHaptic();
-    Animated.sequence([
-      Animated.timing(scaleAnim, {
-        toValue: 0.85,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
+    
+    // Bounce and rotate animation
+    Animated.parallel([
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 0.8,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 3,
+          tension: 200,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.timing(rotateAnim, {
         toValue: 1,
-        friction: 3,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start(() => {
+      rotateAnim.setValue(0);
+    });
+
     onPress();
   };
 
-  const pulseScale = glowAnim.interpolate({
+  const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [1, 1.08],
+    outputRange: ['0deg', '45deg'],
+  });
+
+  const glowScale = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.1],
+  });
+
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.3, 0.6, 0.3],
   });
 
   return (
-    <TouchableOpacity
-      style={styles.centerButtonContainer}
-      onPress={handlePress}
-      activeOpacity={1}
-    >
+    <View style={styles.centerButtonWrapper}>
+      {/* Glow effect */}
       <Animated.View
         style={[
-          styles.centerButton,
+          styles.centerButtonGlow,
           {
-            transform: [
-              { scale: Animated.multiply(scaleAnim, pulseScale) },
-            ],
+            transform: [{ scale: glowScale }],
+            opacity: glowOpacity,
           },
         ]}
+      />
+      
+      <TouchableOpacity
+        onPress={handlePress}
+        activeOpacity={1}
+        style={styles.centerButtonTouchable}
       >
-        <View style={styles.centerButtonInner}>
-          <Text style={styles.centerButtonIcon}>➕</Text>
-        </View>
-      </Animated.View>
-    </TouchableOpacity>
+        <Animated.View
+          style={[
+            styles.centerButton,
+            { transform: [{ scale: scaleAnim }] },
+          ]}
+        >
+          <Animated.View
+            style={[
+              styles.centerButtonInner,
+              { transform: [{ rotate }] },
+            ]}
+          >
+            <Text style={styles.centerButtonIcon}>➕</Text>
+          </Animated.View>
+        </Animated.View>
+      </TouchableOpacity>
+    </View>
   );
 };
 
+// Custom Tab Bar Component
+const CustomTabBar = ({ 
+  state, 
+  descriptors, 
+  navigation,
+  onCenterPress,
+}: any) => {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
+      <View style={styles.tabBarContent}>
+        {state.routes.map((route: any, index: number) => {
+          const { options } = descriptors[route.key];
+          const isFocused = state.index === index;
+          const tabConfig = TAB_CONFIG[index];
+          const isCenter = route.name === 'QuickAction';
+
+          const onPress = () => {
+            if (isCenter) {
+              onCenterPress();
+              return;
+            }
+
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          if (isCenter) {
+            return <CenterActionButton key={route.key} onPress={onCenterPress} />;
+          }
+
+          return (
+            <AnimatedTabButton
+              key={route.key}
+              focused={isFocused}
+              icon={tabConfig.icon}
+              activeIcon={tabConfig.activeIcon}
+              label={tabConfig.label}
+              onPress={onPress}
+              isCenter={isCenter}
+            />
+          );
+        })}
+      </View>
+    </View>
+  );
+};
+
+// ============================================
+// SCREEN OPTIONS
+// ============================================
+const defaultScreenOptions = {
+  headerShown: false,
+  gestureEnabled: true,
+  gestureResponseDistance: 50,
+  ...TransitionPresets.SlideFromRightIOS,
+};
+
+const modalScreenOptions = {
+  headerShown: false,
+  gestureEnabled: true,
+  ...TransitionPresets.ModalSlideFromBottomIOS,
+};
+
+// ============================================
+// STACK NAVIGATORS
+// ============================================
+const HomeStackNavigator = () => (
+  <HomeStack.Navigator screenOptions={defaultScreenOptions}>
+    <HomeStack.Screen name="HomeMain" component={HomeScreen} />
+    <HomeStack.Screen name="Workouts" component={WorkoutsScreen} />
+    <HomeStack.Screen name="LiveWorkout" component={LiveWorkoutScreen} options={modalScreenOptions} />
+    <HomeStack.Screen name="ExerciseLibrary" component={ExerciseLibraryScreen} />
+    <HomeStack.Screen name="Activity" component={ActivityScreen} />
+    <HomeStack.Screen name="Notifications" component={NotificationsScreen} />
+    <HomeStack.Screen name="BodyMeasurements" component={BodyMeasurementsScreen} />
+    <HomeStack.Screen name="Nutrition" component={NutritionScreen} />
+    <HomeStack.Screen name="WorkoutHistory" component={WorkoutHistoryScreen} />
+    <HomeStack.Screen name="Goals" component={GoalsScreen} />
+    <HomeStack.Screen name="OneRMCalculator" component={OneRMCalculatorScreen} options={modalScreenOptions} />
+    <HomeStack.Screen name="ProgressDashboard" component={ProgressDashboardScreen} />
+    <HomeStack.Screen name="WorkoutPrograms" component={WorkoutProgramsScreen} />
+    <HomeStack.Screen name="SmartNotifications" component={SmartNotificationsScreen} />
+    <HomeStack.Screen name="ThemeSettings" component={ThemeSettingsScreen} />
+    <HomeStack.Screen name="WeeklyChallenges" component={WeeklyChallengesScreen} />
+    <HomeStack.Screen name="GymCheckin" component={GymCheckinScreen} />
+    {/* AI Features */}
+    <HomeStack.Screen name="AIHub" component={AIHubScreen} />
+    <HomeStack.Screen name="AICoach" component={AICoachScreen} />
+    <HomeStack.Screen name="AIWorkoutGenerator" component={AIWorkoutGeneratorScreen} />
+    <HomeStack.Screen name="AIProgressInsights" component={AIProgressInsightsScreen} />
+    <HomeStack.Screen name="AIMealPlanner" component={AIMealPlannerScreen} />
+    <HomeStack.Screen name="WhatsAppIntegration" component={WhatsAppIntegrationScreen} />
+    {/* Games */}
+    <HomeStack.Screen name="FitnessRPG" component={FitnessRPGScreen} />
+    <HomeStack.Screen name="Guild" component={GuildScreen} />
+    <HomeStack.Screen name="BossRaid" component={BossRaidScreen} />
+    <HomeStack.Screen name="Tournament" component={TournamentScreen} />
+  </HomeStack.Navigator>
+);
+
+const ProfileStackNavigator = () => (
+  <ProfileStack.Navigator screenOptions={defaultScreenOptions}>
+    <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
+    <ProfileStack.Screen name="Settings" component={SettingsScreen} />
+    <ProfileStack.Screen name="Stats" component={StatsScreen} />
+    <ProfileStack.Screen name="Notifications" component={NotificationsScreen} />
+  </ProfileStack.Navigator>
+);
+
+// ============================================
+// MEMBER TABS
+// ============================================
 const MemberTabs = () => {
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const navigation = useNavigation();
   const { showTooltip, dismissTooltip } = useQuickAccessTooltip();
 
+  const handleQuickAction = useCallback((action: string, screen?: string) => {
+    setShowQuickMenu(false);
+    mediumHaptic();
+    
+    if (screen) {
+      // Small delay for smooth modal close animation
+      setTimeout(() => {
+        (navigation as any).navigate(screen);
+      }, 200);
+    }
+  }, [navigation]);
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused }) => {
-            let iconName = '';
-            let iconStyle = focused ? styles.tabIconFocused : styles.tabIcon;
-
-            if (route.name === 'HomeTab') {
-              iconName = '🏠';
-            } else if (route.name === 'Activity') {
-              iconName = '📊';
-            } else if (route.name === 'QuickAction') {
-              return null; // Custom button handled separately
-            } else if (route.name === 'Leaderboard') {
-              iconName = '🏆';
-            } else if (route.name === 'ProfileTab') {
-              iconName = '👤';
-            }
-
-            return (
-              <View style={styles.tabIconContainer}>
-                <Text style={[styles.tabIconText, iconStyle]}>{iconName}</Text>
-                {focused && <View style={styles.tabIndicator} />}
-              </View>
-            );
-          },
-          tabBarActiveTintColor: '#10b981',
-          tabBarInactiveTintColor: '#9ca3af',
-          tabBarStyle: {
-            backgroundColor: '#fff',
-            borderTopWidth: 0,
-            elevation: 20,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 12,
-            paddingBottom: Platform.OS === 'ios' ? 20 : 8,
-            paddingTop: 8,
-            height: Platform.OS === 'ios' ? 85 : 65,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          },
-          tabBarLabelStyle: {
-            fontSize: 11,
-            fontWeight: '600',
-            marginTop: -4,
-          },
+        screenOptions={{
           headerShown: false,
-          tabBarButton: (props) => <TabBarButton {...props} />,
-        })}
+          tabBarShowLabel: false,
+        }}
+        tabBar={(props) => (
+          <CustomTabBar 
+            {...props} 
+            onCenterPress={() => setShowQuickMenu(true)} 
+          />
+        )}
       >
-        <Tab.Screen
-          name="HomeTab"
-          component={HomeStackNavigator}
-          options={{ tabBarLabel: 'Home' }}
-        />
-        <Tab.Screen
-          name="Activity"
-          component={ActivityScreen}
-          options={{ tabBarLabel: 'Activity' }}
-        />
-        <Tab.Screen
-          name="QuickAction"
-          component={View} // Placeholder - never shown
-          options={{
-            tabBarLabel: '',
-            tabBarButton: () => (
-              <CenterTabButton onPress={() => setShowQuickMenu(true)} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Leaderboard"
-          component={LeaderboardScreen}
-          options={{ tabBarLabel: 'Ranks' }}
-        />
-        <Tab.Screen
-          name="ProfileTab"
-          component={ProfileStackNavigator}
-          options={{ tabBarLabel: 'Profile' }}
-        />
+        <Tab.Screen name="HomeTab" component={HomeStackNavigator} />
+        <Tab.Screen name="Activity" component={ActivityScreen} />
+        <Tab.Screen name="QuickAction" component={View} />
+        <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
+        <Tab.Screen name="ProfileTab" component={ProfileStackNavigator} />
       </Tab.Navigator>
 
-      {/* Floating Quick Access Menu */}
-      <FloatingMenu
-        navigation={navigation}
+      {/* Quick Actions Sheet */}
+      <QuickActionsSheet
         visible={showQuickMenu}
         onClose={() => setShowQuickMenu(false)}
+        onActionPress={handleQuickAction}
+        navigation={navigation}
       />
 
       {/* First-time user tooltip */}
@@ -335,6 +635,9 @@ const MemberTabs = () => {
   );
 };
 
+// ============================================
+// MAIN NAVIGATOR
+// ============================================
 const AppNavigator = () => {
   const { user, loading } = useAuth();
 
@@ -343,109 +646,213 @@ const AppNavigator = () => {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator 
+      screenOptions={{ 
+        headerShown: false,
+        ...TransitionPresets.SlideFromRightIOS,
+      }}
+    >
       {user ? (
         user.user_type === 'gym_owner' ? (
-          <Stack.Screen
-            name="GymOwnerDashboard"
-            component={GymOwnerDashboard}
+          <Stack.Screen 
+            name="GymOwnerDashboard" 
+            component={GymOwnerDashboard} 
           />
         ) : (
-          <Stack.Screen name="MemberTabs" component={MemberTabs} />
+          <Stack.Screen 
+            name="MemberTabs" 
+            component={MemberTabs}
+            options={{
+              animationEnabled: false,
+            }}
+          />
         )
       ) : (
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen}
+          options={{
+            cardStyleInterpolator: forFadeWithScale,
+          }}
+        />
       )}
     </Stack.Navigator>
   );
 };
 
+// ============================================
+// STYLES
+// ============================================
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  
+  // Loading Screen
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f9fafb',
+    backgroundColor: COLORS.background,
   },
   loadingContent: {
     alignItems: 'center',
   },
+  loadingRings: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingRing: {
+    position: 'absolute',
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    borderStyle: 'dashed',
+  },
   loadingLogo: {
-    fontSize: 64,
+    fontSize: 72,
     marginBottom: 16,
   },
   loadingTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#10b981',
-    marginBottom: 24,
+    fontSize: 36,
+    fontWeight: '800',
+    color: COLORS.primary,
+    letterSpacing: -1,
+    marginBottom: 4,
   },
-  spinner: {
-    marginBottom: 16,
-  },
-  loadingText: {
+  loadingSubtitle: {
     fontSize: 14,
-    color: '#6b7280',
+    color: COLORS.textSecondary,
+    marginBottom: 32,
   },
-  tabBarButton: {
-    flex: 1,
+  loadingIndicator: {
+    marginTop: 8,
+  },
+  loadingDots: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  tabBarButtonFocused: {
-    transform: [{ scale: 1.05 }],
+  loadingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
+    marginHorizontal: 4,
   },
-  tabIconContainer: {
+
+  // Tab Bar
+  tabBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 16,
+      },
+      android: {
+        elevation: 16,
+      },
+    }),
+  },
+  tabBarContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingTop: 12,
+    paddingHorizontal: 8,
+    height: TAB_BAR_HEIGHT - 20,
+  },
+
+  // Tab Button
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabButtonInner: {
     alignItems: 'center',
   },
-  tabIconText: {
-    fontSize: 22,
-  },
   tabIcon: {
-    opacity: 0.7,
+    fontSize: 24,
+    marginBottom: 4,
+    opacity: 0.6,
   },
   tabIconFocused: {
     opacity: 1,
   },
-  tabIndicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#10b981',
-    marginTop: 4,
+  tabLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.inactive,
+    marginBottom: 4,
   },
-  // Center Quick Action Button Styles
-  centerButtonContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  tabLabelFocused: {
+    color: COLORS.primary,
+  },
+  tabIndicator: {
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: COLORS.primary,
+  },
+
+  // Center Button
+  centerButtonWrapper: {
     alignItems: 'center',
-    marginTop: -25,
+    justifyContent: 'center',
+    marginTop: -30,
+    width: CENTER_BUTTON_SIZE + 20,
+  },
+  centerButtonGlow: {
+    position: 'absolute',
+    width: CENTER_BUTTON_SIZE + 16,
+    height: CENTER_BUTTON_SIZE + 16,
+    borderRadius: (CENTER_BUTTON_SIZE + 16) / 2,
+    backgroundColor: COLORS.primary,
+  },
+  centerButtonTouchable: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#10b981',
+    width: CENTER_BUTTON_SIZE,
+    height: CENTER_BUTTON_SIZE,
+    borderRadius: CENTER_BUTTON_SIZE / 2,
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
   centerButtonInner: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#10b981',
+    width: CENTER_BUTTON_SIZE - 8,
+    height: CENTER_BUTTON_SIZE - 8,
+    borderRadius: (CENTER_BUTTON_SIZE - 8) / 2,
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   centerButtonIcon: {
-    fontSize: 26,
+    fontSize: 28,
   },
 });
 

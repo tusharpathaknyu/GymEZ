@@ -87,10 +87,17 @@ class GoogleAuthService {
         // Fall back to mock for development
         console.log('Play Services not available, using mock authentication');
         return this.mockSignIn();
+      } else if (error.message?.includes('DEVELOPER_ERROR')) {
+        // OAuth configuration error - provide helpful message
+        return {
+          error:
+            'Google Sign-In not configured. Please use email/password to sign in, or set up Google Cloud OAuth credentials.',
+        };
       } else {
-        // For any other error, fall back to mock
-        console.log('Google Sign-In failed, using mock authentication');
-        return this.mockSignIn();
+        // For any other error, provide a clear message
+        return {
+          error: `Sign-in failed: ${error.message || 'Unknown error'}. Please try email/password login.`,
+        };
       }
     }
   }

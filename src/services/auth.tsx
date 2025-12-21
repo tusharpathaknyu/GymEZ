@@ -15,19 +15,24 @@ import {
   isErrorWithCode,
 } from '@react-native-google-signin/google-signin';
 
-// Development flag - set to false when you have a real Google project
-const USE_DEMO_GOOGLE_SIGNIN = false;
+// Development flag - set to true for demo mode (skip real Google auth)
+const USE_DEMO_GOOGLE_SIGNIN = true;
 
-// Configure Google Sign-In only if not in demo mode
-if (!USE_DEMO_GOOGLE_SIGNIN) {
-  GoogleSignin.configure({
-    webClientId:
-      '895230403778-7a4klalvtmjr7iokdqrj17e7pdirli5p.apps.googleusercontent.com', // Web client ID from google-services.json
-    offlineAccess: true,
-    forceCodeForRefreshToken: true,
-    scopes: ['profile', 'email'],
-  });
-}
+// Configure Google Sign-In lazily (not at module load)
+let googleSignInConfigured = false;
+const configureGoogleSignIn = () => {
+  if (!googleSignInConfigured && !USE_DEMO_GOOGLE_SIGNIN) {
+    try {
+      GoogleSignin.configure({
+        webClientId:
+          '86467948830-mso681ekb171rqnmqoqm8bpk80ahbv2l.apps.googleusercontent.com',
+      });
+      googleSignInConfigured = true;
+    } catch (e) {
+      console.warn('Google Sign-In config failed:', e);
+    }
+  }
+};
 
 const AuthContext = createContext<AuthContextType>({
   user: null,

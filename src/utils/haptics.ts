@@ -88,6 +88,13 @@ export const tabChangeHaptic = (): void => {
 };
 
 /**
+ * Medium intensity haptic
+ */
+export const mediumHaptic = (): void => {
+  hapticFeedback('medium');
+};
+
+/**
  * Haptic for completing a set/exercise
  */
 export const setCompleteHaptic = (): void => {
@@ -150,6 +157,7 @@ export default {
   impactHaptic,
   notificationHaptic,
   tabChangeHaptic,
+  mediumHaptic,
   setCompleteHaptic,
   prAchievementHaptic,
   workoutCompleteHaptic,
