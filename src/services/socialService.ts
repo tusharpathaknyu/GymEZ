@@ -59,6 +59,24 @@ export class SocialService {
     offset: number = 0,
   ): Promise<Post[]> {
     try {
+      const followingIds = await this.getFollowingIds(userId);
+      
+      // Build the filter condition based on available data
+      let filterCondition = '';
+      if (followingIds && followingIds.length > 0) {
+        filterCondition = `user_id.in.(${followingIds})`;
+      }
+      if (gymId) {
+        filterCondition = filterCondition 
+          ? `${filterCondition},gym_id.eq.${gymId}`
+          : `gym_id.eq.${gymId}`;
+      }
+      
+      // If no following and no gym, just get the user's own posts or public posts
+      if (!filterCondition) {
+        filterCondition = `user_id.eq.${userId}`;
+      }
+      
       // Get posts from people the user follows + gym posts
       const { data, error } = await supabase
         .from('posts')
@@ -70,11 +88,7 @@ export class SocialService {
           post_comments!left(id)
         `,
         )
-        .or(
-          `user_id.in.(${await this.getFollowingIds(
-            userId,
-          )}),gym_id.eq.${gymId}`,
-        )
+        .or(filterCondition)
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 

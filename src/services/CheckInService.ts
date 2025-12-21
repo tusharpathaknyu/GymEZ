@@ -15,6 +15,7 @@ export const REWARD_TIERS = [
 // Constants
 const GYM_RADIUS_METERS = 100; // Must be within 100m of gym
 const MIN_WORKOUT_DURATION_MINUTES = 30;
+const DEV_MODE_BYPASS_LOCATION = __DEV__; // Bypass location check in development mode
 
 interface GymLocation {
   id: string;
@@ -324,7 +325,8 @@ class CheckInService {
       }
 
       // Verify user is at the gym (if gym has coordinates)
-      if (gym.latitude && gym.longitude) {
+      // DEV MODE: Skip location verification for testing
+      if (!DEV_MODE_BYPASS_LOCATION && gym.latitude && gym.longitude) {
         const isAtGym = this.isWithinGymRadius(
           location.latitude,
           location.longitude,
@@ -333,11 +335,19 @@ class CheckInService {
         );
 
         if (!isAtGym) {
+          const distance = this.calculateDistance(
+            location.latitude,
+            location.longitude,
+            gym.latitude,
+            gym.longitude,
+          );
           return {
             success: false,
-            message: `You need to be at ${gym.name} to check in. Get within 100m of the gym.`,
+            message: `You need to be at ${gym.name} to check in. You're ${Math.round(distance)}m away (need to be within 100m).`,
           };
         }
+      } else if (DEV_MODE_BYPASS_LOCATION) {
+        console.log('DEV MODE: Bypassing location verification');
       }
 
       // Create check-in record
