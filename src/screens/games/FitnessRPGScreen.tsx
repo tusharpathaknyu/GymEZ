@@ -197,6 +197,12 @@ const FitnessRPGScreen = ({ navigation }: { navigation: any }) => {
               chapter.current && styles.chapterCurrent,
             ]}
             disabled={!chapter.completed && !chapter.current}
+            onPress={() => {
+              if (chapter.completed || chapter.current) {
+                buttonPress();
+                navigation.navigate('StoryMode', { chapterId: chapter.id });
+              }
+            }}
           >
             <View style={styles.chapterNumber}>
               <Text style={styles.chapterNumberText}>
@@ -225,7 +231,15 @@ const FitnessRPGScreen = ({ navigation }: { navigation: any }) => {
         ))}
       </View>
 
-      <TouchableOpacity style={styles.continueButton} onPress={() => buttonPress()}>
+      <TouchableOpacity 
+        style={styles.continueButton} 
+        onPress={() => {
+          successHaptic();
+          // Find current chapter and navigate to it
+          const currentChapter = STORY_CHAPTERS.find(c => c.current);
+          navigation.navigate('StoryMode', { chapterId: currentChapter?.id || 3 });
+        }}
+      >
         <Text style={styles.continueButtonText}>Continue Story</Text>
         <Text style={styles.continueButtonIcon}>▶</Text>
       </TouchableOpacity>
@@ -400,6 +414,17 @@ const FitnessRPGScreen = ({ navigation }: { navigation: any }) => {
 
         {/* Quick Actions Grid */}
         <View style={styles.actionsGrid}>
+          <TouchableOpacity 
+            style={[styles.actionCard, { backgroundColor: '#FF456022' }]}
+            onPress={() => {
+              buttonPress();
+              navigation.navigate('CombatArena', { opponentId: 0 });
+            }}
+          >
+            <Text style={styles.actionIcon}>🥊</Text>
+            <Text style={styles.actionTitle}>Battle</Text>
+            <Text style={styles.actionSubtitle}>Quick Fight</Text>
+          </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.actionCard, { backgroundColor: '#e9456022' }]}
             onPress={() => {

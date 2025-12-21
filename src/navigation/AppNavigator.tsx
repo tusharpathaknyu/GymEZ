@@ -50,6 +50,8 @@ import FitnessRPGScreen from '../screens/games/FitnessRPGScreen';
 import GuildScreen from '../screens/games/GuildScreen';
 import BossRaidScreen from '../screens/games/BossRaidScreen';
 import TournamentScreen from '../screens/games/TournamentScreen';
+import StoryModeScreen from '../screens/games/StoryModeScreen';
+import CombatArenaScreen from '../screens/games/CombatArenaScreen';
 
 // Navigation components
 import {
@@ -63,6 +65,7 @@ import { tabChangeHaptic, successHaptic, mediumHaptic } from '../utils/haptics';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
+const GameStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 
 // ============================================
@@ -240,9 +243,9 @@ interface TabConfig {
 
 const TAB_CONFIG: TabConfig[] = [
   { name: 'HomeTab', label: 'Home', icon: '🏠', activeIcon: '🏡' },
-  { name: 'Activity', label: 'Activity', icon: '📊', activeIcon: '📈' },
+  { name: 'GameTab', label: 'Game', icon: '⚔️', activeIcon: '🎮' },
   { name: 'QuickAction', label: '', icon: '➕', activeIcon: '➕' },
-  { name: 'Leaderboard', label: 'Ranks', icon: '🏆', activeIcon: '👑' },
+  { name: 'Activity', label: 'Activity', icon: '📊', activeIcon: '📈' },
   { name: 'ProfileTab', label: 'Profile', icon: '👤', activeIcon: '🙂' },
 ];
 
@@ -577,6 +580,19 @@ const ProfileStackNavigator = () => (
   </ProfileStack.Navigator>
 );
 
+// Game Stack Navigator - Main game hub
+const GameStackNavigator = () => (
+  <GameStack.Navigator screenOptions={defaultScreenOptions}>
+    <GameStack.Screen name="FitnessRPGMain" component={FitnessRPGScreen} />
+    <GameStack.Screen name="StoryMode" component={StoryModeScreen} />
+    <GameStack.Screen name="CombatArena" component={CombatArenaScreen} />
+    <GameStack.Screen name="Guild" component={GuildScreen} />
+    <GameStack.Screen name="BossRaid" component={BossRaidScreen} />
+    <GameStack.Screen name="Tournament" component={TournamentScreen} />
+    <GameStack.Screen name="Leaderboard" component={LeaderboardScreen} />
+  </GameStack.Navigator>
+);
+
 // ============================================
 // MEMBER TABS
 // ============================================
@@ -612,9 +628,9 @@ const MemberTabs = () => {
         )}
       >
         <Tab.Screen name="HomeTab" component={HomeStackNavigator} />
-        <Tab.Screen name="Activity" component={ActivityScreen} />
+        <Tab.Screen name="GameTab" component={GameStackNavigator} />
         <Tab.Screen name="QuickAction" component={View} />
-        <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
+        <Tab.Screen name="Activity" component={ActivityScreen} />
         <Tab.Screen name="ProfileTab" component={ProfileStackNavigator} />
       </Tab.Navigator>
 

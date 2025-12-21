@@ -49,18 +49,24 @@ const GymComparison = () => {
         .eq('user_type', 'gym_member')
         .neq('id', user.id);
 
-      // Get PRs for each member
+      // Get PRs for each member (use created_at instead of achieved_at)
       const membersWithPRs: GymMemberPR[] = await Promise.all(
         (profiles || []).map(async member => {
           const { data: prs } = await supabase
             .from('personal_records')
             .select('*')
             .eq('user_id', member.id)
-            .order('achieved_at', { ascending: false });
+            .order('created_at', { ascending: false });
+
+          // Map created_at to achieved_at for compatibility
+          const mappedPrs = (prs || []).map(pr => ({
+            ...pr,
+            achieved_at: pr.achieved_at || pr.created_at,
+          }));
 
           return {
             user: member as User,
-            prs: (prs as PersonalRecord[]) || [],
+            prs: mappedPrs as PersonalRecord[],
             total_prs: prs?.length || 0,
           };
         }),

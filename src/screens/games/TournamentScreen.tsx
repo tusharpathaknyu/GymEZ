@@ -230,32 +230,13 @@ const TournamentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     if (!currentOpponent) return;
     buttonPress();
     
-    // Simulate battle (random outcome weighted by level difference)
-    const levelDiff = player.level - currentOpponent.level;
-    const winChance = 0.5 + (levelDiff * 0.02);
-    const won = Math.random() < winChance;
-    
-    if (won) {
-      successHaptic();
-      setMatchResult('win');
-      const trophyGain = Math.floor(25 + Math.random() * 20);
-      setPlayer(prev => ({
-        ...prev,
-        trophies: prev.trophies + trophyGain,
-        wins: prev.wins + 1,
-        winStreak: prev.winStreak + 1,
-      }));
-    } else {
-      errorHaptic();
-      setMatchResult('loss');
-      const trophyLoss = Math.floor(15 + Math.random() * 10);
-      setPlayer(prev => ({
-        ...prev,
-        trophies: Math.max(0, prev.trophies - trophyLoss),
-        losses: prev.losses + 1,
-        winStreak: 0,
-      }));
-    }
+    // Close the match modal and navigate to Combat Arena
+    setShowMatchModal(false);
+    const opponentIndex = LEADERBOARD.findIndex(p => p.id === currentOpponent.id);
+    navigation.navigate('CombatArena', { 
+      opponentId: Math.max(0, Math.min(opponentIndex, 4)),
+      opponentName: currentOpponent.name,
+    });
   };
 
   const closeMatch = () => {

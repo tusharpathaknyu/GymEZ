@@ -40,14 +40,13 @@ const WorkoutStreak = () => {
         days.push(date.toISOString().split('T')[0]);
       }
 
+      // Use created_at instead of achieved_at (database column name)
       const { data: prs } = await supabase
         .from('personal_records')
-        .select('achieved_at')
+        .select('created_at')
         .eq('user_id', user.id)
-        .in(
-          'achieved_at',
-          days.map(d => d.split('T')[0]),
-        );
+        .gte('created_at', days[days.length - 1])
+        .lte('created_at', days[0] + 'T23:59:59');
 
       // Calculate current streak
       let currentStreak = 0;
@@ -55,7 +54,7 @@ const WorkoutStreak = () => {
 
       while (true) {
         const dateStr = checkDate.toISOString().split('T')[0];
-        const hasPR = prs?.some(pr => pr.achieved_at.startsWith(dateStr));
+        const hasPR = prs?.some(pr => pr.created_at?.startsWith(dateStr));
 
         if (hasPR) {
           currentStreak++;
@@ -74,7 +73,7 @@ const WorkoutStreak = () => {
         const date = new Date(today);
         date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        const hasPR = prs?.some(pr => pr.achieved_at.startsWith(dateStr));
+        const hasPR = prs?.some(pr => pr.created_at?.startsWith(dateStr));
         weeklyProgress.push(hasPR ? 1 : 0);
       }
 

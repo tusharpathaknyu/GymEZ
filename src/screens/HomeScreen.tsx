@@ -177,21 +177,123 @@ const HomeScreen = ({ navigation }: any) => {
           </View>
         </View>
 
-        {/* Daily Motivational Quote */}
+        {/* 🎮 GAME HERO SECTION - Primary Focus */}
         <FadeInView delay={50}>
-          <View style={styles.quoteCard}>
-            <View style={styles.quoteIconContainer}>
-              <Text style={styles.quoteIcon}>💭</Text>
+          <TouchableOpacity 
+            style={styles.gameHeroCard}
+            onPress={() => navigation.getParent()?.navigate('GameTab')}
+            activeOpacity={0.9}
+          >
+            <View style={styles.gameHeroGradient}>
+              <View style={styles.gameHeroHeader}>
+                <View style={styles.gameHeroTitleRow}>
+                  <Text style={styles.gameHeroIcon}>⚔️</Text>
+                  <View>
+                    <Text style={styles.gameHeroTitle}>Fitness Quest</Text>
+                    <Text style={styles.gameHeroSubtitle}>Your workout RPG adventure awaits!</Text>
+                  </View>
+                </View>
+                <View style={styles.gameHeroLevelBadge}>
+                  <Text style={styles.gameHeroLevelText}>LVL</Text>
+                  <Text style={styles.gameHeroLevelNumber}>7</Text>
+                </View>
+              </View>
+              
+              <View style={styles.gameHeroStats}>
+                <View style={styles.gameHeroStatItem}>
+                  <Text style={styles.gameHeroStatValue}>2,450</Text>
+                  <Text style={styles.gameHeroStatLabel}>XP</Text>
+                </View>
+                <View style={styles.gameHeroStatDivider} />
+                <View style={styles.gameHeroStatItem}>
+                  <Text style={styles.gameHeroStatValue}>5</Text>
+                  <Text style={styles.gameHeroStatLabel}>🔥 Streak</Text>
+                </View>
+                <View style={styles.gameHeroStatDivider} />
+                <View style={styles.gameHeroStatItem}>
+                  <Text style={styles.gameHeroStatValue}>12</Text>
+                  <Text style={styles.gameHeroStatLabel}>Quests</Text>
+                </View>
+              </View>
+
+              <View style={styles.gameHeroProgress}>
+                <View style={styles.gameHeroProgressBar}>
+                  <View style={[styles.gameHeroProgressFill, { width: '65%' }]} />
+                </View>
+                <Text style={styles.gameHeroProgressText}>650/1000 XP to Level 8</Text>
+              </View>
+
+              <View style={styles.gameHeroActions}>
+                <View style={styles.gameHeroPlayButton}>
+                  <Text style={styles.gameHeroPlayText}>🎮 Continue Adventure</Text>
+                </View>
+              </View>
             </View>
+          </TouchableOpacity>
+        </FadeInView>
+
+        {/* Quick Game Actions */}
+        <FadeInView delay={75}>
+          <View style={styles.gameQuickActions}>
+            <TouchableOpacity 
+              style={styles.gameQuickActionCard}
+              onPress={() => navigation.navigate('GymCheckin')}
+            >
+              <View style={[styles.gameQuickIcon, { backgroundColor: '#fef2f2' }]}>
+                <Text style={styles.gameQuickEmoji}>📍</Text>
+              </View>
+              <Text style={styles.gameQuickLabel}>Check In</Text>
+              <Text style={styles.gameQuickXP}>+50 XP</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.gameQuickActionCard}
+              onPress={() => navigation.navigate('Guild')}
+            >
+              <View style={[styles.gameQuickIcon, { backgroundColor: '#f0fdf4' }]}>
+                <Text style={styles.gameQuickEmoji}>⚔️</Text>
+              </View>
+              <Text style={styles.gameQuickLabel}>Guild</Text>
+              <Text style={styles.gameQuickXP}>Raid Active!</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.gameQuickActionCard}
+              onPress={() => navigation.navigate('Tournament')}
+            >
+              <View style={[styles.gameQuickIcon, { backgroundColor: '#fefce8' }]}>
+                <Text style={styles.gameQuickEmoji}>🏆</Text>
+              </View>
+              <Text style={styles.gameQuickLabel}>Tournament</Text>
+              <Text style={styles.gameQuickXP}>Rank #24</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.gameQuickActionCard}
+              onPress={() => navigation.navigate('BossRaid')}
+            >
+              <View style={[styles.gameQuickIcon, { backgroundColor: '#fdf4ff' }]}>
+                <Text style={styles.gameQuickEmoji}>👹</Text>
+              </View>
+              <Text style={styles.gameQuickLabel}>Boss Raid</Text>
+              <Text style={styles.gameQuickXP}>NEW</Text>
+            </TouchableOpacity>
+          </View>
+        </FadeInView>
+
+        {/* Daily Motivational Quote - Compact */}
+        <FadeInView delay={100}>
+          <View style={styles.quoteCardCompact}>
+            <Text style={styles.quoteIcon}>💭</Text>
             <View style={styles.quoteContent}>
-              <Text style={styles.quoteText}>"{dailyQuote.quote}"</Text>
-              <Text style={styles.quoteAuthor}>— {dailyQuote.author}</Text>
+              <Text style={styles.quoteTextCompact}>"{dailyQuote.quote}"</Text>
+              <Text style={styles.quoteAuthorCompact}>— {dailyQuote.author}</Text>
             </View>
           </View>
         </FadeInView>
 
-        {/* Today's Suggested Workout */}
-        <FadeInView delay={75}>
+        {/* Today's Suggested Workout - Moved down */}
+        <FadeInView delay={125}>
           <TouchableOpacity 
             style={[styles.suggestedWorkoutCard, { borderLeftColor: suggestedWorkout.color }]}
             onPress={() => navigation.navigate('LiveWorkout')}
@@ -1031,6 +1133,191 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#4b5563',
     fontWeight: '500',
+  },
+  // Game Hero Styles
+  gameHeroCard: {
+    marginHorizontal: 20,
+    marginTop: 16,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  gameHeroGradient: {
+    backgroundColor: '#1e1b4b',
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#6366f1',
+  },
+  gameHeroHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  gameHeroTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  gameHeroIcon: {
+    fontSize: 40,
+    marginRight: 12,
+  },
+  gameHeroTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  gameHeroSubtitle: {
+    fontSize: 13,
+    color: '#a5b4fc',
+    marginTop: 2,
+  },
+  gameHeroLevelBadge: {
+    backgroundColor: '#fbbf24',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  gameHeroLevelText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#78350f',
+  },
+  gameHeroLevelNumber: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#78350f',
+  },
+  gameHeroStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 12,
+  },
+  gameHeroStatItem: {
+    alignItems: 'center',
+  },
+  gameHeroStatValue: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  gameHeroStatLabel: {
+    fontSize: 12,
+    color: '#a5b4fc',
+    marginTop: 2,
+  },
+  gameHeroStatDivider: {
+    width: 1,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  gameHeroProgress: {
+    marginTop: 16,
+  },
+  gameHeroProgressBar: {
+    height: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  gameHeroProgressFill: {
+    height: '100%',
+    backgroundColor: '#10b981',
+    borderRadius: 4,
+  },
+  gameHeroProgressText: {
+    fontSize: 11,
+    color: '#a5b4fc',
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  gameHeroActions: {
+    marginTop: 16,
+  },
+  gameHeroPlayButton: {
+    backgroundColor: '#6366f1',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  gameHeroPlayText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  // Game Quick Actions
+  gameQuickActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginTop: 16,
+    gap: 10,
+  },
+  gameQuickActionCard: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  gameQuickIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  gameQuickEmoji: {
+    fontSize: 22,
+  },
+  gameQuickLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  gameQuickXP: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#10b981',
+    marginTop: 2,
+  },
+  // Compact Quote Styles
+  quoteCardCompact: {
+    marginHorizontal: 20,
+    marginTop: 16,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  quoteTextCompact: {
+    fontSize: 13,
+    color: '#374151',
+    fontStyle: 'italic',
+    lineHeight: 18,
+  },
+  quoteAuthorCompact: {
+    fontSize: 11,
+    color: '#9ca3af',
+    marginTop: 4,
   },
 });
 

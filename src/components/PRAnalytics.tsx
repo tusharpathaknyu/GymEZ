@@ -26,15 +26,20 @@ const PRAnalytics = () => {
       const stats = await PersonalRecordsService.getUserPRStats(user.id);
       setPrStats(stats);
 
-      // Get recent PRs for the month
+      // Get recent PRs for the month (use created_at instead of achieved_at)
       const { data } = await supabase
         .from('personal_records')
         .select('*')
         .eq('user_id', user.id)
-        .gte('achieved_at', new Date(new Date().setDate(1)).toISOString())
-        .order('achieved_at', { ascending: false });
+        .gte('created_at', new Date(new Date().setDate(1)).toISOString())
+        .order('created_at', { ascending: false });
 
-      setRecentPRs((data as PersonalRecord[]) || []);
+      // Map created_at to achieved_at for compatibility
+      const mappedData = (data || []).map(pr => ({
+        ...pr,
+        achieved_at: pr.achieved_at || pr.created_at,
+      }));
+      setRecentPRs(mappedData as PersonalRecord[]);
     } catch (error) {
       console.error('Error loading analytics:', error);
     }
